@@ -1,20 +1,23 @@
 /**
- * 首页 — 调用后端健康检查 API 展示服务状态
+ * 首页 — 展示服务状态，需登录才能访问
  * GET /api/health → { status, timestamp, uptime }
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import api from '../api/axios';
+import { clearAuth, getUser } from '../utils/auth';
 
 function Home() {
-  const [data, setData] = useState(null);   // API 返回数据
-  const [loading, setLoading] = useState(true); // 加载中
-  const [error, setError] = useState(null);  // 错误信息
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const user = getUser();
 
   useEffect(() => {
-    axios
-      .get('/api/health')
+    api
+      .get('/health')
       .then((res) => {
         setData(res.data);
         setLoading(false);
@@ -25,23 +28,28 @@ function Home() {
       });
   }, []);
 
+  function handleLogout() {
+    clearAuth();
+    navigate('/login');
+  }
+
   return (
     <div className="page">
       <header className="topbar">
         <h1>Memory Vault</h1>
-        <Link to="/login" className="text-btn">退出</Link>
+        <div className="topbar-right">
+          {user && <span className="user-tag">{user.username}</span>}
+          <button onClick={handleLogout} className="text-btn logout-btn">
+            退出
+          </button>
+        </div>
       </header>
 
       <main className="content">
         <h2>Home Page</h2>
 
-        {/* 加载中 */}
         {loading && <p className="status-text">加载中...</p>}
-
-        {/* 请求失败 */}
         {error && <p className="status-text error">请求失败: {error}</p>}
-
-        {/* 请求成功 */}
         {data && (
           <div className="health-card">
             <span className={`dot ${data.status === 'ok' ? 'dot-ok' : 'dot-err'}`} />

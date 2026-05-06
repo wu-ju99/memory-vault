@@ -131,6 +131,26 @@ body {
   color: #1a1a1a;
 }
 
+.logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  margin-left: 16px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-tag {
+  font-size: 13px;
+  color: #888;
+}
+
 /* --- 主内容区 --- */
 
 .content {
@@ -154,11 +174,15 @@ body {
 .status-text {
   font-size: 14px;
   color: #888;
-  margin-top: 12px;
+  margin-bottom: 12px;
 }
 
 .status-text.error {
   color: #d44;
+}
+
+.status-text.success {
+  color: #4caf50;
 }
 
 /* --- 健康状态卡片 --- */

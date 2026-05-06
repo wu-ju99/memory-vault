@@ -1,22 +1,18 @@
 /**
- * 登录页 — 用户名/密码表单
- * 调用 POST /api/auth/login，成功后存 token 并跳转首页
+ * 注册页 — 用户名/密码表单
+ * 调用 POST /api/auth/register，成功后跳转登录页并提示
  */
 
 import { useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
-import { saveAuth } from '../utils/auth';
 
-function Login() {
+function Register() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const successMessage = location.state?.message || '';
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -30,13 +26,12 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await api.post('/auth/login', {
+      await api.post('/auth/register', {
         username: username.trim(),
         password,
       });
 
-      saveAuth(res.data.token, res.data.user);
-      navigate('/');
+      navigate('/login', { state: { message: '注册成功，请登录' } });
     } catch (err) {
       if (err.response && err.response.data) {
         setError(err.response.data.message);
@@ -52,9 +47,8 @@ function Login() {
     <div className="page">
       <form className="card" onSubmit={handleSubmit}>
         <h1>Memory Vault</h1>
-        <p className="subtitle">登录你的私人空间</p>
+        <p className="subtitle">创建你的账号</p>
 
-        {successMessage && <p className="status-text success">{successMessage}</p>}
         {error && <p className="status-text error">{error}</p>}
 
         <label htmlFor="username">用户名</label>
@@ -75,20 +69,20 @@ function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="请输入密码"
-          autoComplete="current-password"
+          autoComplete="new-password"
           required
         />
 
         <button type="submit" disabled={loading}>
-          {loading ? '登录中...' : '登 录'}
+          {loading ? '注册中...' : '注 册'}
         </button>
 
         <p className="hint">
-          没有账号？<Link to="/register">去注册</Link>
+          已有账号？<Link to="/login">去登录</Link>
         </p>
       </form>
     </div>
   );
 }
 
-export default Login;
+export default Register;

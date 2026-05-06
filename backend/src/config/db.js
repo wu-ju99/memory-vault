@@ -9,8 +9,8 @@ const mysql = require('mysql2/promise');
 const dbConfig = {
   host: 'localhost',
   port: 3306,
-  user: 'your_username',
-  password: 'your_password',
+  user: 'root',
+  password: '',
   database: 'memory_vault',
   waitForConnections: true,
   connectionLimit: 10,
