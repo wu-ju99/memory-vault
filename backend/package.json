@@ -1,0 +1,14 @@
+{
+  "name": "memory-vault-backend",
+  "version": "1.0.0",
+  "description": "私人照片/视频分享网站 - 后端服务",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "mysql2": "^3.11.0"
+  }
+}
