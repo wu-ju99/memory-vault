@@ -504,6 +504,101 @@ body {
   background: rgba(220, 50, 50, 0.8);
 }
 
+/* --- 评论 --- */
+
+.comment-toggle {
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: #bbb;
+  cursor: pointer;
+  padding: 2px 10px 4px;
+  font-family: inherit;
+}
+
+.comment-toggle:hover {
+  color: #666;
+}
+
+.comments {
+  padding: 0 10px 8px;
+}
+
+.comment-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.comment-user {
+  color: #444;
+  font-weight: 500;
+}
+
+.comment-content {
+  color: #555;
+  flex: 1;
+  word-break: break-all;
+}
+
+.comment-date {
+  color: #ccc;
+  font-size: 11px;
+}
+
+.comment-del {
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0;
+  line-height: 1;
+}
+
+.comment-del:hover {
+  color: #d44;
+}
+
+.comment-input-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.comment-input {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+}
+
+.comment-input:focus {
+  border-color: #333;
+}
+
+.comment-submit {
+  border: none;
+  border-radius: 4px;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 12px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.comment-submit:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+
 /* --- 状态文字 --- */
 
 .status-text {

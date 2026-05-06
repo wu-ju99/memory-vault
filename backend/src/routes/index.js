@@ -11,6 +11,7 @@ const authRoutes = require('./auth');
 const userRoutes = require('./user');
 const mediaRoutes = require('./media');
 const albumRoutes = require('./album');
+const commentRoutes = require('./comment');
 
 // 挂载健康检查路由（公开）
 router.use(healthRoutes);
@@ -26,5 +27,8 @@ router.use(mediaRoutes);
 
 // 挂载相册路由（受 JWT 保护）
 router.use(albumRoutes);
+
+// 挂载评论路由（受 JWT 保护）
+router.use(commentRoutes);
 
 module.exports = router;

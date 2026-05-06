@@ -1,0 +1,49 @@
+/**
+ * 评论控制器
+ */
+
+const commentService = require('../services/commentService');
+
+// POST /api/comments
+async function create(req, res, next) {
+  try {
+    const { media_id, content } = req.body;
+    if (!media_id) return res.status(400).json({ message: 'media_id 不能为空' });
+    if (!content || !content.trim()) return res.status(400).json({ message: '评论内容不能为空' });
+
+    const result = await commentService.create(req.user.id, media_id, content.trim());
+    res.status(201).json(result);
+  } catch (error) {
+    next(error);
+  }
+}
+
+// GET /api/comments/:mediaId
+async function list(req, res, next) {
+  try {
+    const mediaId = parseInt(req.params.mediaId, 10);
+    const rows = await commentService.getByMedia(mediaId);
+    res.json({ comments: rows });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// DELETE /api/comments/:id
+async function remove(req, res, next) {
+  try {
+    const commentId = parseInt(req.params.id, 10);
+    const [rows] = await require('../config/db').pool.query(
+      'SELECT user_id FROM comments WHERE id = ?', [commentId]
+    );
+    if (rows.length === 0) return res.status(404).json({ message: '评论不存在' });
+    if (rows[0].user_id !== req.user.id) return res.status(403).json({ message: '无权删除' });
+
+    await commentService.deleteById(commentId);
+    res.json({ message: '删除成功' });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { create, list, remove };

@@ -1,15 +1,15 @@
 /**
- * 相册详情页 — 展示该相册内的媒体 + 上传
+ * 相册详情页 — 展示该相册内的媒体 + 上传 + 评论
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import api from '../api/axios';
+import { getUser } from '../utils/auth';
 import BASE_URL from '../config';
 
 function AlbumDetail() {
   const { id } = useParams();
-  const navigate = useNavigate();
 
   const [album, setAlbum] = useState(null);
   const [mediaList, setMediaList] = useState([]);
@@ -26,6 +26,14 @@ function AlbumDetail() {
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState('');
   const [saving, setSaving] = useState(false);
+
+  // 评论
+  const [commentsMap, setCommentsMap] = useState({});
+  const [commentText, setCommentText] = useState({});
+  const [expandedComments, setExpandedComments] = useState({});
+  const [submitting, setSubmitting] = useState({});
+
+  const currentUser = getUser();
 
   const fetchData = useCallback(() => {
     setLoading(true);
@@ -47,6 +55,7 @@ function AlbumDetail() {
   function mediaUrl(path) { return BASE_URL + path; }
   function formatDate(iso) { return iso ? iso.slice(0, 10) : ''; }
 
+  // === 上传 ===
   async function handleUpload(e) {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -76,6 +85,7 @@ function AlbumDetail() {
     }
   }
 
+  // === 删除媒体 ===
   async function handleDelete(item) {
     if (!window.confirm('确定删除吗？')) return;
     try {
@@ -84,6 +94,7 @@ function AlbumDetail() {
     } catch {}
   }
 
+  // === 编辑描述 ===
   function startEdit(item) { setEditingId(item.id); setEditText(item.description || ''); }
   function cancelEdit() { setEditingId(null); setEditText(''); }
   async function saveEdit(mediaId) {
@@ -95,17 +106,56 @@ function AlbumDetail() {
     } catch {} finally { setSaving(false); }
   }
 
+  // === 评论 ===
+  function toggleComments(mediaId) {
+    setExpandedComments((prev) => {
+      const next = { ...prev, [mediaId]: !prev[mediaId] };
+      if (next[mediaId] && !commentsMap[mediaId]) {
+        fetchComments(mediaId);
+      }
+      return next;
+    });
+  }
+
+  async function fetchComments(mediaId) {
+    try {
+      const res = await api.get(`/comments/${mediaId}`);
+      setCommentsMap((prev) => ({ ...prev, [mediaId]: res.data.comments }));
+    } catch {}
+  }
+
+  async function submitComment(mediaId) {
+    const text = (commentText[mediaId] || '').trim();
+    if (!text) return;
+
+    setSubmitting((prev) => ({ ...prev, [mediaId]: true }));
+    try {
+      await api.post('/comments', { media_id: mediaId, content: text });
+      setCommentText((prev) => ({ ...prev, [mediaId]: '' }));
+      fetchComments(mediaId);
+    } catch {} finally {
+      setSubmitting((prev) => ({ ...prev, [mediaId]: false }));
+    }
+  }
+
+  async function deleteComment(commentId, mediaId) {
+    try {
+      await api.delete(`/comments/${commentId}`);
+      fetchComments(mediaId);
+    } catch {}
+  }
+
   if (loading) return <div className="page"><main className="content"><p className="status-text">加载中...</p></main></div>;
   if (!album) return <div className="page"><main className="content"><p className="status-text">相册不存在</p><Link to="/" className="text-btn">← 返回</Link></main></div>;
 
-  // 按类型分组
   const images = mediaList.filter((item) => item.type === 'image');
   const videos = mediaList.filter((item) => item.type === 'video');
 
-  // 渲染单个媒体卡片
   function renderItem(item) {
     const fullUrl = mediaUrl(item.url);
     const isEditing = editingId === item.id;
+    const comments = commentsMap[item.id] || [];
+    const showComments = expandedComments[item.id];
 
     return (
       <div key={item.id} className={`grid-item ${item.type === 'video' ? 'grid-item-video' : ''}`}>
@@ -132,6 +182,44 @@ function AlbumDetail() {
         )}
 
         <p className="grid-date">{formatDate(item.created_at)}</p>
+
+        {/* 评论按钮 */}
+        <button className="comment-toggle" onClick={() => toggleComments(item.id)}>
+          💬 {comments.length || ''}
+        </button>
+
+        {/* 评论区 */}
+        {showComments && (
+          <div className="comments">
+            {comments.map((c) => (
+              <div key={c.id} className="comment-item">
+                <span className="comment-user">{c.username}</span>
+                <span className="comment-content">{c.content}</span>
+                <span className="comment-date">{formatDate(c.created_at)}</span>
+                {c.user_id === currentUser?.id && (
+                  <button className="comment-del" onClick={() => deleteComment(c.id, item.id)}>×</button>
+                )}
+              </div>
+            ))}
+            <div className="comment-input-row">
+              <input
+                className="comment-input"
+                placeholder="写评论..."
+                value={commentText[item.id] || ''}
+                onChange={(e) => setCommentText((prev) => ({ ...prev, [item.id]: e.target.value }))}
+                onKeyDown={(e) => e.key === 'Enter' && submitComment(item.id)}
+              />
+              <button
+                className="comment-submit"
+                disabled={submitting[item.id]}
+                onClick={() => submitComment(item.id)}
+              >
+                发送
+              </button>
+            </div>
+          </div>
+        )}
+
         <button className="del-btn" onClick={() => handleDelete(item)}>×</button>
       </div>
     );
@@ -146,15 +234,8 @@ function AlbumDetail() {
       </header>
 
       <main className="content">
-        {/* 上传 */}
         <div className="upload-section">
-          <textarea
-            className="upload-desc"
-            placeholder="写点回忆..."
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={2}
-          />
+          <textarea className="upload-desc" placeholder="写点回忆..." value={description} onChange={(e) => setDescription(e.target.value)} rows={2} />
           <input ref={fileInputRef} type="file" multiple accept="image/jpeg,image/png,image/webp,video/mp4,video/mov,video/webm" onChange={handleUpload} id="file-upload-detail" className="file-input" />
           <label htmlFor="file-upload-detail" className={`upload-btn ${uploading ? 'disabled' : ''}`}>
             {uploading ? '上传中...' : '上传图片 / 视频'}
@@ -163,28 +244,21 @@ function AlbumDetail() {
           {uploadError && <p className="status-text error">{uploadError}</p>}
         </div>
 
-        {/* 空状态 */}
         {!loading && mediaList.length === 0 && (
           <p className="status-text">暂无内容，上传第一张吧</p>
         )}
 
-        {/* 图片区 */}
         {images.length > 0 && (
           <>
             <h3 className="section-title">📷 图片</h3>
-            <div className="grid">
-              {images.map(renderItem)}
-            </div>
+            <div className="grid">{images.map(renderItem)}</div>
           </>
         )}
 
-        {/* 视频区 */}
         {videos.length > 0 && (
           <>
             <h3 className="section-title">🎬 视频</h3>
-            <div className="grid">
-              {videos.map(renderItem)}
-            </div>
+            <div className="grid">{videos.map(renderItem)}</div>
           </>
         )}
       </main>
