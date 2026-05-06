@@ -1,37 +1,44 @@
 /**
- * 首页 — 展示服务状态，需登录才能访问
- * GET /api/health → { status, timestamp, uptime }
+ * 首页 — 相册列表 + 新建相册
+ * 点击相册进入详情页
  */
 
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
 import { clearAuth, getUser } from '../utils/auth';
+import BASE_URL from '../config';
 
 function Home() {
-  const [data, setData] = useState(null);
+  const [albums, setAlbums] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [newTitle, setNewTitle] = useState('');
+
   const navigate = useNavigate();
   const user = getUser();
 
-  useEffect(() => {
-    api
-      .get('/health')
-      .then((res) => {
-        setData(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+  const fetchAlbums = useCallback(() => {
+    setLoading(true);
+    api.get('/albums')
+      .then((res) => setAlbums(res.data.albums))
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
-  function handleLogout() {
-    clearAuth();
-    navigate('/login');
+  useEffect(() => { fetchAlbums(); }, [fetchAlbums]);
+
+  async function handleCreate() {
+    const title = newTitle.trim();
+    if (!title) return;
+    try {
+      const res = await api.post('/albums', { title });
+      setAlbums((prev) => [res.data, ...prev]);
+      setNewTitle('');
+    } catch {}
   }
+
+  function handleLogout() { clearAuth(); navigate('/login'); }
+  function formatDate(iso) { return iso ? iso.slice(0, 10) : ''; }
 
   return (
     <div className="page">
@@ -39,21 +46,43 @@ function Home() {
         <h1>Memory Vault</h1>
         <div className="topbar-right">
           {user && <span className="user-tag">{user.username}</span>}
-          <button onClick={handleLogout} className="text-btn logout-btn">
-            退出
-          </button>
+          <button onClick={handleLogout} className="text-btn logout-btn">退出</button>
         </div>
       </header>
 
       <main className="content">
-        <h2>Home Page</h2>
+        {/* 新建相册 */}
+        <div className="create-album">
+          <input
+            className="album-input-lg"
+            placeholder="新建相册..."
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+          />
+          <button className="upload-btn" onClick={handleCreate}>创建</button>
+        </div>
 
+        {/* 相册列表 */}
         {loading && <p className="status-text">加载中...</p>}
-        {error && <p className="status-text error">请求失败: {error}</p>}
-        {data && (
-          <div className="health-card">
-            <span className={`dot ${data.status === 'ok' ? 'dot-ok' : 'dot-err'}`} />
-            <span>status: <strong>{data.status}</strong></span>
+
+        {!loading && albums.length === 0 && (
+          <p className="status-text">还没有相册，创建一个吧</p>
+        )}
+
+        {albums.length > 0 && (
+          <div className="album-grid">
+            {albums.map((a) => (
+              <Link key={a.id} to={`/album/${a.id}`} className="album-card">
+                <div className="album-cover">
+                  <span className="album-icon">📷</span>
+                </div>
+                <div className="album-info">
+                  <h3>{a.title}</h3>
+                  <p>{formatDate(a.created_at)}</p>
+                </div>
+              </Link>
+            ))}
           </div>
         )}
       </main>

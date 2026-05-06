@@ -9,6 +9,8 @@ const router = express.Router();
 const healthRoutes = require('./health');
 const authRoutes = require('./auth');
 const userRoutes = require('./user');
+const mediaRoutes = require('./media');
+const albumRoutes = require('./album');
 
 // 挂载健康检查路由（公开）
 router.use(healthRoutes);
@@ -18,5 +20,11 @@ router.use(authRoutes);
 
 // 挂载用户路由（受 JWT 保护）
 router.use(userRoutes);
+
+// 挂载媒体路由（受 JWT 保护）
+router.use(mediaRoutes);
+
+// 挂载相册路由（受 JWT 保护）
+router.use(albumRoutes);
 
 module.exports = router;
