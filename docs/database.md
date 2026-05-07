@@ -57,6 +57,7 @@ media (1) ──< comments (many)   ON DELETE CASCADE
 | type | ENUM('image','video') | NOT NULL | 'image' | 媒体类型 |
 | size | INT UNSIGNED | NOT NULL | 0 | 文件大小（字节） |
 | description | TEXT | NULL | NULL | 媒体描述 |
+| event_time | DATETIME | NULL | NULL | 事件发生时间（用户可选） |
 | created_at | DATETIME | NOT NULL | CURRENT_TIMESTAMP | 上传时间 |
 
 **索引：** PRIMARY KEY (id), KEY idx_user_id (user_id), KEY idx_album_id (album_id), KEY idx_type (type), KEY idx_created_at (created_at)
@@ -74,16 +75,23 @@ media (1) ──< comments (many)   ON DELETE CASCADE
 | id | INT UNSIGNED | PK, AUTO_INCREMENT | — | 主键 |
 | user_id | INT UNSIGNED | NOT NULL, FK→users(id) | — | 评论者 |
 | media_id | INT UNSIGNED | NOT NULL, FK→media(id) | — | 所属媒体 |
+| parent_id | INT UNSIGNED | NULL | NULL | 父评论 ID（NULL=一级评论） |
 | content | TEXT | NOT NULL | — | 评论内容 |
 | created_at | DATETIME | NOT NULL | CURRENT_TIMESTAMP | 评论时间 |
 
-**索引：** PRIMARY KEY (id), KEY idx_media_id (media_id)
+**索引：** PRIMARY KEY (id), KEY idx_media_id (media_id), KEY idx_parent_id (parent_id)
 
 **外键：**
 - fk_comment_user — user_id → users(id) ON DELETE CASCADE
 - fk_comment_media — media_id → media(id) ON DELETE CASCADE
 
 ---
+
+## 共享模式说明
+
+- `media` 和 `albums` 表通过 `user_id` 关联上传者
+- API 查询时通过 `JOIN users` 获取 `username`
+- 前端根据 `user_id` 判断是否显示删除按钮
 
 ## 初始化脚本
 

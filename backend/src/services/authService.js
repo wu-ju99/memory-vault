@@ -13,12 +13,18 @@ const SALT_ROUNDS = 10;
 /**
  * 用户注册
  */
-async function register(username, password) {
+async function register(username, password, confirmPassword) {
   if (!username || username.trim() === '') {
     throw Object.assign(new Error('用户名不能为空'), { status: 400 });
   }
   if (!password || password === '') {
     throw Object.assign(new Error('密码不能为空'), { status: 400 });
+  }
+  if (password.length < 6) {
+    throw Object.assign(new Error('密码长度不能少于 6 位'), { status: 400 });
+  }
+  if (password !== confirmPassword) {
+    throw Object.assign(new Error('两次密码输入不一致'), { status: 400 });
   }
 
   const [rows] = await pool.query(
@@ -82,4 +88,53 @@ async function login(username, password) {
   };
 }
 
-module.exports = { register, login };
+/**
+ * 修改个人信息（用户名 + 密码）
+ * @param {number} userId - 当前用户 ID
+ * @param {string} [username] - 新用户名
+ * @param {string} [password] - 新密码（可选）
+ * @param {string} [confirmPassword] - 确认密码（填写密码时必填）
+ * @returns {object} 更新后的用户信息（不含密码）
+ */
+async function updateProfile(userId, username, password, confirmPassword) {
+  if (!username || username.trim() === '') {
+    throw Object.assign(new Error('用户名不能为空'), { status: 400 });
+  }
+
+  // 检查新用户名是否被其他用户占用
+  const [existing] = await pool.query(
+    'SELECT id FROM users WHERE username = ? AND id != ?',
+    [username.trim(), userId]
+  );
+  if (existing.length > 0) {
+    throw Object.assign(new Error('用户名已被占用'), { status: 409 });
+  }
+
+  if (password) {
+    if (password.length < 6) {
+      throw Object.assign(new Error('密码长度不能少于 6 位'), { status: 400 });
+    }
+    if (password !== confirmPassword) {
+      throw Object.assign(new Error('两次密码输入不一致'), { status: 400 });
+    }
+    const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+    await pool.query(
+      'UPDATE users SET username = ?, password_hash = ? WHERE id = ?',
+      [username.trim(), passwordHash, userId]
+    );
+  } else {
+    await pool.query(
+      'UPDATE users SET username = ? WHERE id = ?',
+      [username.trim(), userId]
+    );
+  }
+
+  const [rows] = await pool.query(
+    'SELECT id, username, role, created_at FROM users WHERE id = ?',
+    [userId]
+  );
+
+  return { user: rows[0] };
+}
+
+module.exports = { register, login, updateProfile };

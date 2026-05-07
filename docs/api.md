@@ -34,14 +34,15 @@ Authorization: Bearer <token>
 
 **请求体：**
 ```json
-{ "username": "string", "password": "string" }
+{ "username": "string", "password": "string", "confirm_password": "string" }
 ```
+> `confirm_password` 必须与 `password` 一致，密码长度 ≥ 6。
 
 **响应：**
 | 状态码 | 响应体 |
 |------|------|
 | 201 | `{ "message": "注册成功" }` |
-| 400 | `{ "message": "用户名不能为空" }` 或 `{ "message": "密码不能为空" }` |
+| 400 | `{ "message": "用户名不能为空" }` 或 `{ "message": "密码不能为空" }` 或 `{ "message": "密码长度不能少于 6 位" }` 或 `{ "message": "两次密码输入不一致" }` |
 | 409 | `{ "message": "用户名已存在" }` |
 
 ---
@@ -60,6 +61,25 @@ Authorization: Bearer <token>
 |------|------|
 | 200 | `{ "token": "eyJ...", "user": { "id": 1, "username": "xxx", "role": "user" } }` |
 | 401 | `{ "message": "用户名或密码错误" }` |
+
+---
+
+### PUT /api/auth/me
+
+修改当前登录用户的个人信息（需认证）。
+
+**请求体：**
+```json
+{ "username": "string", "password": "string?", "confirm_password": "string?" }
+```
+> `password` 和 `confirm_password` 为可选字段。不填则不修改密码；填写时必须一致且长度 ≥ 6。
+
+**响应：**
+| 状态码 | 响应体 |
+|------|------|
+| 200 | `{ "user": { "id": 1, "username": "xxx", "role": "user", "created_at": "..." } }` |
+| 400 | `{ "message": "用户名不能为空" }` 或 `{ "message": "密码长度不能少于 6 位" }` 或 `{ "message": "两次密码输入不一致" }` |
+| 409 | `{ "message": "用户名已被占用" }` |
 
 ---
 
@@ -98,13 +118,13 @@ Authorization: Bearer <token>
 
 ### GET /api/albums
 
-获取当前用户的相册列表（需认证），按创建时间倒序。
+获取所有相册列表（需认证），按创建时间倒序。**共享模式：返回所有用户的相册。**
 
 **响应：**
 ```json
 {
   "albums": [
-    { "id": 1, "title": "2026 春游", "created_at": "2026-05-06T..." }
+    { "id": 1, "user_id": 2, "title": "2026 春游", "username": "logintest", "created_at": "2026-05-06T..." }
   ]
 }
 ```
@@ -125,6 +145,7 @@ Authorization: Bearer <token>
 |------|------|------|------|
 | files | File[] | 是 | 图片或视频文件（最多 10 个） |
 | description | string | 否 | 描述文字 |
+| event_time | string | 否 | 事件发生时间（datetime 格式） |
 | album_id | number | 否 | 归属相册 ID |
 
 **格式限制：**
@@ -146,7 +167,7 @@ Authorization: Bearer <token>
 
 ### GET /api/media
 
-获取当前用户的媒体列表（需认证），按上传时间倒序。
+获取所有用户的媒体列表（需认证），按上传时间倒序。**共享模式：返回所有用户的媒体。**
 
 **查询参数：**
 
@@ -160,12 +181,15 @@ Authorization: Bearer <token>
   "media": [
     {
       "id": 1,
+      "user_id": 2,
+      "username": "logintest",
       "album_id": 1,
       "album_title": "2026 春游",
       "url": "/uploads/uuid.png",
       "type": "image",
       "size": 12345,
       "description": "日落",
+      "event_time": "2025-03-15T08:30:00.000Z",
       "created_at": "2026-05-06T12:00:00.000Z"
     }
   ]
@@ -214,8 +238,9 @@ Authorization: Bearer <token>
 
 **请求体：**
 ```json
-{ "media_id": 1, "content": "好美的照片！" }
+{ "media_id": 1, "content": "好美的照片！", "parent_id": null }
 ```
+> `parent_id` 为可选字段，传入时表示回复某条评论。
 
 **响应：**
 | 状态码 | 响应体 |
@@ -227,7 +252,7 @@ Authorization: Bearer <token>
 
 ### GET /api/comments/:mediaId
 
-获取某个媒体的评论列表（需认证），按时间正序。
+获取某个媒体的评论列表（需认证），**已构建为树形结构（含 replies）**。
 
 **响应：**
 ```json
@@ -236,10 +261,20 @@ Authorization: Bearer <token>
     {
       "id": 1,
       "media_id": 1,
+      "parent_id": null,
       "user_id": 2,
       "username": "logintest",
       "content": "好美的照片！",
-      "created_at": "2026-05-06T12:00:00.000Z"
+      "created_at": "2026-05-06T12:00:00.000Z",
+      "replies": [
+        {
+          "id": 2,
+          "parent_id": 1,
+          "username": "testuser",
+          "content": "谢谢！",
+          "replies": []
+        }
+      ]
     }
   ]
 }
@@ -249,7 +284,7 @@ Authorization: Bearer <token>
 
 ### DELETE /api/comments/:id
 
-删除评论（需认证，仅评论作者）。
+删除评论（需认证，仅评论作者）。**级联删除：同时删除该评论的所有回复。**
 
 **响应：**
 | 状态码 | 响应体 |

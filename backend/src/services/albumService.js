@@ -14,8 +14,7 @@ async function create(userId, title) {
 
 async function getList(userId) {
   const [rows] = await pool.query(
-    'SELECT id, title, created_at FROM albums WHERE user_id = ? ORDER BY created_at DESC',
-    [userId]
+    'SELECT a.id, a.user_id, a.title, a.created_at, u.username FROM albums a JOIN users u ON a.user_id = u.id ORDER BY a.created_at DESC'
   );
   return rows;
 }

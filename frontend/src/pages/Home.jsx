@@ -7,7 +7,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
 import { clearAuth, getUser } from '../utils/auth';
-import BASE_URL from '../config';
 
 function Home() {
   const [albums, setAlbums] = useState([]);
@@ -45,7 +44,7 @@ function Home() {
       <header className="topbar">
         <h1>Memory Vault</h1>
         <div className="topbar-right">
-          {user && <span className="user-tag">{user.username}</span>}
+          {user && <Link to="/profile" className="user-tag">{user.username}</Link>}
           <button onClick={handleLogout} className="text-btn logout-btn">退出</button>
         </div>
       </header>
@@ -80,6 +79,7 @@ function Home() {
                 <div className="album-info">
                   <h3>{a.title}</h3>
                   <p>{formatDate(a.created_at)}</p>
+                  {a.username && <p className="album-owner">{a.username}</p>}
                 </div>
               </Link>
             ))}

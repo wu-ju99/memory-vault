@@ -20,6 +20,7 @@ function AlbumDetail() {
   const [uploadMessage, setUploadMessage] = useState('');
   const [uploadError, setUploadError] = useState('');
   const [description, setDescription] = useState('');
+  const [eventTime, setEventTime] = useState('');
   const fileInputRef = useRef(null);
 
   // 编辑描述
@@ -27,11 +28,15 @@ function AlbumDetail() {
   const [editText, setEditText] = useState('');
   const [saving, setSaving] = useState(false);
 
+  // 视图模式
+  const [viewMode, setViewMode] = useState('grid');
+
   // 评论
   const [commentsMap, setCommentsMap] = useState({});
   const [commentText, setCommentText] = useState({});
   const [expandedComments, setExpandedComments] = useState({});
   const [submitting, setSubmitting] = useState({});
+  const [replyTo, setReplyTo] = useState({});
 
   const currentUser = getUser();
 
@@ -55,6 +60,18 @@ function AlbumDetail() {
   function mediaUrl(path) { return BASE_URL + path; }
   function formatDate(iso) { return iso ? iso.slice(0, 10) : ''; }
 
+  // 按日期分组（优先 event_time，fallback created_at）
+  function groupByDate(list) {
+    const groups = {};
+    list.forEach((item) => {
+      const time = item.event_time || item.created_at;
+      const date = new Date(time).toISOString().split('T')[0];
+      if (!groups[date]) groups[date] = { images: [], videos: [] };
+      groups[date][item.type === 'video' ? 'videos' : 'images'].push(item);
+    });
+    return Object.entries(groups).sort(([a], [b]) => new Date(b) - new Date(a));
+  }
+
   // === 上传 ===
   async function handleUpload(e) {
     const files = e.target.files;
@@ -68,6 +85,7 @@ function AlbumDetail() {
       const formData = new FormData();
       for (let i = 0; i < files.length; i++) formData.append('files', files[i]);
       if (description.trim()) formData.append('description', description.trim());
+      if (eventTime) formData.append('event_time', eventTime);
       formData.append('album_id', id);
 
       const res = await api.post('/media/upload', formData, {
@@ -76,6 +94,7 @@ function AlbumDetail() {
 
       setUploadMessage(`上传完成: ${res.data.count} 个文件`);
       setDescription('');
+      setEventTime('');
       fetchData();
     } catch (err) {
       setUploadError(err.response?.data?.message || '上传失败');
@@ -124,17 +143,23 @@ function AlbumDetail() {
     } catch {}
   }
 
-  async function submitComment(mediaId) {
-    const text = (commentText[mediaId] || '').trim();
+  async function submitComment(mediaId, parentId) {
+    const key = parentId ? `reply_${parentId}` : mediaId;
+    const text = (commentText[key] || '').trim();
     if (!text) return;
 
-    setSubmitting((prev) => ({ ...prev, [mediaId]: true }));
+    setSubmitting((prev) => ({ ...prev, [key]: true }));
     try {
-      await api.post('/comments', { media_id: mediaId, content: text });
-      setCommentText((prev) => ({ ...prev, [mediaId]: '' }));
+      await api.post('/comments', {
+        media_id: mediaId,
+        content: text,
+        parent_id: parentId || undefined,
+      });
+      setCommentText((prev) => ({ ...prev, [key]: '' }));
+      setReplyTo((prev) => ({ ...prev, [mediaId]: null }));
       fetchComments(mediaId);
     } catch {} finally {
-      setSubmitting((prev) => ({ ...prev, [mediaId]: false }));
+      setSubmitting((prev) => ({ ...prev, [key]: false }));
     }
   }
 
@@ -150,6 +175,46 @@ function AlbumDetail() {
 
   const images = mediaList.filter((item) => item.type === 'image');
   const videos = mediaList.filter((item) => item.type === 'video');
+
+  // 递归渲染评论（支持二级嵌套）
+  function renderComment(comment, mediaId, depth) {
+    const repKey = `reply_${comment.id}`;
+
+    return (
+      <div key={comment.id} className={`comment-item ${depth > 0 ? 'comment-nested' : ''}`}>
+        <div className="comment-main">
+          <span className="comment-user">{comment.username}</span>
+          <span className="comment-content">{comment.content}</span>
+          <span className="comment-date">{formatDate(comment.created_at)}</span>
+          <button className="comment-reply-btn" onClick={() => setReplyTo((prev) => ({ ...prev, [mediaId]: prev?.[mediaId] === comment.id ? null : comment.id }))}>
+            {replyTo[mediaId] === comment.id ? '取消' : '回复'}
+          </button>
+          {comment.user_id === currentUser?.id && (
+            <button className="comment-del" onClick={() => deleteComment(comment.id, mediaId)}>×</button>
+          )}
+        </div>
+
+        {replyTo[mediaId] === comment.id && (
+          <div className="comment-input-row comment-reply-row">
+            <input
+              className="comment-input"
+              placeholder={`回复 ${comment.username}...`}
+              value={commentText[repKey] || ''}
+              onChange={(e) => setCommentText((prev) => ({ ...prev, [repKey]: e.target.value }))}
+              onKeyDown={(e) => e.key === 'Enter' && submitComment(mediaId, comment.id)}
+            />
+            <button className="comment-submit" disabled={submitting[repKey]} onClick={() => submitComment(mediaId, comment.id)}>发送</button>
+          </div>
+        )}
+
+        {comment.replies?.length > 0 && (
+          <div className="comment-replies">
+            {comment.replies.map((r) => renderComment(r, mediaId, depth + 1))}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   function renderItem(item) {
     const fullUrl = mediaUrl(item.url);
@@ -181,7 +246,10 @@ function AlbumDetail() {
           </div>
         )}
 
-        <p className="grid-date">{formatDate(item.created_at)}</p>
+        <p className="grid-date">
+          {item.event_time ? `📷 ${formatDate(item.event_time)}` : `📅 ${formatDate(item.created_at)}`}
+        </p>
+        {item.username && <p className="media-user">{item.username}</p>}
 
         {/* 评论按钮 */}
         <button className="comment-toggle" onClick={() => toggleComments(item.id)}>
@@ -191,36 +259,26 @@ function AlbumDetail() {
         {/* 评论区 */}
         {showComments && (
           <div className="comments">
-            {comments.map((c) => (
-              <div key={c.id} className="comment-item">
-                <span className="comment-user">{c.username}</span>
-                <span className="comment-content">{c.content}</span>
-                <span className="comment-date">{formatDate(c.created_at)}</span>
-                {c.user_id === currentUser?.id && (
-                  <button className="comment-del" onClick={() => deleteComment(c.id, item.id)}>×</button>
-                )}
+            {comments.length === 0 && <p className="comment-empty">暂无评论</p>}
+            {comments.map((c) => renderComment(c, item.id, 0))}
+            {!replyTo[item.id] && (
+              <div className="comment-input-row">
+                <input
+                  className="comment-input"
+                  placeholder="写评论..."
+                  value={commentText[item.id] || ''}
+                  onChange={(e) => setCommentText((prev) => ({ ...prev, [item.id]: e.target.value }))}
+                  onKeyDown={(e) => e.key === 'Enter' && submitComment(item.id)}
+                />
+                <button className="comment-submit" disabled={submitting[item.id]} onClick={() => submitComment(item.id)}>发送</button>
               </div>
-            ))}
-            <div className="comment-input-row">
-              <input
-                className="comment-input"
-                placeholder="写评论..."
-                value={commentText[item.id] || ''}
-                onChange={(e) => setCommentText((prev) => ({ ...prev, [item.id]: e.target.value }))}
-                onKeyDown={(e) => e.key === 'Enter' && submitComment(item.id)}
-              />
-              <button
-                className="comment-submit"
-                disabled={submitting[item.id]}
-                onClick={() => submitComment(item.id)}
-              >
-                发送
-              </button>
-            </div>
+            )}
           </div>
         )}
 
-        <button className="del-btn" onClick={() => handleDelete(item)}>×</button>
+        {item.user_id === currentUser?.id && (
+          <button className="del-btn" onClick={() => handleDelete(item)}>×</button>
+        )}
       </div>
     );
   }
@@ -236,6 +294,7 @@ function AlbumDetail() {
       <main className="content">
         <div className="upload-section">
           <textarea className="upload-desc" placeholder="写点回忆..." value={description} onChange={(e) => setDescription(e.target.value)} rows={2} />
+          <input className="upload-event" type="datetime-local" value={eventTime} onChange={(e) => setEventTime(e.target.value)} />
           <input ref={fileInputRef} type="file" multiple accept="image/jpeg,image/png,image/webp,video/mp4,video/mov,video/webm" onChange={handleUpload} id="file-upload-detail" className="file-input" />
           <label htmlFor="file-upload-detail" className={`upload-btn ${uploading ? 'disabled' : ''}`}>
             {uploading ? '上传中...' : '上传图片 / 视频'}
@@ -248,18 +307,59 @@ function AlbumDetail() {
           <p className="status-text">暂无内容，上传第一张吧</p>
         )}
 
-        {images.length > 0 && (
+        {/* 视图切换 */}
+        {mediaList.length > 0 && (
+          <div className="view-toggle">
+            <button
+              className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
+              onClick={() => setViewMode('grid')}
+            >▦ 网格</button>
+            <button
+              className={`view-btn ${viewMode === 'timeline' ? 'active' : ''}`}
+              onClick={() => setViewMode('timeline')}
+            >⏱ 时间轴</button>
+          </div>
+        )}
+
+        {/* 网格视图 */}
+        {viewMode === 'grid' && (
           <>
-            <h3 className="section-title">📷 图片</h3>
-            <div className="grid">{images.map(renderItem)}</div>
+            {images.length > 0 && (
+              <>
+                <h3 className="section-title">📷 图片</h3>
+                <div className="grid">{images.map(renderItem)}</div>
+              </>
+            )}
+            {videos.length > 0 && (
+              <>
+                <h3 className="section-title">🎬 视频</h3>
+                <div className="grid">{videos.map(renderItem)}</div>
+              </>
+            )}
           </>
         )}
 
-        {videos.length > 0 && (
-          <>
-            <h3 className="section-title">🎬 视频</h3>
-            <div className="grid">{videos.map(renderItem)}</div>
-          </>
+        {/* 时间轴视图 */}
+        {viewMode === 'timeline' && (
+          <div className="timeline">
+            {groupByDate(mediaList).map(([date, items]) => (
+              <div key={date} className="timeline-group">
+                <h3 className="timeline-date">{date}</h3>
+                {items.images.length > 0 && (
+                  <>
+                    <h4 className="section-subtitle">📷 图片</h4>
+                    <div className="grid">{items.images.map(renderItem)}</div>
+                  </>
+                )}
+                {items.videos.length > 0 && (
+                  <>
+                    <h4 className="section-subtitle">🎬 视频</h4>
+                    <div className="grid">{items.videos.map(renderItem)}</div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
         )}
       </main>
     </div>

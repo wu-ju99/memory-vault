@@ -646,3 +646,182 @@ body {
 .dot-err {
   background: #f44336;
 }
+
+/* --- 上传者标签 --- */
+
+.media-user {
+  font-size: 11px;
+  color: #bbb;
+  padding: 0 10px 2px;
+}
+
+.album-owner {
+  font-size: 11px;
+  color: #bbb;
+  margin-top: 2px;
+}
+
+/* --- 用户标签链接 --- */
+
+.user-tag {
+  font-size: 13px;
+  color: #888;
+  text-decoration: none;
+}
+
+.user-tag:hover {
+  color: #333;
+}
+
+/* --- 视图切换 --- */
+
+.view-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  width: 100%;
+  max-width: 960px;
+}
+
+.view-btn {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  color: #888;
+  transition: all 0.15s;
+}
+
+.view-btn.active {
+  border-color: #333;
+  color: #333;
+  font-weight: 500;
+}
+
+.view-btn:hover {
+  border-color: #999;
+}
+
+/* --- 分区标题 --- */
+
+.section-title {
+  margin: 24px 0 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  width: 100%;
+  max-width: 960px;
+}
+
+.section-subtitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: #888;
+  margin: 0 0 8px;
+  width: 100%;
+  max-width: 960px;
+}
+
+/* --- 时间轴 --- */
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 960px;
+}
+
+.timeline-group {
+  border-top: 1px solid #eee;
+  padding-top: 12px;
+}
+
+.timeline-date {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+/* --- 事件时间 --- */
+
+.upload-event {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  margin-bottom: 12px;
+  color: #666;
+}
+
+.upload-event:focus {
+  border-color: #333;
+}
+
+/* --- 评论增强 --- */
+
+.comment-main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 6px;
+  align-items: baseline;
+  margin-bottom: 2px;
+}
+
+.comment-reply-btn {
+  background: none;
+  border: none;
+  color: #bbb;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+
+.comment-reply-btn:hover {
+  color: #555;
+}
+
+.comment-replies {
+  margin-left: 16px;
+  border-left: 2px solid #eee;
+  padding-left: 8px;
+}
+
+.comment-nested {
+  margin-bottom: 0;
+}
+
+.comment-reply-row {
+  margin-left: 0;
+  margin-top: 2px;
+}
+
+.comment-empty {
+  font-size: 12px;
+  color: #ccc;
+  padding: 4px 0;
+}
+
+/* --- 状态文字 --- */
+
+.status-text {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 12px;
+}
+
+.status-text.error {
+  color: #d44;
+}
+
+.status-text.success {
+  color: #4caf50;
+}

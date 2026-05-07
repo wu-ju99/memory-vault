@@ -29,6 +29,7 @@ async function upload(req, res, next) {
 
     const description = req.body.description || '';
     const albumId = req.body.album_id ? parseInt(req.body.album_id, 10) || null : null;
+    const eventTime = req.body.event_time || null;
     const results = [];
 
     for (const file of files) {
@@ -45,7 +46,8 @@ async function upload(req, res, next) {
         type,
         file.size,
         description,
-        albumId
+        albumId,
+        eventTime
       );
       results.push(result);
     }
