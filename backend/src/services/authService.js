@@ -52,7 +52,7 @@ async function register(username, password, confirmPassword) {
 async function login(username, password) {
   // 查询用户
   const [rows] = await pool.query(
-    'SELECT id, username, password_hash, role FROM users WHERE username = ?',
+    'SELECT id, username, nickname, avatar, password_hash, role FROM users WHERE username = ?',
     [username]
   );
 
@@ -83,6 +83,8 @@ async function login(username, password) {
     user: {
       id: user.id,
       username: user.username,
+      nickname: user.nickname,
+      avatar: user.avatar,
       role: user.role,
     },
   };
@@ -130,7 +132,7 @@ async function updateProfile(userId, username, password, confirmPassword) {
   }
 
   const [rows] = await pool.query(
-    'SELECT id, username, role, created_at FROM users WHERE id = ?',
+    'SELECT id, username, nickname, avatar, role, created_at FROM users WHERE id = ?',
     [userId]
   );
 

@@ -1,5 +1,41 @@
 # 功能更新日志
 
+## 2026-05-07（夜晚）
+
+### 重构
+- **组件化拆分** — 从页面中提取 7 个独立组件，props 清晰，职责单一
+
+| 新建文件 | 来源 | 说明 |
+|----------|------|------|
+| `components/AlbumCard.jsx` | Home.jsx | 相册卡片 |
+| `components/AvatarUploader.jsx` | Profile.jsx | 头像上传 |
+| `components/NicknameEditor.jsx` | Profile.jsx | 昵称编辑 |
+| `components/MediaCard.jsx` | AlbumDetail.jsx | 媒体卡片（children 注入评论） |
+| `components/CommentList.jsx` | AlbumDetail.jsx | 自包含评论组件，独立管理状态和 API |
+| `components/SearchBar.jsx` | 通用 | 搜索栏（预留） |
+
+- **AlbumDetail.jsx** — 从 370 行精简至 215 行，移除评论状态（commentsMap/commentText/submitting/replyTo 等），通过 MediaCard + CommentList 组合
+- **Profile.jsx** — 从 252 行精简至 122 行，头像/昵称逻辑提取到独立组件
+- **Home.jsx** — 使用 AlbumCard 组件渲染列表
+
+---
+
+## 2026-05-07（傍晚）
+
+### 新增
+- **用户资料完善** — 头像上传（jpg/png/webp，≤2MB）、昵称编辑、密码修改（旧密码验证 + 新密码确认）
+- **PUT /api/user/update-profile** — 新增接口，支持 multipart 上传头像 + 表单字段混合提交
+- **数据库扩展** — users 表新增 `nickname`、`avatar` 列
+
+### 变更
+- `userService.js` — 新增 `updateProfile` 方法，独立处理昵称/头像/密码更新
+- `userController.js` — 新增 avatarUpload multer 中间件（uploads/avatars/ 目录，UUID 命名）
+- `Profile.jsx` — 重写：头像区域（点击更换 + hover 遮罩）、昵称输入行、密码独立区域
+- `authService.js` — login/updateProfile 返回 nickname + avatar
+- `index.css` — 新增 `.profile-*` 系列样式
+
+---
+
 ## 2026-05-07（下午）
 
 ### 新增

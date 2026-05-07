@@ -1,12 +1,12 @@
 /**
  * 首页 — 相册列表 + 新建相册
- * 点击相册进入详情页
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
 import { clearAuth, getUser } from '../utils/auth';
+import AlbumCard from '../components/AlbumCard';
 
 function Home() {
   const [albums, setAlbums] = useState([]);
@@ -37,7 +37,6 @@ function Home() {
   }
 
   function handleLogout() { clearAuth(); navigate('/login'); }
-  function formatDate(iso) { return iso ? iso.slice(0, 10) : ''; }
 
   return (
     <div className="page">
@@ -50,7 +49,6 @@ function Home() {
       </header>
 
       <main className="content">
-        {/* 新建相册 */}
         <div className="create-album">
           <input
             className="album-input-lg"
@@ -62,7 +60,6 @@ function Home() {
           <button className="upload-btn" onClick={handleCreate}>创建</button>
         </div>
 
-        {/* 相册列表 */}
         {loading && <p className="status-text">加载中...</p>}
 
         {!loading && albums.length === 0 && (
@@ -72,16 +69,7 @@ function Home() {
         {albums.length > 0 && (
           <div className="album-grid">
             {albums.map((a) => (
-              <Link key={a.id} to={`/album/${a.id}`} className="album-card">
-                <div className="album-cover">
-                  <span className="album-icon">📷</span>
-                </div>
-                <div className="album-info">
-                  <h3>{a.title}</h3>
-                  <p>{formatDate(a.created_at)}</p>
-                  {a.username && <p className="album-owner">{a.username}</p>}
-                </div>
-              </Link>
+              <AlbumCard key={a.id} album={a} />
             ))}
           </div>
         )}

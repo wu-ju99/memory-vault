@@ -11,6 +11,7 @@
 | 路由保护 | 前端 ProtectedRoute + 后端 auth 中间件 | 完成 |
 | 登出 | 清除 localStorage token → 跳转登录页 | 完成 |
 | 修改个人信息 | 修改用户名和密码（PUT /api/auth/me），仅可修改自己 | 完成 |
+| 用户资料完善 | 修改昵称、上传头像、修改密码（旧密码验证），PUT /api/user/update-profile | 完成 |
 
 ## 2. 相册系统
 
@@ -88,3 +89,15 @@
 | 路由守卫 | ProtectedRoute 组件，无 token 跳转 /login | 完成 |
 | BASE_URL 配置 | 全局配置文件，部署时改一行 | 完成 |
 | 极简 UI | 黑白灰风格，无 UI 框架依赖 | 完成 |
+
+## 10. 组件化拆分
+
+| 组件 | 路径 | 说明 | 状态 |
+|------|------|------|------|
+| AlbumCard | components/AlbumCard.jsx | 相册列表卡片，纯展示组件 | 完成 |
+| AvatarUploader | components/AvatarUploader.jsx | 头像上传+预览，自包含状态 | 完成 |
+| NicknameEditor | components/NicknameEditor.jsx | 昵称编辑+保存，自包含状态 | 完成 |
+| MediaCard | components/MediaCard.jsx | 单条媒体卡片（图片/视频/描述/删除），children 注入评论区 | 完成 |
+| CommentList | components/CommentList.jsx | 自包含评论（列表/回复/输入），内部管理 API 调用 | 完成 |
+| SearchBar | components/SearchBar.jsx | 通用搜索栏，deounce 300ms，Enter/搜索/清除 | 完成 |
+| ProtectedRoute | components/ProtectedRoute.jsx | 路由守卫，未登录跳转 /login | 完成 |

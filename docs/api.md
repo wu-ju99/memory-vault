@@ -92,7 +92,34 @@ Authorization: Bearer <token>
 **响应：**
 | 状态码 | 响应体 |
 |------|------|
-| 200 | `{ "user": { "id": 1, "username": "xxx", "role": "user", "created_at": "..." } }` |
+| 200 | `{ "user": { "id": 1, "username": "xxx", "nickname": "...", "avatar": "/uploads/avatars/...", "role": "user", "created_at": "..." } }` |
+| 401 | `{ "message": "未提供认证令牌" }` |
+
+---
+
+### PUT /api/user/update-profile
+
+修改当前用户资料 — 昵称、头像、密码（需认证）。
+
+**请求格式：** `multipart/form-data`
+
+**参数：**
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| nickname | string | 否 | 新昵称 |
+| avatar | file | 否 | 头像图片（jpg/png/webp，≤2MB） |
+| oldPassword | string | 条件 | 修改密码时必填，当前密码 |
+| newPassword | string | 条件 | 修改密码时必填，新密码（≥6 位） |
+| confirmPassword | string | 条件 | 修改密码时必填，与新密码一致 |
+
+> 昵称、头像、密码可独立操作，互不影响。密码修改需验证旧密码。
+
+**响应：**
+| 状态码 | 响应体 |
+|------|------|
+| 200 | `{ "user": { "id": 1, "username": "xxx", "nickname": "...", "avatar": "...", "role": "user", "created_at": "..." } }` |
+| 400 | `{ "message": "请输入旧密码" }` 或 `{ "message": "旧密码不正确" }` 或 `{ "message": "头像文件不能超过 2MB" }` |
 | 401 | `{ "message": "未提供认证令牌" }` |
 
 ---

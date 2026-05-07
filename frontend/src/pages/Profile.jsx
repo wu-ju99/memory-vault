@@ -1,69 +1,54 @@
 /**
- * 个人信息页 — 修改用户名和密码
- * 调用 PUT /api/auth/me
+ * 个人信息页 — 头像、昵称、密码修改
  */
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { getUser, saveAuth, clearAuth } from '../utils/auth';
+import BASE_URL from '../config';
+import AvatarUploader from '../components/AvatarUploader';
+import NicknameEditor from '../components/NicknameEditor';
 
 function Profile() {
   const user = getUser();
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState(user?.username || '');
-  const [password, setPassword] = useState('');
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [pwdMsg, setPwdMsg] = useState('');
+  const [pwdErr, setPwdErr] = useState('');
+  const [savingPwd, setSavingPwd] = useState(false);
 
-  async function handleSubmit(e) {
+  function refreshUser(updated) {
+    const token = localStorage.getItem('token');
+    saveAuth(token, updated);
+  }
+
+  async function savePassword(e) {
     e.preventDefault();
-    setError('');
-    setSuccess('');
-
-    if (!username.trim()) {
-      setError('用户名不能为空');
-      return;
-    }
-
-    if (password) {
-      if (password.length < 6) {
-        setError('密码长度不能少于 6 位');
-        return;
-      }
-      if (password !== confirmPassword) {
-        setError('两次密码输入不一致');
-        return;
-      }
-    }
-
-    setLoading(true);
-
+    setPwdMsg('');
+    setPwdErr('');
+    if (!oldPassword) { setPwdErr('请输入旧密码'); return; }
+    if (!newPassword) { setPwdErr('请输入新密码'); return; }
+    if (newPassword.length < 6) { setPwdErr('新密码长度不能少于 6 位'); return; }
+    if (newPassword !== confirmPassword) { setPwdErr('两次新密码输入不一致'); return; }
+    setSavingPwd(true);
     try {
-      const res = await api.put('/auth/me', {
-        username: username.trim(),
-        password: password || undefined,
-        confirm_password: confirmPassword || undefined,
-      });
-
-      // 更新 localStorage 中的用户信息
-      const token = localStorage.getItem('token');
-      saveAuth(token, res.data.user);
-
-      setSuccess('个人信息已更新');
-      setPassword('');
+      const formData = new FormData();
+      formData.append('oldPassword', oldPassword);
+      formData.append('newPassword', newPassword);
+      formData.append('confirmPassword', confirmPassword);
+      await api.put('/user/update-profile', formData);
+      setPwdMsg('密码已更新');
+      setOldPassword('');
+      setNewPassword('');
       setConfirmPassword('');
     } catch (err) {
-      if (err.response && err.response.data) {
-        setError(err.response.data.message);
-      } else {
-        setError('网络错误，请确认后端已启动');
-      }
+      setPwdErr(err.response?.data?.message || '更新失败');
     } finally {
-      setLoading(false);
+      setSavingPwd(false);
     }
   }
 
@@ -71,6 +56,8 @@ function Profile() {
     clearAuth();
     navigate('/login');
   }
+
+  const currentAvatarUrl = user?.avatar ? BASE_URL + user.avatar : null;
 
   return (
     <div className="page">
@@ -85,54 +72,39 @@ function Profile() {
       </header>
 
       <main className="content">
-        <form className="card" onSubmit={handleSubmit}>
-          <h1>个人信息</h1>
-          <p className="subtitle">修改你的用户名或密码</p>
+        <div className="profile-card">
 
-          {error && <p className="status-text error">{error}</p>}
-          {success && <p className="status-text success">{success}</p>}
+          <AvatarUploader currentAvatarUrl={currentAvatarUrl} onAvatarSaved={refreshUser} />
 
-          <label htmlFor="username">用户名</label>
-          <input
-            id="username"
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="请输入新用户名"
-            autoComplete="username"
-            required
-          />
+          <div className="profile-section">
+            <p className="profile-username">@{user?.username}</p>
+            <NicknameEditor initialNickname={user?.nickname} onNicknameSaved={refreshUser} />
+          </div>
 
-          <label htmlFor="password">新密码（留空则不修改）</label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="至少 6 位新密码"
-            autoComplete="new-password"
-          />
+          <div className="profile-section">
+            <h3 className="profile-section-title">修改密码</h3>
+            <form onSubmit={savePassword}>
+              <label htmlFor="oldPassword">旧密码</label>
+              <input id="oldPassword" type="password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} placeholder="输入当前密码" autoComplete="current-password" />
 
-          <label htmlFor="confirmPassword">确认新密码</label>
-          <input
-            id="confirmPassword"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="再次输入新密码"
-            autoComplete="new-password"
-          />
+              <label htmlFor="newPassword">新密码</label>
+              <input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="至少 6 位新密码" autoComplete="new-password" />
 
-          <button type="submit" disabled={loading}>
-            {loading ? '保存中...' : '保 存'}
-          </button>
+              <label htmlFor="confirmPassword">确认新密码</label>
+              <input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="再次输入新密码" autoComplete="new-password" />
+
+              <button type="submit" disabled={savingPwd} className="save-btn-full">
+                {savingPwd ? '修改中...' : '修改密码'}
+              </button>
+              {pwdMsg && <p className="status-text success">{pwdMsg}</p>}
+              {pwdErr && <p className="status-text error">{pwdErr}</p>}
+            </form>
+          </div>
 
           <p className="hint">
-            <a href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }}>
-              返回首页
-            </a>
+            <a href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }}>返回首页</a>
           </p>
-        </form>
+        </div>
       </main>
     </div>
   );
