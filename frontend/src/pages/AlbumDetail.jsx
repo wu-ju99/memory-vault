@@ -139,7 +139,7 @@ function AlbumDetail() {
         onCancelEdit={cancelEdit}
         onDelete={canDelete ? handleDelete : null}
       >
-        <CommentList mediaId={item.id} currentUserId={currentUser?.id} />
+        <CommentList mediaId={item.id} currentUserId={currentUser?.id} currentUserRole={currentUser?.role} />
       </MediaCard>
     );
   }

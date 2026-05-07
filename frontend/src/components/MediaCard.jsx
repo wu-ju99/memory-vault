@@ -52,7 +52,12 @@ function MediaCard({ item, editingId, editText, saving, onStartEdit, onEditTextC
       <p className="grid-date">
         {item.event_time ? `📷 ${formatDate(item.event_time)}` : `📅 ${formatDate(item.created_at)}`}
       </p>
-      {item.username && <p className="media-user">{item.username}</p>}
+      {item.username && (
+        <p className="media-user">
+          {item.username}
+          {item.role === 'admin' && <span className="admin-badge">管理员</span>}
+        </p>
+      )}
 
       {children}
 

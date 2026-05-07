@@ -963,6 +963,20 @@ body {
   cursor: not-allowed;
 }
 
+/* --- 管理员标签 --- */
+
+.admin-badge {
+  display: inline-block;
+  font-size: 10px;
+  color: #d44;
+  border: 1px solid #d44;
+  border-radius: 3px;
+  padding: 0 4px;
+  margin-left: 4px;
+  vertical-align: middle;
+  line-height: 1.4;
+}
+
 /* --- 状态文字 --- */
 
 .status-text {

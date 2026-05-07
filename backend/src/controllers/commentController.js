@@ -60,7 +60,7 @@ async function remove(req, res, next) {
       'SELECT user_id FROM comments WHERE id = ?', [commentId]
     );
     if (rows.length === 0) return res.status(404).json({ message: '评论不存在' });
-    if (rows[0].user_id !== req.user.id) return res.status(403).json({ message: '无权删除' });
+    if (rows[0].user_id !== req.user.id && req.user.role !== 'admin') return res.status(403).json({ message: '无权删除' });
 
     await commentService.deleteById(commentId);
     res.json({ message: '删除成功' });

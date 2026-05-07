@@ -1,13 +1,12 @@
 /**
  * CommentList — 自包含评论组件（单条媒体）
- * 内部管理评论数据、展开/收起、输入、回复
- * Props: mediaId, currentUserId
+ * Props: mediaId, currentUserId, currentUserRole
  */
 
 import { useState } from 'react';
 import api from '../api/axios';
 
-function CommentList({ mediaId, currentUserId }) {
+function CommentList({ mediaId, currentUserId, currentUserRole }) {
   const [comments, setComments] = useState([]);
   const [expanded, setExpanded] = useState(false);
   const [text, setText] = useState('');
@@ -15,6 +14,8 @@ function CommentList({ mediaId, currentUserId }) {
   const [replyTo, setReplyTo] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [loaded, setLoaded] = useState(false);
+
+  const isAdmin = currentUserRole === 'admin';
 
   function formatDate(iso) {
     return iso ? iso.slice(0, 10) : '';
@@ -62,13 +63,20 @@ function CommentList({ mediaId, currentUserId }) {
     } catch {}
   }
 
+  function canDelete(comment) {
+    return comment.user_id === currentUserId || isAdmin;
+  }
+
   function renderComment(comment, depth) {
     const isReplying = replyTo === comment.id;
 
     return (
       <div key={comment.id} className={`comment-item ${depth > 0 ? 'comment-nested' : ''}`}>
         <div className="comment-main">
-          <span className="comment-user">{comment.username}</span>
+          <span className="comment-user">
+            {comment.username}
+            {comment.role === 'admin' && <span className="admin-badge">管理员</span>}
+          </span>
           <span className="comment-content">{comment.content}</span>
           <span className="comment-date">{formatDate(comment.created_at)}</span>
           <button
@@ -77,7 +85,7 @@ function CommentList({ mediaId, currentUserId }) {
           >
             {isReplying ? '取消' : '回复'}
           </button>
-          {comment.user_id === currentUserId && (
+          {canDelete(comment) && (
             <button className="comment-del" onClick={() => deleteComment(comment.id)}>×</button>
           )}
         </div>

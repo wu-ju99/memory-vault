@@ -29,7 +29,7 @@ async function createMedia(userId, filename, type, size, description, albumId, e
 }
 
 async function getList(userId, albumId) {
-  let sql = 'SELECT m.id, m.user_id, m.album_id, m.url, m.type, m.size, m.description, m.event_time, m.created_at, a.title AS album_title, u.username FROM media m LEFT JOIN albums a ON m.album_id = a.id JOIN users u ON m.user_id = u.id';
+  let sql = 'SELECT m.id, m.user_id, m.album_id, m.url, m.type, m.size, m.description, m.event_time, m.created_at, a.title AS album_title, u.username, u.role FROM media m LEFT JOIN albums a ON m.album_id = a.id JOIN users u ON m.user_id = u.id';
   const params = [];
 
   if (albumId) {

@@ -1,5 +1,21 @@
 # 功能更新日志
 
+## 2026-05-07（深夜）
+
+### 新增
+- **管理员系统** — `logintest` 设为 admin，管理员可删除任意媒体和评论
+
+| 改动 | 文件 | 说明 |
+|------|------|------|
+| 后端 | `commentController.js` | delete 增加 `req.user.role !== 'admin'` 判断 |
+| 后端 | `albumService.js` / `mediaService.js` / `commentService.js` | SELECT 增加 `u.role` |
+| 前端 | `AlbumCard.jsx` / `MediaCard.jsx` / `CommentList.jsx` | 管理员昵称旁显示红色「管理员」标签 |
+| 前端 | `CommentList.jsx` | 新增 `currentUserRole` prop，管理员可删任意评论 |
+| 数据库 | `users` 表 | `UPDATE users SET role='admin' WHERE username='logintest'` |
+| 样式 | `index.css` | 新增 `.admin-badge` 红色边框标签样式 |
+
+---
+
 ## 2026-05-07（夜晚）
 
 ### 重构
