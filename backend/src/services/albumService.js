@@ -5,7 +5,7 @@ async function create(userId, title) {
     'INSERT INTO albums (user_id, title) VALUES (?, ?)',
     [userId, title]
   );
-  return { id: result.insertId, title };
+  return getDisplayById(result.insertId);
 }
 
 async function getList(userId) {
@@ -30,6 +30,14 @@ async function getById(id, userId) {
   return rows[0] || null;
 }
 
+async function getDisplayById(id) {
+  const [rows] = await pool.query(
+    'SELECT a.id, a.user_id, a.title, a.cover_url, a.created_at, u.username, u.role FROM albums a JOIN users u ON a.user_id = u.id WHERE a.id = ?',
+    [id]
+  );
+  return rows[0] || null;
+}
+
 async function getAlbumImageByUrl(albumId, coverUrl) {
   const [rows] = await pool.query(
     'SELECT id, url FROM media WHERE album_id = ? AND url = ? AND type = ? LIMIT 1',
@@ -42,4 +50,22 @@ async function updateCover(albumId, coverUrl) {
   await pool.query('UPDATE albums SET cover_url = ? WHERE id = ?', [coverUrl, albumId]);
 }
 
-module.exports = { create, getList, getById, getAlbumImageByUrl, updateCover };
+async function updateTitle(albumId, title) {
+  await pool.query('UPDATE albums SET title = ? WHERE id = ?', [title, albumId]);
+  return getDisplayById(albumId);
+}
+
+async function deleteById(albumId) {
+  await pool.query('DELETE FROM albums WHERE id = ?', [albumId]);
+}
+
+module.exports = {
+  create,
+  getList,
+  getById,
+  getDisplayById,
+  getAlbumImageByUrl,
+  updateCover,
+  updateTitle,
+  deleteById,
+};

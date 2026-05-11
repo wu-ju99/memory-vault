@@ -9,7 +9,9 @@ function Home() {
   const [loading, setLoading] = useState(true);
   const [newTitle, setNewTitle] = useState('');
   const [coverUploadingId, setCoverUploadingId] = useState(null);
-  const [coverError, setCoverError] = useState('');
+  const [managingAlbumId, setManagingAlbumId] = useState(null);
+  const [albumMessage, setAlbumMessage] = useState('');
+  const [albumError, setAlbumError] = useState('');
 
   const navigate = useNavigate();
   const user = getUser();
@@ -24,24 +26,32 @@ function Home() {
 
   useEffect(() => { fetchAlbums(); }, [fetchAlbums]);
 
+  function clearAlbumStatus() {
+    setAlbumMessage('');
+    setAlbumError('');
+  }
+
   async function handleCreate() {
     const title = newTitle.trim();
     if (!title) return;
+    clearAlbumStatus();
     try {
       const res = await api.post('/albums', { title });
       setAlbums((prev) => [res.data, ...prev]);
       setNewTitle('');
-    } catch {}
+    } catch (err) {
+      setAlbumError(err.response?.data?.message || '创建相册失败');
+    }
   }
 
   async function handleCoverUpload(album, file) {
     if (!file.type.startsWith('image/')) {
-      setCoverError('封面只能上传图片');
+      setAlbumError('封面只能上传图片');
       return;
     }
 
     setCoverUploadingId(album.id);
-    setCoverError('');
+    clearAlbumStatus();
     try {
       const formData = new FormData();
       formData.append('cover', file);
@@ -52,10 +62,53 @@ function Home() {
           ? { ...item, cover_url: res.data.cover_url, cover_version: version }
           : item
       ));
+      setAlbumMessage('封面已更新');
     } catch (err) {
-      setCoverError(err.response?.data?.message || '封面上传失败');
+      setAlbumError(err.response?.data?.message || '封面上传失败');
     } finally {
       setCoverUploadingId(null);
+    }
+  }
+
+  async function handleRenameAlbum(album) {
+    const title = window.prompt('请输入新的相册名称', album.title);
+    if (title === null) return;
+
+    const trimmed = title.trim();
+    if (!trimmed) {
+      setAlbumError('相册名称不能为空');
+      return;
+    }
+    if (trimmed === album.title) return;
+
+    setManagingAlbumId(album.id);
+    clearAlbumStatus();
+    try {
+      const res = await api.put(`/albums/${album.id}`, { title: trimmed });
+      setAlbums((prev) => prev.map((item) =>
+        item.id === album.id ? { ...item, ...res.data.album } : item
+      ));
+      setAlbumMessage('相册名称已更新');
+    } catch (err) {
+      setAlbumError(err.response?.data?.message || '修改相册名称失败');
+    } finally {
+      setManagingAlbumId(null);
+    }
+  }
+
+  async function handleDeleteAlbum(album) {
+    if (!window.confirm(`确定删除相册「${album.title}」吗？相册内的照片和视频不会被删除。`)) return;
+
+    setManagingAlbumId(album.id);
+    clearAlbumStatus();
+    try {
+      await api.delete(`/albums/${album.id}`);
+      setAlbums((prev) => prev.filter((item) => item.id !== album.id));
+      setAlbumMessage('相册已删除');
+    } catch (err) {
+      setAlbumError(err.response?.data?.message || '删除相册失败');
+    } finally {
+      setManagingAlbumId(null);
     }
   }
 
@@ -96,7 +149,8 @@ function Home() {
                 <button className="upload-btn" onClick={handleCreate}>创建</button>
               </div>
               {loading && <p className="status-text">正在整理相册...</p>}
-              {coverError && <p className="status-text error">{coverError}</p>}
+              {albumMessage && <p className="status-text success">{albumMessage}</p>}
+              {albumError && <p className="status-text error">{albumError}</p>}
               {!loading && albums.length === 0 && (
                 <p className="status-text">还没有相册，先创建一本吧。</p>
               )}
@@ -105,15 +159,21 @@ function Home() {
             <div className="book-page book-page-right">
               {albums.length > 0 && (
                 <div className="album-grid album-polaroid-grid">
-                  {albums.map((album, index) => (
-                    <AlbumCard
-                      key={album.id}
-                      album={album}
-                      index={index}
-                      onCoverUpload={handleCoverUpload}
-                      uploading={coverUploadingId === album.id}
-                    />
-                  ))}
+                  {albums.map((album, index) => {
+                    const isOwner = album.user_id === user?.id;
+                    return (
+                      <AlbumCard
+                        key={album.id}
+                        album={album}
+                        index={index}
+                        onCoverUpload={handleCoverUpload}
+                        uploading={coverUploadingId === album.id}
+                        onRename={isOwner ? handleRenameAlbum : null}
+                        onDelete={isOwner ? handleDeleteAlbum : null}
+                        managing={managingAlbumId === album.id}
+                      />
+                    );
+                  })}
                 </div>
               )}
             </div>

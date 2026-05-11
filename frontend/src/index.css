@@ -297,6 +297,52 @@ body {
   opacity: 0.62;
 }
 
+.album-card-actions {
+  padding: 0 12px 14px;
+}
+
+.album-card-actions .album-cover-action {
+  width: 100%;
+  margin: 0;
+}
+
+.album-owner-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.album-small-action {
+  padding: 7px 8px;
+  border: 1px solid rgba(117, 97, 82, 0.3);
+  border-radius: 999px;
+  background: transparent;
+  color: #756152;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.album-small-action:hover {
+  background: rgba(117, 97, 82, 0.12);
+}
+
+.album-small-action.danger {
+  border-color: rgba(168, 70, 55, 0.42);
+  color: #a84637;
+}
+
+.album-small-action.danger:hover {
+  background: rgba(168, 70, 55, 0.12);
+}
+
+.album-small-action:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
 .album-card:hover {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }

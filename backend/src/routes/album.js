@@ -6,6 +6,8 @@ const albumController = require('../controllers/albumController');
 
 router.post('/albums', auth, albumController.create);
 router.get('/albums', auth, albumController.list);
+router.put('/albums/:id', auth, albumController.rename);
+router.delete('/albums/:id', auth, albumController.remove);
 router.put('/albums/:id/cover', auth, (req, res, next) => {
   upload.single('cover')(req, res, (err) => {
     if (err) {

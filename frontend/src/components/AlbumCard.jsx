@@ -2,7 +2,15 @@ import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import BASE_URL from '../config';
 
-function AlbumCard({ album, index = 0, onCoverUpload, uploading = false }) {
+function AlbumCard({
+  album,
+  index = 0,
+  onCoverUpload,
+  uploading = false,
+  onRename,
+  onDelete,
+  managing = false,
+}) {
   const fileInputRef = useRef(null);
   const rotations = [-2.5, 1.5, -1, 2, -1.8, 1];
   const rotate = rotations[index % rotations.length];
@@ -49,25 +57,52 @@ function AlbumCard({ album, index = 0, onCoverUpload, uploading = false }) {
         </div>
       </Link>
 
-      {onCoverUpload && (
-        <>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            className="file-input"
-            onChange={handleCoverChange}
-          />
-          <button
-            className="album-cover-action"
-            onClick={handleCoverClick}
-            disabled={uploading}
-            type="button"
-          >
-            {uploading ? '上传中...' : '换封面'}
-          </button>
-        </>
-      )}
+      <div className="album-card-actions">
+        {onCoverUpload && (
+          <>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="file-input"
+              onChange={handleCoverChange}
+            />
+            <button
+              className="album-cover-action"
+              onClick={handleCoverClick}
+              disabled={uploading || managing}
+              type="button"
+            >
+              {uploading ? '上传中...' : '换封面'}
+            </button>
+          </>
+        )}
+
+        {(onRename || onDelete) && (
+          <div className="album-owner-actions">
+            {onRename && (
+              <button
+                className="album-small-action"
+                onClick={() => onRename(album)}
+                disabled={managing}
+                type="button"
+              >
+                改名
+              </button>
+            )}
+            {onDelete && (
+              <button
+                className="album-small-action danger"
+                onClick={() => onDelete(album)}
+                disabled={managing}
+                type="button"
+              >
+                删除
+              </button>
+            )}
+          </div>
+        )}
+      </div>
     </article>
   );
 }
