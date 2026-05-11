@@ -1963,8 +1963,26 @@ html {
 }
 
 .comment-main .comment-content {
-  flex: 1 1 0;
+  order: 2;
+  flex: 0 0 100%;
+  width: 100%;
   min-width: 0;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.comment-main .comment-user,
+.comment-main .comment-date,
+.comment-main .comment-reply-btn,
+.comment-main .comment-del {
+  order: 1;
+  flex: 0 0 auto;
+}
+
+.comment-main .comment-user {
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .comment-reply-btn {
