@@ -881,6 +881,236 @@ body {
   }
 }
 
+/* --- Album detail scrapbook --- */
+
+html {
+  scroll-behavior: smooth;
+}
+
+.album-detail-content {
+  position: relative;
+}
+
+.album-title-block {
+  text-align: center;
+}
+
+.album-title-block h1 {
+  max-width: 48vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detail-book-shell {
+  width: min(1280px, 100%);
+}
+
+.detail-spread {
+  grid-template-columns: minmax(300px, 0.44fr) minmax(520px, 1.56fr);
+  min-height: 720px;
+}
+
+.upload-page {
+  position: sticky;
+  top: 84px;
+  align-self: start;
+  min-height: 720px;
+}
+
+.upload-note {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  padding: 20px;
+  align-items: stretch;
+  transform: rotate(-1.5deg);
+  border: 1px solid rgba(159, 111, 61, 0.22);
+  border-radius: 4px;
+  background: #fff7be;
+  box-shadow: 0 18px 26px rgba(99, 69, 37, 0.12);
+}
+
+.upload-note::before {
+  content: "";
+  position: absolute;
+  top: -11px;
+  right: 32px;
+  width: 92px;
+  height: 24px;
+  transform: rotate(7deg);
+  background: rgba(54, 107, 101, 0.25);
+}
+
+.upload-note .upload-btn {
+  text-align: center;
+}
+
+.memories-page {
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+
+.memory-year-section {
+  scroll-margin-top: 110px;
+}
+
+.year-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  border-bottom: 1px solid rgba(113, 82, 55, 0.16);
+  color: #6e4c37;
+}
+
+.year-heading h2 {
+  color: #6e4c37;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(30px, 4vw, 54px);
+  line-height: 1;
+}
+
+.year-heading span {
+  color: #8a7663;
+  font-size: 13px;
+}
+
+.scrapbook-grid {
+  grid-template-columns: repeat(auto-fill, minmax(178px, 1fr));
+  align-items: start;
+  gap: 24px 18px;
+  max-width: none;
+}
+
+.scrapbook-photo {
+  transform: rotate(var(--photo-tilt));
+  overflow: visible;
+  border: none;
+  border-radius: 3px;
+  background: #fffaf3;
+  box-shadow: 0 16px 28px rgba(69, 47, 31, 0.16);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.scrapbook-photo:nth-child(4n + 2) {
+  margin-top: 22px;
+}
+
+.scrapbook-photo:hover {
+  transform: rotate(0deg) translateY(-8px);
+  box-shadow: 0 24px 34px rgba(69, 47, 31, 0.22);
+}
+
+.scrapbook-photo a,
+.scrapbook-photo .grid-video {
+  margin: 10px 10px 0;
+  width: calc(100% - 20px);
+  border: 1px solid rgba(67, 48, 36, 0.08);
+  background: #efe3d2;
+}
+
+.scrapbook-photo .grid-desc {
+  color: #5f4e42;
+  font-size: 12px;
+}
+
+.scrapbook-photo .grid-date,
+.scrapbook-photo .media-user,
+.comment-toggle {
+  color: #8a7663;
+}
+
+.year-bookmarks {
+  position: fixed;
+  top: 128px;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.year-bookmark {
+  display: block;
+  min-width: 76px;
+  padding: 9px 13px 9px 16px;
+  border-radius: 6px 0 0 6px;
+  background: #bd594a;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 12px 20px rgba(77, 46, 31, 0.18);
+  transform: translateX(10px);
+  transition: transform 0.16s ease, background 0.16s ease;
+}
+
+.year-bookmark:nth-child(2n) {
+  background: #366b65;
+}
+
+.year-bookmark:nth-child(3n) {
+  background: #8b6f45;
+}
+
+.year-bookmark:hover {
+  transform: translateX(0);
+  color: #fff;
+}
+
+.empty-memory {
+  margin: auto;
+  color: #8a7663;
+}
+
+@media (max-width: 1020px) {
+  .detail-spread {
+    display: block;
+  }
+
+  .upload-page {
+    position: relative;
+    top: auto;
+    min-height: auto;
+  }
+
+  .year-bookmarks {
+    position: sticky;
+    top: 76px;
+    right: auto;
+    flex-direction: row;
+    justify-content: flex-start;
+    width: 100%;
+    margin: 0 auto 14px;
+    overflow-x: auto;
+  }
+
+  .year-bookmark {
+    min-width: auto;
+    border-radius: 999px;
+    transform: none;
+    white-space: nowrap;
+  }
+
+  .album-title-block h1 {
+    max-width: 54vw;
+  }
+}
+
+@media (max-width: 620px) {
+  .album-title-block h1 {
+    max-width: 36vw;
+    font-size: 17px;
+  }
+
+  .scrapbook-grid {
+    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+  }
+}
+
 /* --- 健康状态卡片 --- */
 
 .health-card {
