@@ -159,6 +159,13 @@ function AlbumDetail() {
     setActiveMediaId(null);
   }
 
+  async function handleSetCover(item) {
+    try {
+      await api.put(`/albums/${id}/cover`, { cover_url: item.url });
+      setAlbum((prev) => prev ? { ...prev, cover_url: item.url } : prev);
+    } catch {}
+  }
+
   useEffect(() => {
     if (!activeMediaId) return;
     function handleKey(e) {
@@ -327,6 +334,12 @@ function AlbumDetail() {
                 <div className="modal-comments">
                   <CommentList mediaId={activeMedia.id} currentUserId={currentUser?.id} currentUserRole={currentUser?.role} />
                 </div>
+
+                {activeMedia.type === 'image' && (
+                  <button className="modal-set-cover" onClick={() => handleSetCover(activeMedia)} type="button">
+                    设为相册封面
+                  </button>
+                )}
 
                 {(activeMedia.user_id === currentUser?.id || currentUser?.role === 'admin') && (
                   <button className="modal-delete" onClick={() => handleDelete(activeMedia)} type="button">

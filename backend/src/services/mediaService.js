@@ -71,6 +71,7 @@ async function deleteById(id) {
   } catch {}
 
   await pool.query('DELETE FROM media WHERE id = ?', [id]);
+  await pool.query('UPDATE albums SET cover_url = NULL WHERE cover_url = ?', [media.url]);
 
   return media;
 }

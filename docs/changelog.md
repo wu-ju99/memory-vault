@@ -2,6 +2,25 @@
 
 ## 2026-05-11
 
+### 新增：相册封面增强
+- 首页相册卡片新增“换封面”入口，支持上传相册外部图片作为封面。
+- 所有登录用户均可修改任意相册封面，符合当前共享相册模式。
+- 相册详情页保留“设为相册封面”，可继续使用相册内已有照片作为封面。
+- 删除媒体时，如果该媒体 URL 正被相册封面引用，会自动清空 `albums.cover_url`，避免封面残留。
+- 新增 `PUT /api/albums/:id/cover`，支持 `multipart/form-data` 字段 `cover`，也兼容 JSON `cover_url`。
+- `albums` 表新增 `cover_url` 字段；新增迁移脚本 `backend/sql/migrate_album_cover.sql`。
+- 新增说明文档：`docs/album-cover.md`。
+
+| 改动 | 文件 | 说明 |
+|------|------|------|
+| 后端 | `albumController.js` / `album.js` / `albumService.js` | 支持封面上传、相册内照片设封面、所有登录用户可改封面 |
+| 后端 | `mediaService.js` | 删除被用作封面的媒体时自动清空相册封面 |
+| 前端 | `Home.jsx` / `AlbumCard.jsx` | 首页相册卡片直接上传封面，成功后即时刷新显示 |
+| 样式 | `index.css` | 新增相册封面按钮和封面图片样式 |
+| 数据库 | `init_albums.sql` / `migrate_album_cover.sql` | 增加 `albums.cover_url` |
+
+---
+
 ### 新增（codex/album-book-ui-step1~3 分支）
 - **剪贴簿风格 UI 重构** — 首页和相册详情页改为书本翻页布局
 - **拍立得相册卡片** — 相册卡片带随机倾斜角度，hover 回正动画

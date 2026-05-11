@@ -8,6 +8,8 @@ function Home() {
   const [albums, setAlbums] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newTitle, setNewTitle] = useState('');
+  const [coverUploadingId, setCoverUploadingId] = useState(null);
+  const [coverError, setCoverError] = useState('');
 
   const navigate = useNavigate();
   const user = getUser();
@@ -30,6 +32,31 @@ function Home() {
       setAlbums((prev) => [res.data, ...prev]);
       setNewTitle('');
     } catch {}
+  }
+
+  async function handleCoverUpload(album, file) {
+    if (!file.type.startsWith('image/')) {
+      setCoverError('封面只能上传图片');
+      return;
+    }
+
+    setCoverUploadingId(album.id);
+    setCoverError('');
+    try {
+      const formData = new FormData();
+      formData.append('cover', file);
+      const res = await api.put(`/albums/${album.id}/cover`, formData);
+      const version = Date.now();
+      setAlbums((prev) => prev.map((item) =>
+        item.id === album.id
+          ? { ...item, cover_url: res.data.cover_url, cover_version: version }
+          : item
+      ));
+    } catch (err) {
+      setCoverError(err.response?.data?.message || '封面上传失败');
+    } finally {
+      setCoverUploadingId(null);
+    }
   }
 
   function handleLogout() {
@@ -69,6 +96,7 @@ function Home() {
                 <button className="upload-btn" onClick={handleCreate}>创建</button>
               </div>
               {loading && <p className="status-text">正在整理相册...</p>}
+              {coverError && <p className="status-text error">{coverError}</p>}
               {!loading && albums.length === 0 && (
                 <p className="status-text">还没有相册，先创建一本吧。</p>
               )}
@@ -78,7 +106,13 @@ function Home() {
               {albums.length > 0 && (
                 <div className="album-grid album-polaroid-grid">
                   {albums.map((album, index) => (
-                    <AlbumCard key={album.id} album={album} index={index} />
+                    <AlbumCard
+                      key={album.id}
+                      album={album}
+                      index={index}
+                      onCoverUpload={handleCoverUpload}
+                      uploading={coverUploadingId === album.id}
+                    />
                   ))}
                 </div>
               )}
