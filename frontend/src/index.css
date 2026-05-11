@@ -525,10 +525,7 @@ body {
 }
 
 .comment-item {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 6px;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
   font-size: 12px;
   line-height: 1.5;
 }
@@ -540,8 +537,7 @@ body {
 
 .comment-content {
   color: #555;
-  flex: 1;
-  word-break: break-all;
+  word-break: break-word;
 }
 
 .comment-date {
@@ -1490,10 +1486,15 @@ html {
 
 .comment-main {
   display: flex;
-  flex-wrap: wrap;
-  gap: 2px 6px;
   align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
   margin-bottom: 2px;
+}
+
+.comment-main .comment-content {
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .comment-reply-btn {
