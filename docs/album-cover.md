@@ -68,9 +68,19 @@ ALTER TABLE albums
   ADD COLUMN cover_url VARCHAR(500) DEFAULT NULL COMMENT '相册封面地址' AFTER title;
 ```
 
-## 前端行为
+## 代码职责
 
-- `Home.jsx` 负责上传封面，并在成功后更新对应相册的 `cover_url`。
-- `AlbumCard.jsx` 使用 `cover_url` 渲染封面图片。
+### 后端
+
+- `albumController.setCover()` 只负责 HTTP 参数入口和响应。
+- `albumCoverService` 负责封面业务规则：上传图片设封面、选择相册内照片设封面、删除媒体后按 URL 清空封面引用。
+- `fileStorageService` 负责上传文件 URL 生成和失败时清理临时文件。
+- `albumService` 只保留相册表基础数据操作，不再混入封面业务。
+
+### 前端
+
+- `api/albums.js` 封装 `/albums/:id/cover` 请求。
+- `useAlbums` 负责首页上传封面的状态、错误提示和列表更新。
+- `useAlbumMedia` 负责详情页“设为相册封面”的数据更新。
+- `AlbumCard.jsx` 只负责卡片展示和触发选择文件。
 - 上传成功后会追加 `cover_version` 查询参数，避免浏览器缓存导致新封面不显示。
-- 上传失败会在首页展示后端返回的错误信息。

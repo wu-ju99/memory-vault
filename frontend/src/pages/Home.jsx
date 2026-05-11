@@ -1,115 +1,48 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../api/axios';
 import { clearAuth, getUser } from '../utils/auth';
 import AlbumCard from '../components/AlbumCard';
+import useAlbums from '../hooks/useAlbums';
 
 function Home() {
-  const [albums, setAlbums] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [newTitle, setNewTitle] = useState('');
-  const [coverUploadingId, setCoverUploadingId] = useState(null);
-  const [managingAlbumId, setManagingAlbumId] = useState(null);
-  const [albumMessage, setAlbumMessage] = useState('');
-  const [albumError, setAlbumError] = useState('');
-
   const navigate = useNavigate();
   const user = getUser();
-
-  const fetchAlbums = useCallback(() => {
-    setLoading(true);
-    api.get('/albums')
-      .then((res) => setAlbums(res.data.albums))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
-  useEffect(() => { fetchAlbums(); }, [fetchAlbums]);
-
-  function clearAlbumStatus() {
-    setAlbumMessage('');
-    setAlbumError('');
-  }
+  const {
+    albums,
+    loading,
+    coverUploadingId,
+    managingAlbumId,
+    message: albumMessage,
+    error: albumError,
+    createAlbum,
+    uploadCover,
+    renameAlbum,
+    removeAlbum,
+  } = useAlbums();
 
   async function handleCreate() {
-    const title = newTitle.trim();
-    if (!title) return;
-    clearAlbumStatus();
-    try {
-      const res = await api.post('/albums', { title });
-      setAlbums((prev) => [res.data, ...prev]);
+    const album = await createAlbum(newTitle);
+    if (album) {
       setNewTitle('');
-    } catch (err) {
-      setAlbumError(err.response?.data?.message || '创建相册失败');
     }
   }
 
   async function handleCoverUpload(album, file) {
-    if (!file.type.startsWith('image/')) {
-      setAlbumError('封面只能上传图片');
-      return;
-    }
-
-    setCoverUploadingId(album.id);
-    clearAlbumStatus();
-    try {
-      const formData = new FormData();
-      formData.append('cover', file);
-      const res = await api.put(`/albums/${album.id}/cover`, formData);
-      const version = Date.now();
-      setAlbums((prev) => prev.map((item) =>
-        item.id === album.id
-          ? { ...item, cover_url: res.data.cover_url, cover_version: version }
-          : item
-      ));
-      setAlbumMessage('封面已更新');
-    } catch (err) {
-      setAlbumError(err.response?.data?.message || '封面上传失败');
-    } finally {
-      setCoverUploadingId(null);
-    }
+    await uploadCover(album, file);
   }
 
   async function handleRenameAlbum(album) {
     const title = window.prompt('请输入新的相册名称', album.title);
     if (title === null) return;
 
-    const trimmed = title.trim();
-    if (!trimmed) {
-      setAlbumError('相册名称不能为空');
-      return;
-    }
-    if (trimmed === album.title) return;
-
-    setManagingAlbumId(album.id);
-    clearAlbumStatus();
-    try {
-      const res = await api.put(`/albums/${album.id}`, { title: trimmed });
-      setAlbums((prev) => prev.map((item) =>
-        item.id === album.id ? { ...item, ...res.data.album } : item
-      ));
-      setAlbumMessage('相册名称已更新');
-    } catch (err) {
-      setAlbumError(err.response?.data?.message || '修改相册名称失败');
-    } finally {
-      setManagingAlbumId(null);
-    }
+    await renameAlbum(album, title);
   }
 
   async function handleDeleteAlbum(album) {
     if (!window.confirm(`确定删除相册「${album.title}」吗？相册内的照片和视频不会被删除。`)) return;
 
-    setManagingAlbumId(album.id);
-    clearAlbumStatus();
-    try {
-      await api.delete(`/albums/${album.id}`);
-      setAlbums((prev) => prev.filter((item) => item.id !== album.id));
-      setAlbumMessage('相册已删除');
-    } catch (err) {
-      setAlbumError(err.response?.data?.message || '删除相册失败');
-    } finally {
-      setManagingAlbumId(null);
-    }
+    await removeAlbum(album);
   }
 
   function handleLogout() {

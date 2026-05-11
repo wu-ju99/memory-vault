@@ -1,0 +1,32 @@
+import api from './axios';
+
+export async function fetchAlbums() {
+  const res = await api.get('/albums');
+  return res.data.albums;
+}
+
+export async function createAlbum(title) {
+  const res = await api.post('/albums', { title });
+  return res.data;
+}
+
+export async function renameAlbum(albumId, title) {
+  const res = await api.put(`/albums/${albumId}`, { title });
+  return res.data.album;
+}
+
+export async function deleteAlbum(albumId) {
+  await api.delete(`/albums/${albumId}`);
+}
+
+export async function uploadAlbumCover(albumId, file) {
+  const formData = new FormData();
+  formData.append('cover', file);
+  const res = await api.put(`/albums/${albumId}/cover`, formData);
+  return res.data.cover_url;
+}
+
+export async function setAlbumCover(albumId, coverUrl) {
+  const res = await api.put(`/albums/${albumId}/cover`, { cover_url: coverUrl });
+  return res.data.cover_url;
+}

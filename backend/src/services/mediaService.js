@@ -2,11 +2,7 @@
  * 媒体服务 — 处理文件上传与数据库记录
  */
 
-const fs = require('fs');
-const path = require('path');
 const { pool } = require('../config/db');
-
-const UPLOADS_DIR = path.resolve(__dirname, '../../uploads');
 
 async function createMedia(userId, filename, type, size, description, albumId, eventTime) {
   const url = `/uploads/${filename}`;
@@ -59,21 +55,7 @@ async function updateDescription(id, description) {
 }
 
 async function deleteById(id) {
-  const media = await getById(id);
-  if (!media) return null;
-
-  const filename = path.basename(media.url);
-  const filePath = path.join(UPLOADS_DIR, filename);
-  try {
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-  } catch {}
-
   await pool.query('DELETE FROM media WHERE id = ?', [id]);
-  await pool.query('UPDATE albums SET cover_url = NULL WHERE cover_url = ?', [media.url]);
-
-  return media;
 }
 
 module.exports = { createMedia, getList, getById, updateDescription, deleteById };

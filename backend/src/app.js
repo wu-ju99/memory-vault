@@ -44,4 +44,14 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
+// --- 业务错误处理 ---
+
+app.use((err, req, res, next) => {
+  const status = err.status || 500;
+  if (status >= 500) {
+    console.error('[Error]', err);
+  }
+  res.status(status).json({ message: err.message || '服务器内部错误' });
+});
+
 module.exports = app;

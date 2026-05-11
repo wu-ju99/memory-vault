@@ -38,18 +38,6 @@ async function getDisplayById(id) {
   return rows[0] || null;
 }
 
-async function getAlbumImageByUrl(albumId, coverUrl) {
-  const [rows] = await pool.query(
-    'SELECT id, url FROM media WHERE album_id = ? AND url = ? AND type = ? LIMIT 1',
-    [albumId, coverUrl, 'image']
-  );
-  return rows[0] || null;
-}
-
-async function updateCover(albumId, coverUrl) {
-  await pool.query('UPDATE albums SET cover_url = ? WHERE id = ?', [coverUrl, albumId]);
-}
-
 async function updateTitle(albumId, title) {
   await pool.query('UPDATE albums SET title = ? WHERE id = ?', [title, albumId]);
   return getDisplayById(albumId);
@@ -64,8 +52,6 @@ module.exports = {
   getList,
   getById,
   getDisplayById,
-  getAlbumImageByUrl,
-  updateCover,
   updateTitle,
   deleteById,
 };

@@ -94,10 +94,28 @@ main.jsx
 
 共享模块:
   api/axios.js        — 统一 Axios 实例 (baseURL=/api, Bearer token 拦截, 401 自动登出)
+  api/albums.js       — 相册/封面 API 封装
+  api/media.js        — 媒体 API 封装
+  hooks/useAlbums.js      — 首页相册列表、创建、改名、删除、封面上传状态
+  hooks/useAlbumMedia.js  — 相册详情页数据、上传、删除、设封面状态
+  hooks/useMediaEditor.js — 媒体描述编辑状态
+  hooks/useMediaModal.js  — 媒体预览弹窗状态
   utils/auth.js       — localStorage 读写 (getToken/saveAuth/clearAuth/isAuthenticated)
   config.js           — BASE_URL = 'http://localhost:3000'
   components/ProtectedRoute.jsx — 路由守卫
 ```
+
+## 后端职责边界
+
+- `controllers/*`：HTTP 参数入口、响应格式、错误转交。
+- `routes/*`：路由挂载、中间件组合，不写业务规则。
+- `services/albumService.js`：相册表基础数据操作。
+- `services/albumManagementService.js`：相册创建、改名、删除和创建者权限规则。
+- `services/albumCoverService.js`：上传封面、选择相册内照片设封面、媒体删除后的封面引用清理。
+- `services/mediaService.js`：媒体表基础数据操作。
+- `services/mediaUploadService.js`：媒体上传文件分类、大小校验和入库编排。
+- `services/mediaManagementService.js`：媒体编辑、删除权限和删除副作用编排。
+- `services/fileStorageService.js`：上传文件路径、URL 和文件删除。
 
 ## 数据关系
 

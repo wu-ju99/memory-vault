@@ -69,9 +69,17 @@
 | 403 | 当前用户不是相册创建者 |
 | 404 | 相册不存在 |
 
-## 前端行为
+## 代码职责
 
-- `Home.jsx` 根据 `album.user_id === currentUser.id` 判断是否显示“改名”“删除”。
-- “改名”使用浏览器输入框输入新标题，成功后即时更新当前相册卡片。
-- “删除”会二次确认，成功后从首页相册列表移除该相册。
+### 后端
+
+- `albumController` 只负责 HTTP 参数入口和响应。
+- `albumManagementService` 负责创建、改名、删除的业务规则和创建者权限校验。
+- `albumService` 只保留相册表基础数据操作。
+
+### 前端
+
+- `api/albums.js` 封装相册创建、改名、删除请求。
+- `useAlbums` 负责首页相册列表状态、创建、改名、删除、封面上传和错误提示。
+- `Home.jsx` 负责页面组织、输入框、确认框和把操作传给组件。
 - `AlbumCard.jsx` 接收 `onRename`、`onDelete` 和 `managing` props，负责展示创建者操作按钮和处理中状态。
