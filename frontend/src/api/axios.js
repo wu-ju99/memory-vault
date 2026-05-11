@@ -19,13 +19,13 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// 响应拦截器：401 时自动清除登录态
+// 响应拦截器：401 时自动清除登录状态
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
       clearAuth();
-      // 不在登录页的话跳转
+      // 不在登录页时跳转
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
