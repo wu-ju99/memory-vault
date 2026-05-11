@@ -5,8 +5,8 @@ export async function fetchAlbums() {
   return res.data.albums;
 }
 
-export async function createAlbum(title) {
-  const res = await api.post('/albums', { title });
+export async function createAlbum(title, albumYear) {
+  const res = await api.post('/albums', { title, album_year: albumYear });
   return res.data;
 }
 

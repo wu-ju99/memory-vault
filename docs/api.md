@@ -132,26 +132,31 @@ Authorization: Bearer <token>
 
 **请求体：**
 ```json
-{ "title": "2026 春游" }
+{
+  "title": "2020 日本旅行",
+  "album_year": 2020
+}
 ```
+
+`album_year` 为用户选择的相册年份，缺省时后端使用当前年份。
 
 **响应：**
 | 状态码 | 响应体 |
 |------|------|
-| 201 | `{ "id": 1, "title": "2026 春游" }` |
-| 400 | `{ "message": "相册名称不能为空" }` |
+| 201 | `{ "id": 1, "user_id": 2, "title": "2020 日本旅行", "album_year": 2020, "cover_url": null, "created_at": "...", "username": "user", "role": "user" }` |
+| 400 | `{ "message": "相册名称不能为空" }` 或 `{ "message": "相册年份必须在 1900 到 2027 之间" }` |
 
 ---
 
 ### GET /api/albums
 
-获取所有相册列表（需认证），按创建时间倒序。**共享模式：返回所有用户的相册。**
+获取所有相册列表（需认证），按相册年份倒序、创建时间倒序。**共享模式：返回所有用户的相册。**
 
 **响应：**
 ```json
 {
   "albums": [
-    { "id": 1, "user_id": 2, "title": "2026 春游", "username": "logintest", "created_at": "2026-05-06T..." }
+    { "id": 1, "user_id": 2, "title": "2020 日本旅行", "album_year": 2020, "cover_url": null, "username": "logintest", "created_at": "2026-05-06T..." }
   ]
 }
 ```

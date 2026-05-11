@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS albums (
   id         INT UNSIGNED  NOT NULL AUTO_INCREMENT  COMMENT '主键',
   user_id    INT UNSIGNED  NOT NULL                 COMMENT '所属用户',
   title      VARCHAR(100)  NOT NULL                 COMMENT '相册名称',
+  album_year SMALLINT UNSIGNED DEFAULT NULL          COMMENT '相册年份（用户选择）',
   cover_url  VARCHAR(500)  DEFAULT NULL             COMMENT '相册封面地址',
   created_at DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 

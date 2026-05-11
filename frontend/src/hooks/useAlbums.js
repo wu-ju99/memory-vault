@@ -19,6 +19,10 @@ function replaceAlbum(albums, albumId, updater) {
   return albums.map((album) => (album.id === albumId ? updater(album) : album));
 }
 
+function withRequestedYear(album, albumYear) {
+  return album.album_year ? album : { ...album, album_year: albumYear };
+}
+
 export default function useAlbums() {
   const [albums, setAlbums] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -44,15 +48,16 @@ export default function useAlbums() {
     loadAlbums();
   }, [loadAlbums]);
 
-  async function createAlbum(title) {
+  async function createAlbum(title, albumYear) {
     const trimmed = title.trim();
     if (!trimmed) return null;
 
     clearStatus();
     try {
-      const album = await createAlbumRequest(trimmed);
-      setAlbums((prev) => [album, ...prev]);
-      return album;
+      const album = await createAlbumRequest(trimmed, albumYear);
+      const albumWithYear = withRequestedYear(album, albumYear);
+      setAlbums((prev) => [albumWithYear, ...prev]);
+      return albumWithYear;
     } catch (err) {
       setError(getErrorMessage(err, '创建相册失败'));
       return null;

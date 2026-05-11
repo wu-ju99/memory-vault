@@ -1,11 +1,12 @@
-import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { clearAuth, getUser } from '../utils/auth';
-import AlbumCard from '../components/AlbumCard';
+import CreateAlbumForm from '../components/CreateAlbumForm';
+import AlbumYearNav from '../components/AlbumYearNav';
+import AlbumYearSection from '../components/AlbumYearSection';
 import useAlbums from '../hooks/useAlbums';
+import useAlbumYears from '../hooks/useAlbumYears';
 
 function Home() {
-  const [newTitle, setNewTitle] = useState('');
   const navigate = useNavigate();
   const user = getUser();
   const {
@@ -20,13 +21,7 @@ function Home() {
     renameAlbum,
     removeAlbum,
   } = useAlbums();
-
-  async function handleCreate() {
-    const album = await createAlbum(newTitle);
-    if (album) {
-      setNewTitle('');
-    }
-  }
+  const albumYears = useAlbumYears(albums);
 
   async function handleCoverUpload(album, file) {
     await uploadCover(album, file);
@@ -64,49 +59,47 @@ function Home() {
       </header>
 
       <main className="content memory-content">
-        <section className="album-book-shell" aria-label="相册列表">
+        <section id="album-year-root" className="album-book-shell" aria-label="相册列表">
           <div className="book-spread">
             <div className="book-page book-page-left">
               <div className="book-page-header">
                 <span>Shared Albums</span>
                 <strong>{albums.length}</strong>
               </div>
-              <div className="create-album create-album-note">
-                <input
-                  className="album-input-lg"
-                  placeholder="新建一本相册..."
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-                />
-                <button className="upload-btn" onClick={handleCreate}>创建</button>
-              </div>
+              <CreateAlbumForm onCreate={createAlbum} />
               {loading && <p className="status-text">正在整理相册...</p>}
               {albumMessage && <p className="status-text success">{albumMessage}</p>}
               {albumError && <p className="status-text error">{albumError}</p>}
               {!loading && albums.length === 0 && (
                 <p className="status-text">还没有相册，先创建一本吧。</p>
               )}
+              <AlbumYearNav
+                years={albumYears.years}
+                totalCount={albums.length}
+                activeYear={albumYears.activeYear}
+                allYearsValue={albumYears.allYearsValue}
+                onSelectYear={albumYears.scrollToYear}
+              />
             </div>
 
             <div className="book-page book-page-right">
               {albums.length > 0 && (
-                <div className="album-grid album-polaroid-grid">
-                  {albums.map((album, index) => {
-                    const isOwner = album.user_id === user?.id;
-                    return (
-                      <AlbumCard
-                        key={album.id}
-                        album={album}
-                        index={index}
-                        onCoverUpload={handleCoverUpload}
-                        uploading={coverUploadingId === album.id}
-                        onRename={isOwner ? handleRenameAlbum : null}
-                        onDelete={isOwner ? handleDeleteAlbum : null}
-                        managing={managingAlbumId === album.id}
-                      />
-                    );
-                  })}
+                <div className="album-year-sections">
+                  {albumYears.yearGroups.map(({ year, items, startIndex }) => (
+                    <AlbumYearSection
+                      key={year}
+                      year={year}
+                      albums={items}
+                      sectionId={albumYears.getYearSectionId(year)}
+                      startIndex={startIndex}
+                      currentUser={user}
+                      coverUploadingId={coverUploadingId}
+                      managingAlbumId={managingAlbumId}
+                      onCoverUpload={handleCoverUpload}
+                      onRename={handleRenameAlbum}
+                      onDelete={handleDeleteAlbum}
+                    />
+                  ))}
                 </div>
               )}
             </div>

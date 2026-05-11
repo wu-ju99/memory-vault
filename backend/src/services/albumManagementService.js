@@ -1,6 +1,25 @@
 const albumService = require('./albumService');
 const httpError = require('../utils/httpError');
 
+function getCurrentYear() {
+  return new Date().getFullYear();
+}
+
+function normalizeAlbumYear(rawYear) {
+  const fallbackYear = getCurrentYear();
+  if (rawYear === undefined || rawYear === null || rawYear === '') {
+    return fallbackYear;
+  }
+
+  const albumYear = Number(rawYear);
+  const maxYear = fallbackYear + 1;
+  if (!Number.isInteger(albumYear) || albumYear < 1900 || albumYear > maxYear) {
+    throw httpError(400, `相册年份必须在 1900 到 ${maxYear} 之间`);
+  }
+
+  return albumYear;
+}
+
 async function requireAlbum(albumId) {
   const album = await albumService.getById(albumId);
   if (!album) {
@@ -15,12 +34,13 @@ function assertAlbumOwner(album, userId, actionLabel) {
   }
 }
 
-async function createAlbum(userId, rawTitle) {
+async function createAlbum(userId, rawTitle, rawYear) {
   const title = (rawTitle || '').trim();
   if (!title) {
     throw httpError(400, '相册名称不能为空');
   }
-  return albumService.create(userId, title);
+  const albumYear = normalizeAlbumYear(rawYear);
+  return albumService.create(userId, title, albumYear);
 }
 
 async function renameAlbum(albumId, userId, rawTitle) {

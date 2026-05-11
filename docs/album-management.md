@@ -6,11 +6,46 @@
 
 - 相册创建者可以在首页相册卡片上修改相册名称。
 - 相册创建者可以在首页相册卡片上删除相册。
+- 创建相册时可以选择相册年份，首页按相册年份分区；相册年份独立于记录创建时间。
 - 非创建者不能修改或删除相册，前端不会显示“改名”“删除”按钮。
 - 后端也会校验创建者权限，防止绕过前端直接调用接口。
 - 删除相册只删除相册记录，不删除相册内原有照片/视频；媒体记录会按现有外键规则解除相册关联。
 
 ## API
+
+### POST /api/albums
+
+创建相册。需要登录。`album_year` 为用户选择的相册年份，缺省时后端使用当前年份。
+
+请求体：
+
+```json
+{
+  "title": "2020 日本旅行",
+  "album_year": 2020
+}
+```
+
+响应：
+
+```json
+{
+  "id": 1,
+  "user_id": 2,
+  "title": "2020 日本旅行",
+  "album_year": 2020,
+  "cover_url": null,
+  "created_at": "2026-05-11T00:00:00.000Z",
+  "username": "user",
+  "role": "user"
+}
+```
+
+常见错误：
+
+| 状态码 | 说明 |
+|------|------|
+| 400 | 相册名称为空，或年份不在允许范围 |
 
 ### PUT /api/albums/:id
 
@@ -33,6 +68,7 @@
     "id": 1,
     "user_id": 2,
     "title": "新的相册名称",
+    "album_year": 2020,
     "cover_url": "/uploads/cover.png",
     "created_at": "2026-05-11T00:00:00.000Z",
     "username": "user",
@@ -74,12 +110,14 @@
 ### 后端
 
 - `albumController` 只负责 HTTP 参数入口和响应。
-- `albumManagementService` 负责创建、改名、删除的业务规则和创建者权限校验。
+- `albumManagementService` 负责创建、年份校验、改名、删除的业务规则和创建者权限校验。
 - `albumService` 只保留相册表基础数据操作。
 
 ### 前端
 
 - `api/albums.js` 封装相册创建、改名、删除请求。
 - `useAlbums` 负责首页相册列表状态、创建、改名、删除、封面上传和错误提示。
-- `Home.jsx` 负责页面组织、输入框、确认框和把操作传给组件。
+- `CreateAlbumForm.jsx` 负责相册名称和相册年份输入。
+- `useAlbumYears` 负责按 `album_year` 分组和年份定位；旧数据缺少 `album_year` 时回退到 `created_at`。
+- `Home.jsx` 负责页面组织、确认框和把操作传给组件。
 - `AlbumCard.jsx` 接收 `onRename`、`onDelete` 和 `managing` props，负责展示创建者操作按钮和处理中状态。

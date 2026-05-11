@@ -2,6 +2,31 @@
 
 ## 2026-05-11
 
+### 新增：相册年份选择与首页年份分区
+- 创建相册时新增“相册年份”选择，年份独立于相册记录创建时间。
+- 首页按 `albums.album_year` 分区展示相册，支持左侧年份导航和点击定位。
+- 旧相册缺少 `album_year` 时前端回退到 `created_at` 年份；数据库迁移会用 `YEAR(created_at)` 初始化旧数据。
+- 新增 `albums.album_year` 字段和迁移脚本 `backend/sql/migrate_album_year.sql`。
+- 新增 `CreateAlbumForm`、`AlbumYearNav`、`AlbumYearSection` 和 `useAlbumYears`，保持创建表单、年份导航、分区展示、分组逻辑职责独立。
+
+| 改动 | 文件 | 说明 |
+|------|------|------|
+| 数据库 | `init_albums.sql` / `migrate_album_year.sql` | 增加 `albums.album_year` |
+| 后端 | `albumController.js` / `albumManagementService.js` / `albumService.js` | 创建相册支持年份参数，列表返回并按年份排序 |
+| 前端 | `CreateAlbumForm.jsx` / `useAlbumYears.js` | 相册年份输入、分组和滚动定位 |
+| 前端 | `AlbumYearNav.jsx` / `AlbumYearSection.jsx` / `Home.jsx` | 首页年份导航和年份分区展示 |
+| 文档 | `api.md` / `database.md` / `features.md` / `album-management.md` | 同步相册年份字段和迁移说明 |
+
+---
+
+### 重构：相册与媒体职责分离
+- 后端控制器瘦身，业务规则下沉到专门服务。
+- 新增 `albumManagementService`、`albumCoverService`、`mediaUploadService`、`mediaManagementService`、`fileStorageService`。
+- 前端新增 `api/albums.js`、`api/media.js`、`useAlbums`、`useAlbumMedia`、`useMediaEditor`、`useMediaModal`。
+- `Home.jsx` 和 `AlbumDetail.jsx` 只负责页面组合，减少功能堆叠。
+
+---
+
 ### 新增：相册改名与删除
 - 首页相册卡片新增“改名”“删除”操作。
 - 只有相册创建者可以修改相册名称或删除相册。

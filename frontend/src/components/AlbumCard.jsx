@@ -22,6 +22,11 @@ function AlbumCard({
     return iso ? iso.slice(0, 10) : '';
   }
 
+  function getDisplayYear() {
+    if (album.album_year) return album.album_year;
+    return formatDate(album.created_at);
+  }
+
   function handleCoverClick() {
     fileInputRef.current?.click();
   }
@@ -47,7 +52,7 @@ function AlbumCard({
         </div>
         <div className="album-info">
           <h3>{album.title}</h3>
-          <p>{formatDate(album.created_at)}</p>
+          <p>{getDisplayYear()}</p>
           {album.username && (
             <p className="album-owner">
               {album.username}

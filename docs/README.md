@@ -18,7 +18,8 @@ Memory Vault 是一个**私人照片/视频分享网站**。用户可以创建�
 ## 功能列表
 
 - 用户注册/登录（JWT 鉴权）
-- 相册创建与管理
+- 相册创建与管理（支持用户选择相册年份）
+- 首页按相册年份分区和年份导航定位
 - 图片/视频批量上传（10MB / 500MB 限制）
 - 媒体描述编辑、删除
 - 图片/视频分区展示
@@ -35,7 +36,8 @@ memory-vault/
 │   │   ├── init_users.sql
 │   │   ├── init_albums.sql
 │   │   ├── init_media.sql
-│   │   └── init_comments.sql
+│   │   ├── init_comments.sql
+│   │   └── migrate_*.sql
 │   ├── uploads/                      # 上传文件存储（已 gitignore）
 │   └── src/
 │       ├── server.js                 # 启动入口
@@ -71,6 +73,13 @@ mysql -u root -p < backend/sql/init_users.sql
 mysql -u root -p < backend/sql/init_media.sql
 mysql -u root -p < backend/sql/init_albums.sql
 mysql -u root -p < backend/sql/init_comments.sql
+```
+
+已有数据库升级时按需执行迁移脚本：
+
+```bash
+mysql -u root -p memory_vault < backend/sql/migrate_album_cover.sql
+mysql -u root -p memory_vault < backend/sql/migrate_album_year.sql
 ```
 
 ### 2. 后端
@@ -114,7 +123,7 @@ npm run dev          # → http://localhost:5173
 |------|------|------|
 | 登录 | `/login` | 用户名/密码登录表单 |
 | 注册 | `/register` | 创建新账号 |
-| 首页 | `/` | 相册列表 + 新建相册 |
+| 首页 | `/` | 相册列表 + 新建相册 + 年份分区导航 |
 | 相册详情 | `/album/:id` | 上传 + 图片/视频分区 + 评论 |
 
 ---

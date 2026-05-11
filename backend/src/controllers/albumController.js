@@ -5,7 +5,7 @@ const parseId = require('../utils/parseId');
 
 async function create(req, res, next) {
   try {
-    const album = await albumManagementService.createAlbum(req.user.id, req.body.title);
+    const album = await albumManagementService.createAlbum(req.user.id, req.body.title, req.body.album_year);
     res.status(201).json(album);
   } catch (error) {
     next(error);

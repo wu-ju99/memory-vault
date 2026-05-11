@@ -38,6 +38,8 @@ media (1) ──< comments (many)   ON DELETE CASCADE
 | id | INT UNSIGNED | PK, AUTO_INCREMENT | — | 主键 |
 | user_id | INT UNSIGNED | NOT NULL, FK→users(id) | — | 所属用户 |
 | title | VARCHAR(100) | NOT NULL | — | 相册名称 |
+| album_year | SMALLINT UNSIGNED | NULL | NULL | 相册年份（用户选择，用于首页年份分区） |
+| cover_url | VARCHAR(500) | NULL | NULL | 相册封面地址 |
 | created_at | DATETIME | NOT NULL | CURRENT_TIMESTAMP | 创建时间 |
 
 **索引：** PRIMARY KEY (id), KEY idx_user_id (user_id)
@@ -100,3 +102,7 @@ media (1) ──< comments (many)   ON DELETE CASCADE
 2. `sql/init_media.sql` — 创建 media 表
 3. `sql/init_albums.sql` — 创建 albums 表 + media 添加 album_id
 4. `sql/init_comments.sql` — 创建 comments 表
+
+已有数据库迁移：
+- `sql/migrate_album_cover.sql` — albums 增加 `cover_url`
+- `sql/migrate_album_year.sql` — albums 增加 `album_year`，并用 `YEAR(created_at)` 初始化旧相册
