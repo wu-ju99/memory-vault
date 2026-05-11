@@ -247,17 +247,34 @@ function AlbumDetail() {
                 <p className="status-text empty-memory">暂无内容，上传第一张回忆吧。</p>
               )}
 
-              {yearGroups.map(({ year, items }) => (
-                <section key={year} id={`year-${year}`} className="memory-year-section">
-                  <div className="year-heading">
-                    <h2>{year}</h2>
-                    <span>{items.length} 张</span>
-                  </div>
-                  <div className="grid scrapbook-grid">
-                    {items.map((item, index) => renderMediaCard(item, index))}
-                  </div>
-                </section>
-              ))}
+              {yearGroups.map(({ year, items }) => {
+                const photos = items.filter((i) => i.type === 'image');
+                const videos = items.filter((i) => i.type === 'video');
+                return (
+                  <section key={year} id={`year-${year}`} className="memory-year-section">
+                    <div className="year-heading">
+                      <h2>{year}</h2>
+                      <span>{items.length} 张</span>
+                    </div>
+                    {photos.length > 0 && (
+                      <>
+                        <p className="media-type-label">📷 照片 ({photos.length})</p>
+                        <div className="grid scrapbook-grid">
+                          {photos.map((item, index) => renderMediaCard(item, index))}
+                        </div>
+                      </>
+                    )}
+                    {videos.length > 0 && (
+                      <>
+                        <p className="media-type-label">🎬 视频 ({videos.length})</p>
+                        <div className="grid scrapbook-grid">
+                          {videos.map((item, index) => renderMediaCard(item, index))}
+                        </div>
+                      </>
+                    )}
+                  </section>
+                );
+              })}
             </div>
           </div>
         </section>
