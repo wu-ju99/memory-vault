@@ -4,6 +4,7 @@ import api from '../api/axios';
 import { getUser } from '../utils/auth';
 import MediaCard from '../components/MediaCard';
 import CommentList from '../components/CommentList';
+import BASE_URL from '../config';
 
 function AlbumDetail() {
   const { id } = useParams();
@@ -22,6 +23,7 @@ function AlbumDetail() {
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState('');
   const [saving, setSaving] = useState(false);
+  const [activeMediaId, setActiveMediaId] = useState(null);
 
   const currentUser = getUser();
 
@@ -59,6 +61,9 @@ function AlbumDetail() {
       .map(([year, items]) => ({ year, items }));
   }, [mediaList]);
 
+  const activeIndex = mediaList.findIndex((item) => item.id === activeMediaId);
+  const activeMedia = activeIndex >= 0 ? mediaList[activeIndex] : null;
+
   function formatDate(iso) {
     return iso ? iso.slice(0, 10) : '';
   }
@@ -95,6 +100,7 @@ function AlbumDetail() {
     try {
       await api.delete(`/media/${item.id}`);
       setMediaList((prev) => prev.filter((media) => media.id !== item.id));
+      if (activeMediaId === item.id) setActiveMediaId(null);
     } catch {}
   }
 
@@ -136,10 +142,21 @@ function AlbumDetail() {
         onSaveEdit={saveEdit}
         onCancelEdit={cancelEdit}
         onDelete={canDelete ? handleDelete : null}
+        onOpen={(media) => setActiveMediaId(media.id)}
       >
         <CommentList mediaId={item.id} currentUserId={currentUser?.id} currentUserRole={currentUser?.role} />
       </MediaCard>
     );
+  }
+
+  function goToMedia(offset) {
+    if (activeIndex < 0 || mediaList.length === 0) return;
+    const nextIndex = (activeIndex + offset + mediaList.length) % mediaList.length;
+    setActiveMediaId(mediaList[nextIndex].id);
+  }
+
+  function closeMediaModal() {
+    setActiveMediaId(null);
   }
 
   if (loading) {
@@ -233,6 +250,65 @@ function AlbumDetail() {
             </div>
           </div>
         </section>
+
+        {activeMedia && (
+          <div className="media-modal" role="dialog" aria-modal="true">
+            <button className="media-modal-backdrop" onClick={closeMediaModal} aria-label="关闭" type="button" />
+            <article className="memory-draw-card">
+              <button className="modal-close" onClick={closeMediaModal} type="button">x</button>
+              <button className="modal-nav modal-prev" onClick={() => goToMedia(-1)} type="button">‹</button>
+              <button className="modal-nav modal-next" onClick={() => goToMedia(1)} type="button">›</button>
+
+              <div className="modal-media-frame">
+                {activeMedia.type === 'video' ? (
+                  <video src={BASE_URL + activeMedia.url} controls autoPlay className="modal-video" />
+                ) : (
+                  <img src={BASE_URL + activeMedia.url} alt="" className="modal-image" />
+                )}
+              </div>
+
+              <div className="modal-memory-details">
+                <p className="eyebrow">{activeMedia.type === 'video' ? 'Video Memory' : 'Photo Memory'}</p>
+                {editingId === activeMedia.id ? (
+                  <div className="edit-area modal-edit-area">
+                    <textarea
+                      className="edit-input"
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      rows={3}
+                      autoFocus
+                    />
+                    <div className="edit-actions">
+                      <button className="edit-btn save" disabled={saving} onClick={() => saveEdit(activeMedia.id)}>
+                        {saving ? '...' : '保存'}
+                      </button>
+                      <button className="edit-btn cancel" onClick={cancelEdit}>取消</button>
+                    </div>
+                  </div>
+                ) : (
+                  <button className="modal-description" onClick={() => startEdit(activeMedia)} type="button">
+                    {activeMedia.description || '添加这段回忆的描述...'}
+                  </button>
+                )}
+
+                <div className="modal-meta">
+                  <span>{activeMedia.event_time ? `拍摄 ${formatDate(activeMedia.event_time)}` : `上传 ${formatDate(activeMedia.created_at)}`}</span>
+                  {activeMedia.username && <span>{activeMedia.username}</span>}
+                </div>
+
+                <div className="modal-comments">
+                  <CommentList mediaId={activeMedia.id} currentUserId={currentUser?.id} currentUserRole={currentUser?.role} />
+                </div>
+
+                {(activeMedia.user_id === currentUser?.id || currentUser?.role === 'admin') && (
+                  <button className="modal-delete" onClick={() => handleDelete(activeMedia)} type="button">
+                    删除这条回忆
+                  </button>
+                )}
+              </div>
+            </article>
+          </div>
+        )}
       </main>
     </div>
   );

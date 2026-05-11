@@ -11,6 +11,7 @@ function MediaCard({
   onSaveEdit,
   onCancelEdit,
   onDelete,
+  onOpen,
   children,
 }) {
   const fullUrl = BASE_URL + item.url;
@@ -28,11 +29,14 @@ function MediaCard({
       style={{ '--photo-tilt': `${tilt}deg` }}
     >
       {item.type === 'video' ? (
-        <video src={fullUrl} controls className="grid-video" />
+        <button className="media-preview-btn" onClick={() => onOpen?.(item)} type="button">
+          <video src={fullUrl} muted className="grid-video" />
+          <span className="video-play-mark">播放</span>
+        </button>
       ) : (
-        <a href={fullUrl} target="_blank" rel="noopener noreferrer">
+        <button className="media-preview-btn" onClick={() => onOpen?.(item)} type="button">
           <img src={fullUrl} alt="" />
-        </a>
+        </button>
       )}
 
       {isEditing ? (

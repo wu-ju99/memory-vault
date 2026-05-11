@@ -1003,12 +1003,41 @@ html {
   box-shadow: 0 24px 34px rgba(69, 47, 31, 0.22);
 }
 
-.scrapbook-photo a,
-.scrapbook-photo .grid-video {
+.media-preview-btn {
+  position: relative;
+  display: block;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
+.scrapbook-photo .media-preview-btn {
   margin: 10px 10px 0;
   width: calc(100% - 20px);
+  aspect-ratio: 1;
+  overflow: hidden;
   border: 1px solid rgba(67, 48, 36, 0.08);
   background: #efe3d2;
+}
+
+.scrapbook-photo .media-preview-btn img,
+.scrapbook-photo .media-preview-btn .grid-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.video-play-mark {
+  position: absolute;
+  inset: auto 12px 12px auto;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(36, 28, 23, 0.72);
+  color: #fff;
+  font-size: 11px;
 }
 
 .scrapbook-photo .grid-desc {
@@ -1108,6 +1137,205 @@ html {
 
   .scrapbook-grid {
     grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+  }
+}
+
+/* --- Draw-card media modal --- */
+
+.media-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.media-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(255, 242, 213, 0.16), transparent 28%),
+    rgba(26, 20, 17, 0.72);
+  backdrop-filter: blur(9px);
+  cursor: pointer;
+}
+
+.memory-draw-card {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(280px, 1.1fr) minmax(260px, 0.72fr);
+  width: min(1060px, 100%);
+  max-height: min(86vh, 820px);
+  overflow: hidden;
+  border: 10px solid #fffaf3;
+  border-radius: 8px;
+  background: #fffaf3;
+  box-shadow: 0 34px 90px rgba(0, 0, 0, 0.42);
+  animation: drawCardIn 0.26s ease-out;
+}
+
+@keyframes drawCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.94) rotate(-2deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+.modal-media-frame {
+  min-height: 420px;
+  max-height: calc(86vh - 20px);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #1f1915;
+}
+
+.modal-image,
+.modal-video {
+  width: 100%;
+  height: 100%;
+  max-height: calc(86vh - 20px);
+  object-fit: contain;
+  display: block;
+}
+
+.modal-memory-details {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 31px, rgba(128, 92, 59, 0.12) 31px 32px),
+    #fff7e6;
+}
+
+.modal-description {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #403127;
+  cursor: pointer;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(22px, 3vw, 34px);
+  line-height: 1.22;
+  text-align: left;
+}
+
+.modal-description:hover {
+  color: #8b3d32;
+}
+
+.modal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0;
+}
+
+.modal-meta span {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(54, 107, 101, 0.12);
+  color: #366b65;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.modal-comments {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(108, 76, 54, 0.16);
+}
+
+.modal-delete {
+  margin-top: 18px;
+  border: 1px solid rgba(168, 70, 55, 0.42);
+  border-radius: 999px;
+  background: transparent;
+  color: #a84637;
+  cursor: pointer;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 13px;
+}
+
+.modal-close,
+.modal-nav {
+  position: absolute;
+  z-index: 3;
+  border: 0;
+  cursor: pointer;
+  color: #fff;
+  background: rgba(31, 24, 20, 0.64);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.24);
+}
+
+.modal-close {
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 16px;
+}
+
+.modal-nav {
+  top: 50%;
+  width: 42px;
+  height: 56px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  font-size: 38px;
+  line-height: 1;
+}
+
+.modal-prev {
+  left: 16px;
+}
+
+.modal-next {
+  right: 16px;
+}
+
+.modal-edit-area {
+  padding: 0;
+}
+
+.modal-edit-area .edit-input {
+  min-height: 110px;
+  font-size: 16px;
+}
+
+@media (max-width: 760px) {
+  .media-modal {
+    padding: 12px;
+  }
+
+  .memory-draw-card {
+    grid-template-columns: 1fr;
+    max-height: 92vh;
+  }
+
+  .modal-media-frame {
+    min-height: 280px;
+    max-height: 54vh;
+  }
+
+  .modal-memory-details {
+    max-height: 38vh;
+  }
+
+  .modal-nav {
+    width: 36px;
+    height: 48px;
+    font-size: 30px;
   }
 }
 
