@@ -53,6 +53,7 @@ function Home() {
           <h1>Memory Vault</h1>
         </div>
         <div className="topbar-right">
+          {user?.role === 'admin' && <Link to="/admin" className="text-btn">管理面板</Link>}
           {user && <Link to="/profile" className="user-tag">{user.username}</Link>}
           <button onClick={handleLogout} className="text-btn logout-btn">退出</button>
         </div>

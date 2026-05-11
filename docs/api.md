@@ -327,6 +327,51 @@ Authorization: Bearer <token>
 
 ---
 
+## 7. 管理员
+
+所有管理员接口都需要登录且 `user.role === 'admin'`，统一路径前缀为 `/api/admin`。
+
+### GET /api/admin/users
+
+查看所有成员，包含相册、媒体、评论数量统计。
+
+### PUT /api/admin/users/:id
+
+管理员更新成员资料。
+
+**请求体：**
+```json
+{ "username": "newname", "nickname": "昵称", "role": "admin" }
+```
+
+安全限制：不能移除最后一个管理员。
+
+### DELETE /api/admin/users/:id
+
+管理员删除成员。不能删除自己，不能删除最后一个管理员。删除前会清理该用户上传的媒体文件和相册封面文件。
+
+### GET /api/admin/albums
+
+查看全站相册列表。
+
+### DELETE /api/admin/albums/:id
+
+管理员删除任意相册。删除相册不会删除相册内媒体，媒体会按外键规则解除相册关联。
+
+### PUT /api/admin/albums/:id/cover
+
+管理员更新任意相册封面。支持上传 `cover` 文件。
+
+### GET /api/admin/media
+
+查看全站媒体列表，支持 `user_id`、`album_id`、`type` 查询参数。
+
+### DELETE /api/admin/media/:id
+
+管理员删除任意媒体，同时删除物理文件并清理引用该媒体的相册封面。
+
+---
+
 ## 认证错误统一响应
 
 所有受保护接口在 token 无效时返回：

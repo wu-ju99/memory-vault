@@ -688,6 +688,238 @@ body {
   color: #4caf50;
 }
 
+/* --- Admin dashboard --- */
+
+.admin-page {
+  min-height: 100vh;
+  background: #f5ead8;
+}
+
+.admin-shell {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 24px;
+  width: min(1280px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 32px 0 56px;
+}
+
+.admin-sidebar,
+.admin-panel {
+  border: 1px solid rgba(83, 56, 38, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 250, 243, 0.78);
+  box-shadow: 0 16px 34px rgba(69, 47, 31, 0.1);
+}
+
+.admin-sidebar {
+  align-self: start;
+  position: sticky;
+  top: 92px;
+  padding: 18px;
+}
+
+.admin-sidebar h2,
+.admin-panel-header h2 {
+  color: #6e4c37;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.admin-sidebar button {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 11px 13px;
+  border: 1px solid rgba(54, 107, 101, 0.22);
+  border-radius: 999px;
+  background: transparent;
+  color: #5f4e42;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.admin-sidebar button.active,
+.admin-sidebar button:hover {
+  background: #366b65;
+  color: #fff;
+}
+
+.admin-panel {
+  min-width: 0;
+  padding: 22px;
+}
+
+.admin-panel-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid rgba(113, 82, 55, 0.16);
+  padding-bottom: 14px;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #5f4e42;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(113, 82, 55, 0.14);
+  text-align: left;
+  vertical-align: top;
+}
+
+.admin-table th {
+  color: #6e4c37;
+  font-size: 12px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.admin-table td span {
+  display: block;
+  margin-top: 4px;
+  color: #8a7663;
+  font-size: 12px;
+}
+
+.admin-edit-stack {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-edit-stack input,
+.admin-table select {
+  min-height: 34px;
+  border: 1px solid rgba(92, 66, 47, 0.22);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #5f4e42;
+  font: inherit;
+}
+
+.admin-role {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(54, 107, 101, 0.12);
+}
+
+.admin-role.admin {
+  color: #a84637;
+  background: rgba(168, 70, 55, 0.12);
+}
+
+.admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-actions button,
+.admin-danger-btn {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(54, 107, 101, 0.28);
+  border-radius: 999px;
+  background: transparent;
+  color: #366b65;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.admin-actions button:hover {
+  background: rgba(54, 107, 101, 0.1);
+}
+
+.admin-actions button.danger,
+.admin-danger-btn {
+  border-color: rgba(168, 70, 55, 0.34);
+  color: #a84637;
+}
+
+.admin-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.admin-media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 18px;
+}
+
+.admin-media-card {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #fffaf3;
+  box-shadow: 0 12px 24px rgba(69, 47, 31, 0.12);
+}
+
+.admin-media-preview {
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #efe3d2;
+}
+
+.admin-media-preview img,
+.admin-media-preview video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-media-meta {
+  display: grid;
+  gap: 3px;
+  color: #5f4e42;
+  font-size: 13px;
+}
+
+.admin-media-meta span,
+.admin-media-card p {
+  color: #8a7663;
+  font-size: 12px;
+}
+
+.admin-cover-thumb {
+  width: 54px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+@media (max-width: 820px) {
+  .admin-shell {
+    display: block;
+    width: min(100% - 24px, 720px);
+  }
+
+  .admin-sidebar {
+    position: static;
+    margin-bottom: 16px;
+  }
+
+  .admin-sidebar button {
+    display: inline-block;
+    width: auto;
+    margin-right: 8px;
+  }
+}
+
 /* --- Memory book redesign --- */
 
 .scrapbook-page {

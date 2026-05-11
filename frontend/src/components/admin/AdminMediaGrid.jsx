@@ -1,0 +1,30 @@
+import BASE_URL from '../../config';
+
+function AdminMediaGrid({ media, onDeleteMedia }) {
+  return (
+    <div className="admin-media-grid">
+      {media.map((item) => (
+        <article key={item.id} className="admin-media-card">
+          <div className="admin-media-preview">
+            {item.type === 'video' ? (
+              <video src={BASE_URL + item.url} controls />
+            ) : (
+              <img src={BASE_URL + item.url} alt="" />
+            )}
+          </div>
+          <div className="admin-media-meta">
+            <strong>{item.username}</strong>
+            <span>{item.album_title || '未归档相册'}</span>
+            <span>{item.type} · {item.created_at?.slice(0, 10)}</span>
+          </div>
+          {item.description && <p>{item.description}</p>}
+          <button className="admin-danger-btn" onClick={() => onDeleteMedia(item)} type="button">
+            删除媒体
+          </button>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+export default AdminMediaGrid;

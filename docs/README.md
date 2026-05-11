@@ -20,6 +20,7 @@ Memory Vault 是一个**私人照片/视频分享网站**。用户可以创建�
 - 用户注册/登录（JWT 鉴权）
 - 相册创建与管理（支持用户选择相册年份）
 - 首页按相册年份分区和年份导航定位
+- 独立管理员面板（成员、相册、媒体管理）
 - 图片/视频批量上传（10MB / 500MB 限制）
 - 媒体描述编辑、删除
 - 图片/视频分区展示
@@ -108,6 +109,9 @@ npm run dev          # → http://localhost:5173
 | | `POST /api/auth/login` | 登录，返回 JWT |
 | 用户 | `GET /api/user/profile` | 当前用户资料 |
 | 相册 | `POST/GET /api/albums` | 创建/列表 |
+| 管理员 | `GET /api/admin/users` | 成员管理 |
+| | `GET /api/admin/albums` | 全站相册管理 |
+| | `GET /api/admin/media` | 全站媒体管理 |
 | 媒体 | `POST /api/media/upload` | 上传（支持批量） |
 | | `GET /api/media` | 列表（按相册筛选） |
 | | `PUT /api/media/:id` | 编辑描述 |

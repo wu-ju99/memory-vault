@@ -101,6 +101,10 @@ main.jsx
   hooks/useAlbumMedia.js  — 相册详情页数据、上传、删除、设封面状态
   hooks/useMediaEditor.js — 媒体描述编辑状态
   hooks/useMediaModal.js  — 媒体预览弹窗状态
+  api/admin.js            — 管理员 API 封装
+  hooks/useAdminUsers.js  — 管理员成员列表、编辑、删除状态
+  hooks/useAdminAlbums.js — 管理员相册列表、删除、封面状态
+  hooks/useAdminMedia.js  — 管理员媒体列表、删除状态
   utils/auth.js       — localStorage 读写 (getToken/saveAuth/clearAuth/isAuthenticated)
   config.js           — BASE_URL = 'http://localhost:3000'
   components/ProtectedRoute.jsx — 路由守卫
@@ -117,6 +121,9 @@ main.jsx
 - `services/mediaUploadService.js`：媒体上传文件分类、大小校验和入库编排。
 - `services/mediaManagementService.js`：媒体编辑、删除权限和删除副作用编排。
 - `services/fileStorageService.js`：上传文件路径、URL 和文件删除。
+- `middlewares/adminOnly.js`：管理员接口权限边界。
+- `routes/admin.js` / `controllers/adminController.js`：独立管理员接口入口。
+- `services/adminUserService.js` / `adminAlbumService.js` / `adminMediaService.js`：管理员业务服务，避免混入普通用户流程。
 
 ## 数据关系
 

@@ -2,6 +2,24 @@
 
 ## 2026-05-11
 
+### 新增：独立管理员管理面板
+- 新增 `/admin` 管理面板，仅 `role=admin` 用户可访问。
+- 管理员可查看全站成员信息和统计，可修改成员用户名、昵称、角色，可删除成员。
+- 管理员可查看全站相册，删除任意相册，上传替换任意相册封面。
+- 管理员可查看全站媒体，删除任意用户上传的媒体。
+- 后端新增独立 `/api/admin/*` 路由和 `adminOnly` 中间件，避免管理员逻辑混入普通用户接口。
+- 删除成员时会清理该成员上传的媒体文件和独立封面文件；删除媒体时复用已有媒体删除流程，清理文件和封面引用。
+
+| 改动 | 文件 | 说明 |
+|------|------|------|
+| 后端 | `middlewares/adminOnly.js` / `routes/admin.js` / `controllers/adminController.js` | 独立管理员 API |
+| 后端 | `adminUserService.js` / `adminAlbumService.js` / `adminMediaService.js` | 独立管理员业务服务 |
+| 前端 | `AdminRoute.jsx` / `AdminDashboard.jsx` | 管理员路由保护和管理面板 |
+| 前端 | `api/admin.js` / `useAdmin*.js` | 管理员 API 封装和状态 hook |
+| 前端 | `components/admin/*` | 成员、相册、媒体管理展示组件 |
+
+---
+
 ### 新增：相册年份选择与首页年份分区
 - 创建相册时新增“相册年份”选择，年份独立于相册记录创建时间。
 - 首页按 `albums.album_year` 分区展示相册，支持左侧年份导航和点击定位。
