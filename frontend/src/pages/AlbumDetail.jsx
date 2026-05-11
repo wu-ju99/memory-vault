@@ -159,6 +159,17 @@ function AlbumDetail() {
     setActiveMediaId(null);
   }
 
+  useEffect(() => {
+    if (!activeMediaId) return;
+    function handleKey(e) {
+      if (e.key === 'Escape') closeMediaModal();
+      else if (e.key === 'ArrowLeft') goToMedia(-1);
+      else if (e.key === 'ArrowRight') goToMedia(1);
+    }
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  });
+
   if (loading) {
     return <div className="page scrapbook-page"><main className="content memory-content"><p className="status-text">正在翻找相册...</p></main></div>;
   }
@@ -255,7 +266,7 @@ function AlbumDetail() {
           <div className="media-modal" role="dialog" aria-modal="true">
             <button className="media-modal-backdrop" onClick={closeMediaModal} aria-label="关闭" type="button" />
             <article className="memory-draw-card">
-              <button className="modal-close" onClick={closeMediaModal} type="button">x</button>
+              <button className="modal-close" onClick={closeMediaModal} type="button" aria-label="关闭">&times;</button>
               <button className="modal-nav modal-prev" onClick={() => goToMedia(-1)} type="button">‹</button>
               <button className="modal-nav modal-next" onClick={() => goToMedia(1)} type="button">›</button>
 
