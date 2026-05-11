@@ -1,26 +1,42 @@
-/**
- * MediaCard — 单条媒体展示卡片
- * Props: item, editingId, editText, saving, onStartEdit, onEditTextChange, onSaveEdit, onCancelEdit, onDelete, children
- */
-
 import BASE_URL from '../config';
 
-function MediaCard({ item, editingId, editText, saving, onStartEdit, onEditTextChange, onSaveEdit, onCancelEdit, onDelete, children }) {
+function MediaCard({
+  item,
+  index = 0,
+  editingId,
+  editText,
+  saving,
+  onStartEdit,
+  onEditTextChange,
+  onSaveEdit,
+  onCancelEdit,
+  onDelete,
+  onOpen,
+  children,
+}) {
   const fullUrl = BASE_URL + item.url;
   const isEditing = editingId === item.id;
+  const tilts = [-2.4, 1.7, -0.9, 2.5, -1.6, 0.8];
+  const tilt = tilts[index % tilts.length];
 
   function formatDate(iso) {
     return iso ? iso.slice(0, 10) : '';
   }
 
   return (
-    <div className={`grid-item ${item.type === 'video' ? 'grid-item-video' : ''}`}>
+    <div
+      className={`grid-item scrapbook-photo ${item.type === 'video' ? 'grid-item-video' : ''}`}
+      style={{ '--photo-tilt': `${tilt}deg` }}
+    >
       {item.type === 'video' ? (
-        <video src={fullUrl} controls className="grid-video" />
+        <button className="media-preview-btn" onClick={() => onOpen?.(item)} type="button">
+          <video src={fullUrl} muted className="grid-video" />
+          <span className="video-play-mark">播放</span>
+        </button>
       ) : (
-        <a href={fullUrl} target="_blank" rel="noopener noreferrer">
+        <button className="media-preview-btn" onClick={() => onOpen?.(item)} type="button">
           <img src={fullUrl} alt="" />
-        </a>
+        </button>
       )}
 
       {isEditing ? (
@@ -50,7 +66,7 @@ function MediaCard({ item, editingId, editText, saving, onStartEdit, onEditTextC
       )}
 
       <p className="grid-date">
-        {item.event_time ? `📷 ${formatDate(item.event_time)}` : `📅 ${formatDate(item.created_at)}`}
+        {item.event_time ? `拍摄 ${formatDate(item.event_time)}` : `上传 ${formatDate(item.created_at)}`}
       </p>
       {item.username && (
         <p className="media-user">
@@ -62,7 +78,7 @@ function MediaCard({ item, editingId, editText, saving, onStartEdit, onEditTextC
       {children}
 
       {onDelete && (
-        <button className="del-btn" onClick={() => onDelete(item)}>×</button>
+        <button className="del-btn" onClick={() => onDelete(item)}>x</button>
       )}
     </div>
   );

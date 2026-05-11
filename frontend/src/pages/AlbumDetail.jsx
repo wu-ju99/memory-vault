@@ -1,13 +1,10 @@
-/**
- * 相册详情页 — 上传 + 媒体列表（MediaCard） + 评论（CommentList）
- */
-
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../api/axios';
 import { getUser } from '../utils/auth';
 import MediaCard from '../components/MediaCard';
 import CommentList from '../components/CommentList';
+import BASE_URL from '../config';
 
 function AlbumDetail() {
   const { id } = useParams();
@@ -16,7 +13,6 @@ function AlbumDetail() {
   const [mediaList, setMediaList] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 上传
   const [uploading, setUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState('');
   const [uploadError, setUploadError] = useState('');
@@ -24,13 +20,10 @@ function AlbumDetail() {
   const [eventTime, setEventTime] = useState('');
   const fileInputRef = useRef(null);
 
-  // 编辑描述
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState('');
   const [saving, setSaving] = useState(false);
-
-  // 视图模式
-  const [viewMode, setViewMode] = useState('grid');
+  const [activeMediaId, setActiveMediaId] = useState(null);
 
   const currentUser = getUser();
 
@@ -41,7 +34,7 @@ function AlbumDetail() {
       api.get(`/media?album_id=${id}`),
     ])
       .then(([albumRes, mediaRes]) => {
-        setAlbum(albumRes.data.albums.find((a) => a.id === parseInt(id)) || null);
+        setAlbum(albumRes.data.albums.find((item) => item.id === parseInt(id, 10)) || null);
         setMediaList(mediaRes.data.media);
       })
       .catch(() => {})
@@ -50,20 +43,31 @@ function AlbumDetail() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  function formatDate(iso) { return iso ? iso.slice(0, 10) : ''; }
-
-  function groupByDate(list) {
+  const yearGroups = useMemo(() => {
     const groups = {};
-    list.forEach((item) => {
+    mediaList.forEach((item) => {
       const time = item.event_time || item.created_at;
-      const date = new Date(time).toISOString().split('T')[0];
-      if (!groups[date]) groups[date] = { images: [], videos: [] };
-      groups[date][item.type === 'video' ? 'videos' : 'images'].push(item);
+      const year = time ? new Date(time).getFullYear().toString() : '未知年份';
+      if (!groups[year]) groups[year] = [];
+      groups[year].push(item);
     });
-    return Object.entries(groups).sort(([a], [b]) => new Date(b) - new Date(a));
+
+    return Object.entries(groups)
+      .sort(([a], [b]) => {
+        if (a === '未知年份') return 1;
+        if (b === '未知年份') return -1;
+        return Number(b) - Number(a);
+      })
+      .map(([year, items]) => ({ year, items }));
+  }, [mediaList]);
+
+  const activeIndex = mediaList.findIndex((item) => item.id === activeMediaId);
+  const activeMedia = activeIndex >= 0 ? mediaList[activeIndex] : null;
+
+  function formatDate(iso) {
+    return iso ? iso.slice(0, 10) : '';
   }
 
-  // === 上传 ===
   async function handleUpload(e) {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -72,14 +76,14 @@ function AlbumDetail() {
     setUploading(true);
     try {
       const formData = new FormData();
-      for (let i = 0; i < files.length; i++) formData.append('files', files[i]);
+      for (let i = 0; i < files.length; i += 1) formData.append('files', files[i]);
       if (description.trim()) formData.append('description', description.trim());
       if (eventTime) formData.append('event_time', eventTime);
       formData.append('album_id', id);
       const res = await api.post('/media/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      setUploadMessage(`上传完成: ${res.data.count} 个文件`);
+      setUploadMessage(`上传完成：${res.data.count} 个文件`);
       setDescription('');
       setEventTime('');
       fetchData();
@@ -91,45 +95,45 @@ function AlbumDetail() {
     }
   }
 
-  // === 删除 ===
   async function handleDelete(item) {
-    if (!window.confirm('确定删除吗？')) return;
+    if (!window.confirm('确定删除这条回忆吗？')) return;
     try {
       await api.delete(`/media/${item.id}`);
-      setMediaList((prev) => prev.filter((m) => m.id !== item.id));
+      setMediaList((prev) => prev.filter((media) => media.id !== item.id));
+      if (activeMediaId === item.id) setActiveMediaId(null);
     } catch {}
   }
 
-  // === 编辑描述 ===
-  function startEdit(item) { setEditingId(item.id); setEditText(item.description || ''); }
-  function cancelEdit() { setEditingId(null); setEditText(''); }
+  function startEdit(item) {
+    setEditingId(item.id);
+    setEditText(item.description || '');
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditText('');
+  }
+
   async function saveEdit(mediaId) {
     setSaving(true);
     try {
       const res = await api.put(`/media/${mediaId}`, { description: editText });
-      setMediaList((prev) => prev.map((m) =>
-        m.id === mediaId ? { ...m, description: res.data.description } : m
+      setMediaList((prev) => prev.map((media) =>
+        media.id === mediaId ? { ...media, description: res.data.description } : media
       ));
       setEditingId(null);
-    } catch {} finally { setSaving(false); }
+    } catch {} finally {
+      setSaving(false);
+    }
   }
 
-  if (loading) {
-    return <div className="page"><main className="content"><p className="status-text">加载中...</p></main></div>;
-  }
-  if (!album) {
-    return <div className="page"><main className="content"><p className="status-text">相册不存在</p><Link to="/" className="text-btn">← 返回</Link></main></div>;
-  }
-
-  const images = mediaList.filter((item) => item.type === 'image');
-  const videos = mediaList.filter((item) => item.type === 'video');
-
-  function renderMediaCard(item) {
+  function renderMediaCard(item, index) {
     const canDelete = item.user_id === currentUser?.id || currentUser?.role === 'admin';
     return (
       <MediaCard
         key={item.id}
         item={item}
+        index={index}
         editingId={editingId}
         editText={editText}
         saving={saving}
@@ -138,79 +142,182 @@ function AlbumDetail() {
         onSaveEdit={saveEdit}
         onCancelEdit={cancelEdit}
         onDelete={canDelete ? handleDelete : null}
+        onOpen={(media) => setActiveMediaId(media.id)}
       >
         <CommentList mediaId={item.id} currentUserId={currentUser?.id} currentUserRole={currentUser?.role} />
       </MediaCard>
     );
   }
 
+  function goToMedia(offset) {
+    if (activeIndex < 0 || mediaList.length === 0) return;
+    const nextIndex = (activeIndex + offset + mediaList.length) % mediaList.length;
+    setActiveMediaId(mediaList[nextIndex].id);
+  }
+
+  function closeMediaModal() {
+    setActiveMediaId(null);
+  }
+
+  useEffect(() => {
+    if (!activeMediaId) return;
+    function handleKey(e) {
+      if (e.key === 'Escape') closeMediaModal();
+      else if (e.key === 'ArrowLeft') goToMedia(-1);
+      else if (e.key === 'ArrowRight') goToMedia(1);
+    }
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  });
+
+  if (loading) {
+    return <div className="page scrapbook-page"><main className="content memory-content"><p className="status-text">正在翻找相册...</p></main></div>;
+  }
+
+  if (!album) {
+    return (
+      <div className="page scrapbook-page">
+        <main className="content memory-content">
+          <p className="status-text">相册不存在</p>
+          <Link to="/" className="text-btn">返回首页</Link>
+        </main>
+      </div>
+    );
+  }
+
   return (
-    <div className="page">
-      <header className="topbar">
-        <Link to="/" className="text-btn">← 返回</Link>
-        <h1>{album.title}</h1>
+    <div className="page scrapbook-page">
+      <header className="topbar memory-topbar">
+        <Link to="/" className="text-btn">返回</Link>
+        <div className="album-title-block">
+          <p className="eyebrow">Album</p>
+          <h1>{album.title}</h1>
+        </div>
         <span className="album-date">{formatDate(album.created_at)}</span>
       </header>
 
-      <main className="content">
-        <div className="upload-section">
-          <textarea className="upload-desc" placeholder="写点回忆..." value={description} onChange={(e) => setDescription(e.target.value)} rows={2} />
-          <input className="upload-event" type="datetime-local" value={eventTime} onChange={(e) => setEventTime(e.target.value)} />
-          <input ref={fileInputRef} type="file" multiple accept="image/jpeg,image/png,image/webp,video/mp4,video/mov,video/webm" onChange={handleUpload} id="file-upload-detail" className="file-input" />
-          <label htmlFor="file-upload-detail" className={`upload-btn ${uploading ? 'disabled' : ''}`}>
-            {uploading ? '上传中...' : '上传图片 / 视频'}
-          </label>
-          {uploadMessage && <p className="status-text success">{uploadMessage}</p>}
-          {uploadError && <p className="status-text error">{uploadError}</p>}
-        </div>
+      <main className="content memory-content album-detail-content">
+        <aside className="year-bookmarks" aria-label="年份书签">
+          {yearGroups.map(({ year }) => (
+            <a key={year} href={`#year-${year}`} className="year-bookmark">{year}</a>
+          ))}
+        </aside>
 
-        {!loading && mediaList.length === 0 && (
-          <p className="status-text">暂无内容，上传第一张吧</p>
-        )}
+        <section className="album-book-shell detail-book-shell">
+          <div className="book-spread detail-spread">
+            <div className="book-page book-page-left upload-page">
+              <div className="book-page-header">
+                <span>New Memory</span>
+                <strong>+</strong>
+              </div>
 
-        {mediaList.length > 0 && (
-          <div className="view-toggle">
-            <button className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`} onClick={() => setViewMode('grid')}>▦ 网格</button>
-            <button className={`view-btn ${viewMode === 'timeline' ? 'active' : ''}`} onClick={() => setViewMode('timeline')}>⏱ 时间轴</button>
+              <div className="upload-section upload-note">
+                <textarea
+                  className="upload-desc"
+                  placeholder="写点这张照片背后的回忆..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={3}
+                />
+                <input
+                  className="upload-event"
+                  type="datetime-local"
+                  value={eventTime}
+                  onChange={(e) => setEventTime(e.target.value)}
+                />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept="image/jpeg,image/png,image/webp,video/mp4,video/mov,video/webm"
+                  onChange={handleUpload}
+                  id="file-upload-detail"
+                  className="file-input"
+                />
+                <label htmlFor="file-upload-detail" className={`upload-btn ${uploading ? 'disabled' : ''}`}>
+                  {uploading ? '上传中...' : '贴一张新照片 / 视频'}
+                </label>
+                {uploadMessage && <p className="status-text success">{uploadMessage}</p>}
+                {uploadError && <p className="status-text error">{uploadError}</p>}
+              </div>
+            </div>
+
+            <div className="book-page book-page-right memories-page">
+              {mediaList.length === 0 && (
+                <p className="status-text empty-memory">暂无内容，上传第一张回忆吧。</p>
+              )}
+
+              {yearGroups.map(({ year, items }) => (
+                <section key={year} id={`year-${year}`} className="memory-year-section">
+                  <div className="year-heading">
+                    <h2>{year}</h2>
+                    <span>{items.length} 张</span>
+                  </div>
+                  <div className="grid scrapbook-grid">
+                    {items.map((item, index) => renderMediaCard(item, index))}
+                  </div>
+                </section>
+              ))}
+            </div>
           </div>
-        )}
+        </section>
 
-        {viewMode === 'grid' && (
-          <>
-            {images.length > 0 && (
-              <>
-                <h3 className="section-title">📷 图片</h3>
-                <div className="grid">{images.map(renderMediaCard)}</div>
-              </>
-            )}
-            {videos.length > 0 && (
-              <>
-                <h3 className="section-title">🎬 视频</h3>
-                <div className="grid">{videos.map(renderMediaCard)}</div>
-              </>
-            )}
-          </>
-        )}
+        {activeMedia && (
+          <div className="media-modal" role="dialog" aria-modal="true">
+            <button className="media-modal-backdrop" onClick={closeMediaModal} aria-label="关闭" type="button" />
+            <article className="memory-draw-card">
+              <button className="modal-close" onClick={closeMediaModal} type="button" aria-label="关闭">&times;</button>
+              <button className="modal-nav modal-prev" onClick={() => goToMedia(-1)} type="button">‹</button>
+              <button className="modal-nav modal-next" onClick={() => goToMedia(1)} type="button">›</button>
 
-        {viewMode === 'timeline' && (
-          <div className="timeline">
-            {groupByDate(mediaList).map(([date, items]) => (
-              <div key={date} className="timeline-group">
-                <h3 className="timeline-date">{date}</h3>
-                {items.images.length > 0 && (
-                  <>
-                    <h4 className="section-subtitle">📷 图片</h4>
-                    <div className="grid">{items.images.map(renderMediaCard)}</div>
-                  </>
-                )}
-                {items.videos.length > 0 && (
-                  <>
-                    <h4 className="section-subtitle">🎬 视频</h4>
-                    <div className="grid">{items.videos.map(renderMediaCard)}</div>
-                  </>
+              <div className="modal-media-frame">
+                {activeMedia.type === 'video' ? (
+                  <video src={BASE_URL + activeMedia.url} controls autoPlay className="modal-video" />
+                ) : (
+                  <img src={BASE_URL + activeMedia.url} alt="" className="modal-image" />
                 )}
               </div>
-            ))}
+
+              <div className="modal-memory-details">
+                <p className="eyebrow">{activeMedia.type === 'video' ? 'Video Memory' : 'Photo Memory'}</p>
+                {editingId === activeMedia.id ? (
+                  <div className="edit-area modal-edit-area">
+                    <textarea
+                      className="edit-input"
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      rows={3}
+                      autoFocus
+                    />
+                    <div className="edit-actions">
+                      <button className="edit-btn save" disabled={saving} onClick={() => saveEdit(activeMedia.id)}>
+                        {saving ? '...' : '保存'}
+                      </button>
+                      <button className="edit-btn cancel" onClick={cancelEdit}>取消</button>
+                    </div>
+                  </div>
+                ) : (
+                  <button className="modal-description" onClick={() => startEdit(activeMedia)} type="button">
+                    {activeMedia.description || '添加这段回忆的描述...'}
+                  </button>
+                )}
+
+                <div className="modal-meta">
+                  <span>{activeMedia.event_time ? `拍摄 ${formatDate(activeMedia.event_time)}` : `上传 ${formatDate(activeMedia.created_at)}`}</span>
+                  {activeMedia.username && <span>{activeMedia.username}</span>}
+                </div>
+
+                <div className="modal-comments">
+                  <CommentList mediaId={activeMedia.id} currentUserId={currentUser?.id} currentUserRole={currentUser?.role} />
+                </div>
+
+                {(activeMedia.user_id === currentUser?.id || currentUser?.role === 'admin') && (
+                  <button className="modal-delete" onClick={() => handleDelete(activeMedia)} type="button">
+                    删除这条回忆
+                  </button>
+                )}
+              </div>
+            </article>
           </div>
         )}
       </main>

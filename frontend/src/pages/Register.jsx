@@ -1,5 +1,5 @@
 /**
- * 注册页 — 用户名/密码/确认密码表单
+ * 注册页：用户名/密码/确认密码表单
  * 调用 POST /api/auth/register，成功后跳转登录页并提示
  */
 
@@ -97,7 +97,7 @@ function Register() {
         />
 
         <button type="submit" disabled={loading}>
-          {loading ? '注册中...' : '注 册'}
+          {loading ? '注册中...' : '注册'}
         </button>
 
         <p className="hint">

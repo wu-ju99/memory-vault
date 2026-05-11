@@ -1,6 +1,6 @@
 /**
- * 登录页 — 用户名/密码表单
- * 调用 POST /api/auth/login，成功后存 token 并跳转首页
+ * 登录页：用户名/密码表单
+ * 调用 POST /api/auth/login，成功后保存 token 并跳转首页
  */
 
 import { useState } from 'react';
@@ -80,7 +80,7 @@ function Login() {
         />
 
         <button type="submit" disabled={loading}>
-          {loading ? '登录中...' : '登 录'}
+          {loading ? '登录中...' : '登录'}
         </button>
 
         <p className="hint">
