@@ -10,7 +10,7 @@ async function create(userId, title, albumYear) {
 
 async function getList(userId) {
   const [rows] = await pool.query(
-    'SELECT a.id, a.user_id, a.title, a.album_year, a.cover_url, a.created_at, u.username, u.role FROM albums a JOIN users u ON a.user_id = u.id ORDER BY COALESCE(a.album_year, YEAR(a.created_at)) DESC, a.created_at DESC'
+    'SELECT a.id, a.user_id, a.title, a.album_year, a.cover_url, a.created_at, u.username, u.nickname, u.role FROM albums a JOIN users u ON a.user_id = u.id ORDER BY COALESCE(a.album_year, YEAR(a.created_at)) DESC, a.created_at DESC'
   );
   return rows;
 }
@@ -32,7 +32,7 @@ async function getById(id, userId) {
 
 async function getDisplayById(id) {
   const [rows] = await pool.query(
-    'SELECT a.id, a.user_id, a.title, a.album_year, a.cover_url, a.created_at, u.username, u.role FROM albums a JOIN users u ON a.user_id = u.id WHERE a.id = ?',
+    'SELECT a.id, a.user_id, a.title, a.album_year, a.cover_url, a.created_at, u.username, u.nickname, u.role FROM albums a JOIN users u ON a.user_id = u.id WHERE a.id = ?',
     [id]
   );
   return rows[0] || null;

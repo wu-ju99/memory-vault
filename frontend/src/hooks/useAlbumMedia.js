@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { fetchAlbums, setAlbumCover } from '../api/albums';
 import {
   deleteMedia,
@@ -9,24 +9,6 @@ import {
 
 function getErrorMessage(error, fallback) {
   return error.response?.data?.message || fallback;
-}
-
-function groupMediaByYear(mediaList) {
-  const groups = {};
-  mediaList.forEach((item) => {
-    const time = item.event_time || item.created_at;
-    const year = time ? new Date(time).getFullYear().toString() : '未知年份';
-    if (!groups[year]) groups[year] = [];
-    groups[year].push(item);
-  });
-
-  return Object.entries(groups)
-    .sort(([a], [b]) => {
-      if (a === '未知年份') return 1;
-      if (b === '未知年份') return -1;
-      return Number(b) - Number(a);
-    })
-    .map(([year, items]) => ({ year, items }));
 }
 
 export default function useAlbumMedia(albumId) {
@@ -54,8 +36,6 @@ export default function useAlbumMedia(albumId) {
   useEffect(() => {
     loadAlbumMedia();
   }, [loadAlbumMedia]);
-
-  const yearGroups = useMemo(() => groupMediaByYear(mediaList), [mediaList]);
 
   async function uploadFiles(files, options) {
     if (!files || files.length === 0) return null;
@@ -97,7 +77,6 @@ export default function useAlbumMedia(albumId) {
   return {
     album,
     mediaList,
-    yearGroups,
     loading,
     uploading,
     uploadMessage,

@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import BASE_URL from '../config';
+import { getUserDisplayName } from '../utils/userDisplay';
 
 function AlbumCard({
   album,
@@ -55,7 +56,7 @@ function AlbumCard({
           <p>{getDisplayYear()}</p>
           {album.username && (
             <p className="album-owner">
-              {album.username}
+              {getUserDisplayName(album)}
               {album.role === 'admin' && <span className="admin-badge">管理员</span>}
             </p>
           )}

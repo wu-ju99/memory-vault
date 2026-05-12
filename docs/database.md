@@ -38,7 +38,7 @@ media (1) ──< comments (many)   ON DELETE CASCADE
 | id | INT UNSIGNED | PK, AUTO_INCREMENT | — | 主键 |
 | user_id | INT UNSIGNED | NOT NULL, FK→users(id) | — | 所属用户 |
 | title | VARCHAR(100) | NOT NULL | — | 相册名称 |
-| album_year | SMALLINT UNSIGNED | NULL | NULL | 相册年份（用户选择，用于首页年份分区） |
+| album_year | SMALLINT UNSIGNED | NULL | NULL | 相册年份（用户选择，用于卡片显示和后续筛选） |
 | cover_url | VARCHAR(500) | NULL | NULL | 相册封面地址 |
 | created_at | DATETIME | NOT NULL | CURRENT_TIMESTAMP | 创建时间 |
 

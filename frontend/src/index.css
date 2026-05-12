@@ -1099,52 +1099,51 @@ body {
   max-width: none;
 }
 
-.album-year-nav {
-  margin-top: 30px;
-  padding-top: 24px;
-  border-top: 1px solid rgba(113, 82, 55, 0.16);
-}
-
-.album-year-nav-title {
-  margin-bottom: 12px;
-  color: #6e4c37;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.album-year-list {
+.album-user-nav {
   display: grid;
-  gap: 10px;
+  gap: 8px;
+  margin-top: 18px;
 }
 
-.album-year-btn {
-  display: grid;
-  grid-template-columns: 1fr auto;
+.album-user-nav button {
+  display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 10px;
   width: 100%;
-  min-height: 42px;
   padding: 9px 12px;
   border: 1px solid rgba(54, 107, 101, 0.22);
   border-radius: 999px;
-  background: rgba(255, 250, 243, 0.64);
+  background: rgba(255, 250, 243, 0.42);
   color: #5f4e42;
   cursor: pointer;
   font: inherit;
-  text-align: left;
-  transition: border-color 0.16s ease, background 0.16s ease, color 0.16s ease;
+  font-size: 13px;
 }
 
-.album-year-btn:hover,
-.album-year-btn.active {
+.album-user-nav button:hover,
+.album-user-nav button.active {
   border-color: rgba(54, 107, 101, 0.48);
   background: #366b65;
   color: #fff;
 }
 
-.album-year-btn strong {
+.album-user-nav span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.album-user-nav em {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 10px;
+  font-style: normal;
+  opacity: 0.78;
+}
+
+.album-user-nav strong {
   min-width: 30px;
   height: 26px;
   display: grid;
@@ -1155,17 +1154,17 @@ body {
   font-size: 12px;
 }
 
-.album-year-sections {
+.album-user-sections {
   display: flex;
   flex-direction: column;
   gap: 42px;
 }
 
-.album-year-section {
+.album-user-section {
   scroll-margin-top: 110px;
 }
 
-.album-year-heading {
+.album-user-heading {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -1176,19 +1175,39 @@ body {
   color: #6e4c37;
 }
 
-.album-year-heading h2 {
+.album-user-heading p {
+  margin: 0 0 4px;
+  color: #8a7663;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.album-user-heading h2 {
   color: #6e4c37;
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(30px, 4vw, 52px);
   line-height: 1;
 }
 
-.album-year-heading span {
+.album-user-heading h2 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.album-user-heading .admin-badge {
+  margin-left: 0;
+  font-family: inherit;
+}
+
+.album-user-heading > span {
   color: #8a7663;
   font-size: 13px;
 }
 
-.album-year-grid {
+.album-user-grid {
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
 }
 
@@ -1293,29 +1312,24 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .album-year-nav {
-    margin-top: 22px;
-    padding-top: 18px;
-  }
-
-  .album-year-list {
+  .album-user-nav {
     display: flex;
     gap: 8px;
     overflow-x: auto;
     padding-bottom: 4px;
   }
 
-  .album-year-btn {
+  .album-user-nav button {
     flex: 0 0 auto;
     width: auto;
-    min-width: 96px;
+    min-width: 118px;
   }
 
-  .album-year-sections {
+  .album-user-sections {
     gap: 34px;
   }
 
-  .album-year-grid {
+  .album-user-grid {
     grid-template-columns: repeat(auto-fill, minmax(142px, 1fr));
   }
 }
@@ -1412,6 +1426,50 @@ html {
 }
 
 .year-heading span {
+  color: #8a7663;
+  font-size: 13px;
+}
+
+.media-user-section {
+  display: grid;
+  gap: 12px;
+}
+
+.media-user-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid rgba(113, 82, 55, 0.16);
+  color: #6e4c37;
+}
+
+.media-user-heading p {
+  margin: 0 0 4px;
+  color: #8a7663;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.media-user-heading h2 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: #6e4c37;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(30px, 4vw, 54px);
+  line-height: 1;
+}
+
+.media-user-heading .admin-badge {
+  margin-left: 0;
+  font-family: inherit;
+}
+
+.media-user-heading > span {
   color: #8a7663;
   font-size: 13px;
 }

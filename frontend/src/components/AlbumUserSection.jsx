@@ -1,10 +1,8 @@
 import AlbumCard from './AlbumCard';
 
-function AlbumYearSection({
-  year,
-  albums,
+function AlbumUserSection({
+  group,
   sectionId,
-  startIndex = 0,
   currentUser,
   coverUploadingId,
   managingAlbumId,
@@ -13,19 +11,26 @@ function AlbumYearSection({
   onDelete,
 }) {
   return (
-    <section id={sectionId} className="album-year-section" data-year={year}>
-      <div className="album-year-heading">
-        <h2>{year}</h2>
-        <span>{albums.length} 本</span>
+    <section id={sectionId} className="album-user-section" data-user-key={group.userKey}>
+      <div className="album-user-heading">
+        <div>
+          <p>Uploaded by</p>
+          <h2>
+            {group.displayName}
+            {group.role === 'admin' && <span className="admin-badge">管理员</span>}
+          </h2>
+        </div>
+        <span>{group.items.length} 本相册</span>
       </div>
-      <div className="album-grid album-polaroid-grid album-year-grid">
-        {albums.map((album, index) => {
+
+      <div className="album-grid album-polaroid-grid album-user-grid">
+        {group.items.map((album, index) => {
           const isOwner = album.user_id === currentUser?.id;
           return (
             <AlbumCard
               key={album.id}
               album={album}
-              index={startIndex + index}
+              index={group.startIndex + index}
               onCoverUpload={onCoverUpload}
               uploading={coverUploadingId === album.id}
               onRename={isOwner ? onRename : null}
@@ -39,4 +44,4 @@ function AlbumYearSection({
   );
 }
 
-export default AlbumYearSection;
+export default AlbumUserSection;

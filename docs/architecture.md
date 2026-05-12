@@ -97,8 +97,9 @@ main.jsx
   api/albums.js       — 相册/封面 API 封装
   api/media.js        — 媒体 API 封装
   hooks/useAlbums.js      — 首页相册列表、创建、改名、删除、封面上传状态
-  hooks/useAlbumYears.js  — 首页按 album_year 分组、年份导航定位状态
+  hooks/useAlbumUsers.js  — 首页按相册创建者分组、用户导航定位状态
   hooks/useAlbumMedia.js  — 相册详情页数据、上传、删除、设封面状态
+  hooks/useMediaUsers.js  — 相册详情按媒体上传者分组状态
   hooks/useMediaEditor.js — 媒体描述编辑状态
   hooks/useMediaModal.js  — 媒体预览弹窗状态
   api/admin.js            — 管理员 API 封装

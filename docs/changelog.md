@@ -2,6 +2,22 @@
 
 ## 2026-05-12
 
+### 新增：首页与相册详情按用户分区
+- 首页相册列表改为按相册创建者分区，左页提供用户导航，点击可定位到对应用户的相册区。
+- 相册详情页改为按媒体上传者分区，每个用户分区内继续保留照片/视频分区，便于区分同一相册中不同成员上传的内容。
+- 单个用户分区内按时间倒序展示：相册按创建时间排序，媒体按拍摄时间 `event_time` 优先、否则按上传时间 `created_at` 排序。
+- 新增独立 `useAlbumUsers`、`useMediaUsers`、`AlbumUserNav`、`AlbumUserSection`、`MediaUserSection`，页面只负责组合，避免分区逻辑混入上传、评论、封面、删除等功能。
+- 后端相册和媒体列表补充返回 `nickname`，前端显示名优先使用昵称，没有昵称再回退到用户名。
+
+| 改动 | 文件 | 说明 |
+|------|------|------|
+| 后端 | `albumService.js` / `mediaService.js` | 列表接口返回 `nickname` |
+| 前端 | `useAlbumUsers.js` / `useMediaUsers.js` | 独立用户分组与排序逻辑 |
+| 前端 | `AlbumUserNav.jsx` / `AlbumUserSection.jsx` / `MediaUserSection.jsx` | 用户导航、首页用户相册分区、详情用户媒体分区 |
+| 前端 | `Home.jsx` / `AlbumDetail.jsx` | 接入用户分区组件，保留原上传、评论、删除、弹窗逻辑 |
+
+---
+
 ### 修复：窄栏评论排版竖排问题
 - 修复媒体详情弹窗右侧栏宽度较窄时，评论正文被日期、回复、删除按钮挤压成逐字竖排的问题。
 - 评论正文现在独占下一行，用户名、管理员标签、日期和操作按钮保持在评论头部行，窄屏和长评论内容会自然换行。
@@ -39,6 +55,7 @@
 - 旧相册缺少 `album_year` 时前端回退到 `created_at` 年份；数据库迁移会用 `YEAR(created_at)` 初始化旧数据。
 - 新增 `albums.album_year` 字段和迁移脚本 `backend/sql/migrate_album_year.sql`。
 - 新增 `CreateAlbumForm`、`AlbumYearNav`、`AlbumYearSection` 和 `useAlbumYears`，保持创建表单、年份导航、分区展示、分组逻辑职责独立。
+- 当前首页浏览分区已在 2026-05-12 调整为按用户分区；`album_year` 仍保留为相册年份字段和卡片显示信息。
 
 | 改动 | 文件 | 说明 |
 |------|------|------|

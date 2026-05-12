@@ -6,7 +6,8 @@
 
 - 相册创建者可以在首页相册卡片上修改相册名称。
 - 相册创建者可以在首页相册卡片上删除相册。
-- 创建相册时可以选择相册年份，首页按相册年份分区；相册年份独立于记录创建时间。
+- 创建相册时可以选择相册年份；相册年份独立于记录创建时间，用于卡片显示和后续筛选。
+- 首页当前按相册创建者分区，单个用户内按创建时间倒序展示相册。
 - 非创建者不能修改或删除相册，前端不会显示“改名”“删除”按钮。
 - 后端也会校验创建者权限，防止绕过前端直接调用接口。
 - 删除相册只删除相册记录，不删除相册内原有照片/视频；媒体记录会按现有外键规则解除相册关联。
@@ -37,6 +38,7 @@
   "cover_url": null,
   "created_at": "2026-05-11T00:00:00.000Z",
   "username": "user",
+  "nickname": "用户昵称",
   "role": "user"
 }
 ```
@@ -72,6 +74,7 @@
     "cover_url": "/uploads/cover.png",
     "created_at": "2026-05-11T00:00:00.000Z",
     "username": "user",
+    "nickname": "用户昵称",
     "role": "user"
   }
 }
@@ -118,6 +121,7 @@
 - `api/albums.js` 封装相册创建、改名、删除请求。
 - `useAlbums` 负责首页相册列表状态、创建、改名、删除、封面上传和错误提示。
 - `CreateAlbumForm.jsx` 负责相册名称和相册年份输入。
-- `useAlbumYears` 负责按 `album_year` 分组和年份定位；旧数据缺少 `album_year` 时回退到 `created_at`。
+- `useAlbumUsers` 负责按相册创建者分组和用户定位；单个用户内按创建时间倒序。
 - `Home.jsx` 负责页面组织、确认框和把操作传给组件。
+- `AlbumUserNav.jsx` / `AlbumUserSection.jsx` 负责用户导航和用户相册分区展示。
 - `AlbumCard.jsx` 接收 `onRename`、`onDelete` 和 `managing` props，负责展示创建者操作按钮和处理中状态。

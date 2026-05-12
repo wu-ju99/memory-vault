@@ -1,10 +1,10 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { clearAuth, getUser } from '../utils/auth';
 import CreateAlbumForm from '../components/CreateAlbumForm';
-import AlbumYearNav from '../components/AlbumYearNav';
-import AlbumYearSection from '../components/AlbumYearSection';
+import AlbumUserNav from '../components/AlbumUserNav';
+import AlbumUserSection from '../components/AlbumUserSection';
 import useAlbums from '../hooks/useAlbums';
-import useAlbumYears from '../hooks/useAlbumYears';
+import useAlbumUsers from '../hooks/useAlbumUsers';
 
 function Home() {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ function Home() {
     renameAlbum,
     removeAlbum,
   } = useAlbums();
-  const albumYears = useAlbumYears(albums);
+  const albumUsers = useAlbumUsers(albums);
 
   async function handleCoverUpload(album, file) {
     await uploadCover(album, file);
@@ -60,7 +60,7 @@ function Home() {
       </header>
 
       <main className="content memory-content">
-        <section id="album-year-root" className="album-book-shell" aria-label="相册列表">
+        <section id="album-user-root" className="album-book-shell" aria-label="相册列表">
           <div className="book-spread">
             <div className="book-page book-page-left">
               <div className="book-page-header">
@@ -74,25 +74,23 @@ function Home() {
               {!loading && albums.length === 0 && (
                 <p className="status-text">还没有相册，先创建一本吧。</p>
               )}
-              <AlbumYearNav
-                years={albumYears.years}
+              <AlbumUserNav
+                users={albumUsers.users}
                 totalCount={albums.length}
-                activeYear={albumYears.activeYear}
-                allYearsValue={albumYears.allYearsValue}
-                onSelectYear={albumYears.scrollToYear}
+                activeUser={albumUsers.activeUser}
+                allUsersValue={albumUsers.allUsersValue}
+                onSelectUser={albumUsers.scrollToUser}
               />
             </div>
 
             <div className="book-page book-page-right">
               {albums.length > 0 && (
-                <div className="album-year-sections">
-                  {albumYears.yearGroups.map(({ year, items, startIndex }) => (
-                    <AlbumYearSection
-                      key={year}
-                      year={year}
-                      albums={items}
-                      sectionId={albumYears.getYearSectionId(year)}
-                      startIndex={startIndex}
+                <div className="album-user-sections">
+                  {albumUsers.userGroups.map((group) => (
+                    <AlbumUserSection
+                      key={group.userKey}
+                      group={group}
+                      sectionId={albumUsers.getUserSectionId(group.userKey)}
                       currentUser={user}
                       coverUploadingId={coverUploadingId}
                       managingAlbumId={managingAlbumId}

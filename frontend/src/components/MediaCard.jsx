@@ -1,4 +1,5 @@
 import BASE_URL from '../config';
+import { getUserDisplayName } from '../utils/userDisplay';
 
 function MediaCard({
   item,
@@ -70,7 +71,7 @@ function MediaCard({
       </p>
       {item.username && (
         <p className="media-user">
-          {item.username}
+          {getUserDisplayName(item)}
           {item.role === 'admin' && <span className="admin-badge">管理员</span>}
         </p>
       )}
