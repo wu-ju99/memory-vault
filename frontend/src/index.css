@@ -1099,10 +1099,69 @@ body {
   max-width: none;
 }
 
+.album-year-nav {
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(113, 82, 55, 0.16);
+}
+
+.album-year-nav-title,
+.album-user-nav-title {
+  margin-bottom: 12px;
+  color: #6e4c37;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.album-year-list {
+  display: grid;
+  gap: 10px;
+}
+
+.album-year-btn {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 12px;
+  border: 1px solid rgba(54, 107, 101, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 250, 243, 0.64);
+  color: #5f4e42;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: border-color 0.16s ease, background 0.16s ease, color 0.16s ease;
+}
+
+.album-year-btn:hover,
+.album-year-btn.active {
+  border-color: rgba(54, 107, 101, 0.48);
+  background: #366b65;
+  color: #fff;
+}
+
+.album-year-btn strong {
+  min-width: 30px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.54);
+  color: inherit;
+  font-size: 12px;
+}
+
 .album-user-nav {
   display: grid;
   gap: 8px;
-  margin-top: 18px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px dashed rgba(113, 82, 55, 0.18);
 }
 
 .album-user-nav button {
@@ -1154,16 +1213,26 @@ body {
   font-size: 12px;
 }
 
-.album-user-sections {
+.album-year-sections,
+.album-year-user-sections {
   display: flex;
   flex-direction: column;
+}
+
+.album-year-sections {
   gap: 42px;
 }
 
+.album-year-user-sections {
+  gap: 28px;
+}
+
+.album-year-section,
 .album-user-section {
   scroll-margin-top: 110px;
 }
 
+.album-year-heading,
 .album-user-heading {
   display: flex;
   align-items: baseline;
@@ -1183,11 +1252,18 @@ body {
   text-transform: uppercase;
 }
 
+.album-year-heading h2,
 .album-user-heading h2 {
   color: #6e4c37;
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(30px, 4vw, 52px);
   line-height: 1;
+}
+
+.album-year-heading span,
+.album-user-heading > span {
+  color: #8a7663;
+  font-size: 13px;
 }
 
 .album-user-heading h2 {
@@ -1202,11 +1278,7 @@ body {
   font-family: inherit;
 }
 
-.album-user-heading > span {
-  color: #8a7663;
-  font-size: 13px;
-}
-
+.album-year-grid,
 .album-user-grid {
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
 }
@@ -1312,6 +1384,18 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .album-year-nav {
+    margin-top: 22px;
+    padding-top: 18px;
+  }
+
+  .album-year-list {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
   .album-user-nav {
     display: flex;
     gap: 8px;
@@ -1325,10 +1409,17 @@ body {
     min-width: 118px;
   }
 
-  .album-user-sections {
+  .album-year-btn {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 96px;
+  }
+
+  .album-year-sections {
     gap: 34px;
   }
 
+  .album-year-grid,
   .album-user-grid {
     grid-template-columns: repeat(auto-fill, minmax(142px, 1fr));
   }

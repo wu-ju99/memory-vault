@@ -1,10 +1,12 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { clearAuth, getUser } from '../utils/auth';
 import CreateAlbumForm from '../components/CreateAlbumForm';
+import AlbumYearNav from '../components/AlbumYearNav';
+import AlbumYearSection from '../components/AlbumYearSection';
 import AlbumUserNav from '../components/AlbumUserNav';
-import AlbumUserSection from '../components/AlbumUserSection';
 import useAlbums from '../hooks/useAlbums';
-import useAlbumUsers from '../hooks/useAlbumUsers';
+import useAlbumYears from '../hooks/useAlbumYears';
+import useYearUserNav from '../hooks/useYearUserNav';
 
 function Home() {
   const navigate = useNavigate();
@@ -21,7 +23,8 @@ function Home() {
     renameAlbum,
     removeAlbum,
   } = useAlbums();
-  const albumUsers = useAlbumUsers(albums);
+  const albumYears = useAlbumYears(albums);
+  const yearUsers = useYearUserNav(albumYears.yearGroups, albumYears.activeYear, albumYears.allYearsValue);
 
   async function handleCoverUpload(album, file) {
     await uploadCover(album, file);
@@ -45,6 +48,12 @@ function Home() {
     navigate('/login');
   }
 
+  function handleSelectYearUser(user) {
+    const targetYear = albumYears.activeYear === albumYears.allYearsValue ? user.year : albumYears.activeYear;
+    const targetId = `${albumYears.getYearSectionId(targetYear)}-${user.userKey}`;
+    document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   return (
     <div className="page scrapbook-page">
       <header className="topbar memory-topbar">
@@ -60,7 +69,7 @@ function Home() {
       </header>
 
       <main className="content memory-content">
-        <section id="album-user-root" className="album-book-shell" aria-label="相册列表">
+        <section id="album-year-root" className="album-book-shell" aria-label="相册列表">
           <div className="book-spread">
             <div className="book-page book-page-left">
               <div className="book-page-header">
@@ -74,23 +83,28 @@ function Home() {
               {!loading && albums.length === 0 && (
                 <p className="status-text">还没有相册，先创建一本吧。</p>
               )}
-              <AlbumUserNav
-                users={albumUsers.users}
+              <AlbumYearNav
+                years={albumYears.years}
                 totalCount={albums.length}
-                activeUser={albumUsers.activeUser}
-                allUsersValue={albumUsers.allUsersValue}
-                onSelectUser={albumUsers.scrollToUser}
+                activeYear={albumYears.activeYear}
+                allYearsValue={albumYears.allYearsValue}
+                onSelectYear={albumYears.scrollToYear}
+              />
+              <AlbumUserNav
+                users={yearUsers}
+                onSelectUser={handleSelectYearUser}
               />
             </div>
 
             <div className="book-page book-page-right">
               {albums.length > 0 && (
-                <div className="album-user-sections">
-                  {albumUsers.userGroups.map((group) => (
-                    <AlbumUserSection
-                      key={group.userKey}
-                      group={group}
-                      sectionId={albumUsers.getUserSectionId(group.userKey)}
+                <div className="album-year-sections">
+                  {albumYears.yearGroups.map(({ year, items }) => (
+                    <AlbumYearSection
+                      key={year}
+                      year={year}
+                      albums={items}
+                      sectionId={albumYears.getYearSectionId(year)}
                       currentUser={user}
                       coverUploadingId={coverUploadingId}
                       managingAlbumId={managingAlbumId}

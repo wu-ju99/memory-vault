@@ -33,7 +33,7 @@ memory-vault/
 ## 2. 已完成模块
 
 - **后端：** 注册/登录 (bcrypt + JWT 7d)、JWT 鉴权中间件(req.user)、健康检查、用户资料查询、个人信息修改(PUT /api/user/update-profile: 昵称/头像 multipart/密码旧验证)、头像上传(multer → uploads/avatars UUID)、相册 CRUD、媒体上传(批量/图片10MB/视频500MB/事件时间)、媒体列表(共享模式+按相册筛)、媒体编辑/删除(权限控制)、评论 CRUD(树形回复+级联删除+管理员可删任意评论)、event_time、请求日志中间件
-- **前端：** 登录/注册页(确认密码)、个人信息页(/profile: 头像上传+预览+昵称编辑+密码修改旧验证)、首页按相册创建者分区(AlbumUserNav/AlbumUserSection)、相册详情按媒体上传者分区(MediaUserSection + MediaCard + CommentList 组合)、图片/视频分区、描述内联编辑、删除(条件显示+管理员全权限)、评论(CommentList 自包含组件:递归渲染+回复+管理员删任意)、BASE_URL 直连后端图片、ProtectedRoute 路由守卫、axios 拦截器(token+401)、极简手账 UI、用户分组 hooks 独立封装
+- **前端：** 登录/注册页(确认密码)、个人信息页(/profile: 头像上传+预览+昵称编辑+密码修改旧验证)、首页按相册年份主分区并在年份内按创建者分区(AlbumYearNav/AlbumYearSection + AlbumUserNav/AlbumUserSection)、相册详情按年份主分区并在年份内按上传者分区(MediaYearSection/MediaUserSection + MediaCard + CommentList 组合)、图片/视频分区、描述内联编辑、删除(条件显示+管理员全权限)、评论(CommentList 自包含组件:递归渲染+回复+管理员删任意)、BASE_URL 直连后端图片、ProtectedRoute 路由守卫、axios 拦截器(token+401)、极简手账 UI、年份和用户分组 hooks 独立封装
 - **数据库：** users (id/username/nickname/avatar/password_hash/role/created_at)、albums (id/user_id FK→users CASCADE/title/created_at)、media (id/user_id FK→users CASCADE/album_id FK→albums SET NULL/url/type/size/description/event_time/created_at)、comments (id/user_id FK→users CASCADE/media_id FK→media CASCADE/parent_id FK→comments SET NULL/content/created_at)
 - **配置：** MySQL 3306 root 无密码、JWT secret=memory-vault-dev-secret-key expiresIn=7d、BASE_URL=http://localhost:3000、multer 图片10MB/视频500MB/头像2MB
 
@@ -48,11 +48,11 @@ memory-vault/
 - **状态管理：** React useState/useEffect/useRef，无全局状态库。Token 存 localStorage，axios 拦截器自动附加
 - **命名规范：** 文件 camelCase；后端三层 routes→controllers→services；前端 api/axios.js 统一封装；组件化拆分 components/ 目录
 - **权限：** 公开路由(health/login/register)；auth 中间件注入 req.user{id,username,role}；编辑/删除需上传者本人或 role==='admin'
-- **前端组件：** AlbumCard(album对象)、AlbumUserNav/AlbumUserSection(首页用户分区)、MediaUserSection(详情上传者分区)、AvatarUploader(currentAvatarUrl,onAvatarSaved)、NicknameEditor(initialNickname,onNicknameSaved)、MediaCard(item+editing props+onDelete+children)、CommentList(mediaId,currentUserId,currentUserRole 自包含)、SearchBar(onSearch,placeholder 预留)
+- **前端组件：** AlbumCard(album对象)、AlbumYearNav/AlbumYearSection(首页年份分区)、AlbumUserNav/AlbumUserSection(年内用户分区)、MediaYearSection/MediaUserSection(详情年份和上传者分区)、AvatarUploader(currentAvatarUrl,onAvatarSaved)、NicknameEditor(initialNickname,onNicknameSaved)、MediaCard(item+editing props+onDelete+children)、CommentList(mediaId,currentUserId,currentUserRole 自包含)、SearchBar(onSearch,placeholder 预留)
 - **前端代理：** Vite 将 /api 和 /uploads 代理到 localhost:3000；媒体文件使用 BASE_URL 绝对路径
 
 ## 5. 最近修改 & 待解决问题
 
-- **最近修改：** 首页/相册详情用户分区、管理员系统(role字段+红色标签+全权限删除)、组件化拆分、个人信息完善(头像+昵称+密码旧验证)、注册确认密码、共享模式、event_time、评论树形回复、评论窄栏排版修复、项目文档体系
+- **最近修改：** 首页/相册详情调整为年份主分区 + 年内用户分区、管理员系统(role字段+红色标签+全权限删除)、组件化拆分、个人信息完善(头像+昵称+密码旧验证)、注册确认密码、共享模式、event_time、评论树形回复、评论窄栏排版修复、项目文档体系
 - **当前 bug：** 无已知 bug
 - **下一步计划：** SearchBar 接入页面实现搜索筛选；admin 分支独立开发管理员面板

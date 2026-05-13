@@ -4,11 +4,10 @@ import MediaCard from '../components/MediaCard';
 import CommentList from '../components/CommentList';
 import MediaUploader from '../components/MediaUploader';
 import MediaModal from '../components/MediaModal';
-import MediaUserSection from '../components/MediaUserSection';
+import MediaYearSection from '../components/MediaYearSection';
 import useAlbumMedia from '../hooks/useAlbumMedia';
 import useMediaEditor from '../hooks/useMediaEditor';
 import useMediaModal from '../hooks/useMediaModal';
-import useMediaUsers from '../hooks/useMediaUsers';
 
 function formatDate(iso) {
   return iso ? iso.slice(0, 10) : '';
@@ -20,6 +19,7 @@ function AlbumDetail() {
   const {
     album,
     mediaList,
+    yearGroups,
     loading,
     uploading,
     uploadMessage,
@@ -31,7 +31,6 @@ function AlbumDetail() {
   } = useAlbumMedia(id);
   const mediaEditor = useMediaEditor(saveDescription);
   const mediaModal = useMediaModal(mediaList);
-  const mediaUserGroups = useMediaUsers(mediaList);
 
   async function handleDelete(item) {
     if (!window.confirm('确定删除这条回忆吗？')) return;
@@ -96,11 +95,9 @@ function AlbumDetail() {
       </header>
 
       <main className="content memory-content album-detail-content">
-        <aside className="year-bookmarks" aria-label="上传者书签">
-          {mediaUserGroups.map((group) => (
-            <a key={group.userKey} href={`#media-user-${group.userKey}`} className="year-bookmark">
-              {group.displayName}
-            </a>
+        <aside className="year-bookmarks" aria-label="年份书签">
+          {yearGroups.map(({ year }) => (
+            <a key={year} href={`#year-${year}`} className="year-bookmark">{year}</a>
           ))}
         </aside>
 
@@ -125,10 +122,13 @@ function AlbumDetail() {
                 <p className="status-text empty-memory">暂无内容，上传第一张回忆吧。</p>
               )}
 
-              {mediaUserGroups.map((group) => (
-                <section key={group.userKey} id={`media-user-${group.userKey}`} className="memory-year-section">
-                  <MediaUserSection group={group} renderMediaCard={renderMediaCard} />
-                </section>
+              {yearGroups.map(({ year, items }) => (
+                <MediaYearSection
+                  key={year}
+                  year={year}
+                  items={items}
+                  renderMediaCard={renderMediaCard}
+                />
               ))}
             </div>
           </div>

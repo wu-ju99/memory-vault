@@ -2,19 +2,21 @@
 
 ## 2026-05-12
 
-### 新增：首页与相册详情按用户分区
-- 首页相册列表改为按相册创建者分区，左页提供用户导航，点击可定位到对应用户的相册区。
-- 相册详情页改为按媒体上传者分区，每个用户分区内继续保留照片/视频分区，便于区分同一相册中不同成员上传的内容。
+### 新增：年份分区内按用户分组
+- 首页恢复年份作为主导航和主分区；每个年份分区内部再按相册创建者分组。
+- 年份导航下方新增当前年份的用户子导航；选择“全部”年份时，用户子导航会定位到该用户最新出现的年份分区。
+- 相册详情页恢复年份书签和年份主分区；每个年份内部再按媒体上传者分区，每个用户分区内继续保留照片/视频分区。
 - 单个用户分区内按时间倒序展示：相册按创建时间排序，媒体按拍摄时间 `event_time` 优先、否则按上传时间 `created_at` 排序。
-- 新增独立 `useAlbumUsers`、`useMediaUsers`、`AlbumUserNav`、`AlbumUserSection`、`MediaUserSection`，页面只负责组合，避免分区逻辑混入上传、评论、封面、删除等功能。
+- 新增独立 `useAlbumUsers`、`useMediaUsers`、`useYearUserNav`、`AlbumUserNav`、`AlbumUserSection`、`MediaYearSection`、`MediaUserSection`，页面只负责组合，避免分区逻辑混入上传、评论、封面、删除等功能。
 - 后端相册和媒体列表补充返回 `nickname`，前端显示名优先使用昵称，没有昵称再回退到用户名。
 
 | 改动 | 文件 | 说明 |
 |------|------|------|
 | 后端 | `albumService.js` / `mediaService.js` | 列表接口返回 `nickname` |
-| 前端 | `useAlbumUsers.js` / `useMediaUsers.js` | 独立用户分组与排序逻辑 |
-| 前端 | `AlbumUserNav.jsx` / `AlbumUserSection.jsx` / `MediaUserSection.jsx` | 用户导航、首页用户相册分区、详情用户媒体分区 |
-| 前端 | `Home.jsx` / `AlbumDetail.jsx` | 接入用户分区组件，保留原上传、评论、删除、弹窗逻辑 |
+| 前端 | `useAlbumYears.js` / `useAlbumUsers.js` / `useMediaUsers.js` / `useYearUserNav.js` | 独立年份分组、年内用户分组和用户子导航逻辑 |
+| 前端 | `AlbumYearNav.jsx` / `AlbumYearSection.jsx` / `AlbumUserNav.jsx` / `AlbumUserSection.jsx` | 首页年份导航、年份分区和年内用户分区 |
+| 前端 | `MediaYearSection.jsx` / `MediaUserSection.jsx` | 相册详情年份分区和年内上传者分区 |
+| 前端 | `Home.jsx` / `AlbumDetail.jsx` | 接入年份 + 用户嵌套分区组件，保留原上传、评论、删除、弹窗逻辑 |
 
 ---
 
@@ -55,7 +57,7 @@
 - 旧相册缺少 `album_year` 时前端回退到 `created_at` 年份；数据库迁移会用 `YEAR(created_at)` 初始化旧数据。
 - 新增 `albums.album_year` 字段和迁移脚本 `backend/sql/migrate_album_year.sql`。
 - 新增 `CreateAlbumForm`、`AlbumYearNav`、`AlbumYearSection` 和 `useAlbumYears`，保持创建表单、年份导航、分区展示、分组逻辑职责独立。
-- 当前首页浏览分区已在 2026-05-12 调整为按用户分区；`album_year` 仍保留为相册年份字段和卡片显示信息。
+- 当前首页浏览分区已在 2026-05-12 调整为“年份主分区 + 年内用户分区”；`album_year` 仍作为年份主分区依据。
 
 | 改动 | 文件 | 说明 |
 |------|------|------|

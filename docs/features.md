@@ -20,7 +20,7 @@
 | 创建相册 | 输入标题和相册年份 → POST /api/albums | 完成 |
 | 相册列表 | 首页卡片展示，按相册年份倒序、创建时间倒序 | 完成 |
 | 相册年份 | 用户可选择 1900 到明年的相册年份，独立于创建时间 | 完成 |
-| 首页用户分区 | 首页按相册创建者分区，并支持用户导航定位 | 完成 |
+| 首页年份+用户分区 | 首页按相册年份主分区，年份内再按相册创建者分区 | 完成 |
 | 相册详情 | /album/:id 独立页面，展示该相册内所有媒体 | 完成 |
 | 关联上传 | 上传时可选择或新建相册 | 完成 |
 | 按相册筛选 | GET /api/media?album_id=X | 完成 |
@@ -40,7 +40,7 @@
 | 功能 | 说明 | 状态 |
 |------|------|------|
 | 图片/视频分区 | 相册详情页分 "📷 图片" 和 "🎬 视频" 两个区域 | 完成 |
-| 上传者分区 | 相册详情页按媒体上传者分区，单个用户内继续按照片/视频分区 | 完成 |
+| 年份+上传者分区 | 相册详情页按年份主分区，年份内再按上传者分区，单个用户内继续按照片/视频分区 | 完成 |
 | 图片展示 | `<img>` 标签，点击新标签页打开原图 | 完成 |
 | 视频播放 | `<video controls>` 原生播放控制 | 完成 |
 | 网格布局 | CSS Grid 自适应列数 | 完成 |
@@ -114,9 +114,9 @@
 |------|------|------|
 | 书本翻页布局 | 首页和详情页使用左右分页的书本视觉 | 完成 |
 | 拍立得相册卡片 | 随机倾斜角度，hover 回正 + 浮起动画 | 完成 |
-| 首页用户分组 | 首页按相册创建者分组展示相册，单个用户内按创建时间倒序 | 完成 |
-| 详情用户分组 | 相册详情按上传者分组展示媒体，单个用户内按拍摄/上传时间倒序 | 完成 |
-| 用户书签导航 | 首页和详情页支持用户导航，点击跳转对应用户分区 | 完成 |
+| 首页年份用户分组 | 首页按年份分组展示相册，年份内按创建者分组，单个用户内按创建时间倒序 | 完成 |
+| 详情年份用户分组 | 相册详情按年份分组展示媒体，年份内按上传者分组，单个用户内按拍摄/上传时间倒序 | 完成 |
+| 年份导航与用户子导航 | 首页保留年份导航，年份导航下方提供当前年份用户子导航 | 完成 |
 | 媒体详情弹窗 | 点击图片/视频打开全屏抽卡式 modal | 完成 |
 | 弹窗左右切换 | 点击箭头或方向键切换上/下一张 | 完成 |
 | 键盘快捷键 | Escape 关闭弹窗，ArrowLeft/Right 切换 | 完成 |
@@ -130,8 +130,11 @@
 | NicknameEditor | components/NicknameEditor.jsx | 昵称编辑+保存，自包含状态 | 完成 |
 | MediaCard | components/MediaCard.jsx | 单条媒体卡片（图片/视频/描述/删除），children 注入评论区 | 完成 |
 | CommentList | components/CommentList.jsx | 自包含评论（列表/回复/输入），内部管理 API 调用 | 完成 |
-| AlbumUserNav | components/AlbumUserNav.jsx | 首页用户导航，点击定位用户相册区 | 完成 |
-| AlbumUserSection | components/AlbumUserSection.jsx | 首页用户相册分区，复用 AlbumCard | 完成 |
-| MediaUserSection | components/MediaUserSection.jsx | 相册详情用户媒体分区，内部保留照片/视频分组 | 完成 |
+| AlbumYearNav | components/AlbumYearNav.jsx | 首页年份导航，点击定位年份分区 | 完成 |
+| AlbumYearSection | components/AlbumYearSection.jsx | 首页年份分区，内部按用户分区 | 完成 |
+| AlbumUserNav | components/AlbumUserNav.jsx | 年份导航下的用户子导航 | 完成 |
+| AlbumUserSection | components/AlbumUserSection.jsx | 年内用户相册分区，复用 AlbumCard | 完成 |
+| MediaYearSection | components/MediaYearSection.jsx | 相册详情年份分区，内部按上传者分区 | 完成 |
+| MediaUserSection | components/MediaUserSection.jsx | 年内用户媒体分区，内部保留照片/视频分组 | 完成 |
 | SearchBar | components/SearchBar.jsx | 通用搜索栏，deounce 300ms，Enter/搜索/清除 | 完成 |
 | ProtectedRoute | components/ProtectedRoute.jsx | 路由守卫，未登录跳转 /login | 完成 |

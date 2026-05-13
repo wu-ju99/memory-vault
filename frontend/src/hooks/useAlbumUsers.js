@@ -1,7 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { getUserDisplayName, getUserGroupKey } from '../utils/userDisplay';
-
-const ALL_USERS = 'all';
 
 function getAlbumTime(album) {
   if (album.created_at) return new Date(album.created_at).getTime();
@@ -13,14 +11,8 @@ function sortByLatestAlbum(a, b) {
   return getAlbumTime(b) - getAlbumTime(a);
 }
 
-function getUserSectionId(userKey) {
-  return `album-user-${userKey}`;
-}
-
-export default function useAlbumUsers(albums, rootElementId = 'album-user-root') {
-  const [activeUser, setActiveUser] = useState(ALL_USERS);
-
-  const userGroups = useMemo(() => {
+export default function useAlbumUsers(albums) {
+  return useMemo(() => {
     const groups = new Map();
 
     albums.forEach((album) => {
@@ -58,61 +50,4 @@ export default function useAlbumUsers(albums, rootElementId = 'album-user-root')
         return nextGroup;
       });
   }, [albums]);
-
-  const users = useMemo(
-    () => userGroups.map(({ userKey, displayName, items, role }) => ({
-      userKey,
-      displayName,
-      count: items.length,
-      role,
-    })),
-    [userGroups]
-  );
-
-  function scrollToUser(userKey) {
-    setActiveUser(userKey);
-
-    const targetId = userKey === ALL_USERS ? rootElementId : getUserSectionId(userKey);
-    const target = document.getElementById(targetId);
-    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  useEffect(() => {
-    if (userGroups.length === 0) {
-      setActiveUser(ALL_USERS);
-      return undefined;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-
-        if (visible?.target.dataset.userKey) {
-          setActiveUser(visible.target.dataset.userKey);
-        }
-      },
-      {
-        rootMargin: '-22% 0px -58% 0px',
-        threshold: [0.08, 0.2, 0.45],
-      }
-    );
-
-    userGroups.forEach(({ userKey }) => {
-      const section = document.getElementById(getUserSectionId(userKey));
-      if (section) observer.observe(section);
-    });
-
-    return () => observer.disconnect();
-  }, [userGroups]);
-
-  return {
-    allUsersValue: ALL_USERS,
-    activeUser,
-    users,
-    userGroups,
-    getUserSectionId,
-    scrollToUser,
-  };
 }

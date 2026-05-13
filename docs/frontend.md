@@ -31,8 +31,8 @@
 ### Home.jsx (`/`)
 
 - 加载相册列表 `GET /api/albums`
-- 按相册创建者分区展示，单个用户内按创建时间倒序
-- 左页 `AlbumUserNav` 提供用户导航，点击定位到对应用户相册区
+- 按相册年份主分区展示，年份内再按相册创建者分区
+- 左页 `AlbumYearNav` 提供年份导航，`AlbumUserNav` 作为当前年份用户子导航
 - 卡片网格展示（`Link` 到 `/album/:id`）
 - 新建相册输入框 + 创建按钮
 - 显示当前用户名 + 退出按钮
@@ -52,8 +52,8 @@
 - 上传成功后刷新媒体列表
 
 **媒体展示：**
-- 按上传者分区，单个用户内按 `event_time` / `created_at` 倒序
-- 每个上传者分区内继续按图片 / 视频分组
+- 按年份主分区展示，年份内再按上传者分区
+- 每个上传者分区内继续按图片 / 视频分组，并按 `event_time` / `created_at` 倒序
 - `renderMediaCard()` 提取函数，复用媒体卡片、评论、删除、弹窗逻辑
 
 **卡片功能：**
@@ -72,7 +72,8 @@
 | Axios 实例 | `api/axios.js` | baseURL=/api，自动 Bearer token，401 自动登出 |
 | Token 工具 | `utils/auth.js` | getToken / saveAuth / clearAuth / isAuthenticated / getUser |
 | 路由守卫 | `components/ProtectedRoute.jsx` | 无 token → Navigate to /login |
-| 用户分组 | `hooks/useAlbumUsers.js` / `hooks/useMediaUsers.js` | 首页相册和详情媒体按用户分区，保持分组逻辑独立 |
+| 年份分组 | `hooks/useAlbumYears.js` / `hooks/useAlbumMedia.js` | 首页相册年份分区、详情媒体年份分区 |
+| 用户分组 | `hooks/useAlbumUsers.js` / `hooks/useMediaUsers.js` / `hooks/useYearUserNav.js` | 年份内用户分区和首页用户子导航，保持分组逻辑独立 |
 | 用户显示名 | `utils/userDisplay.js` | 昵称优先，未设置昵称时回退用户名 |
 | 全局配置 | `config.js` | BASE_URL = 'http://localhost:3000' |
 | 全局样式 | `index.css` | 极简黑白灰风格，无 UI 框架 |
