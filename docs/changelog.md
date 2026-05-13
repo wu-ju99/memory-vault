@@ -2,6 +2,13 @@
 
 ## 2026-05-13
 
+### Admin batch delete
+
+- Added isolated batch-select and batch-delete flows for admin albums
+- Added isolated batch-select and batch-delete flows for admin media
+- Added protected admin batch delete endpoints for albums and media
+- Kept single-item delete actions intact alongside the new batch actions
+
 ### Media download
 
 - Added a standalone single-media download flow for album detail pages

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getUser } from '../utils/auth';
 import SearchBar from '../components/SearchBar';
 import FilterSelect from '../components/FilterSelect';
@@ -15,6 +15,7 @@ import useUrlFilterState from '../hooks/useUrlFilterState';
 import AdminUserTable from '../components/admin/AdminUserTable';
 import AdminMediaGrid from '../components/admin/AdminMediaGrid';
 import AdminAlbumTable from '../components/admin/AdminAlbumTable';
+import AdminBatchToolbar from '../components/admin/AdminBatchToolbar';
 import { getAlbumYearValue, getMediaYearValue, UNKNOWN_YEAR } from '../utils/yearGroups';
 import { getUserDisplayName } from '../utils/userDisplay';
 import { getMediaTypeLabel, getRoleLabel, UNKNOWN_YEAR_LABEL } from '../utils/uiLabels';
@@ -116,10 +117,13 @@ function buildMediaTypeOptions(media) {
 
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('users');
+  const [selectedAlbumIds, setSelectedAlbumIds] = useState([]);
+  const [selectedMediaIds, setSelectedMediaIds] = useState([]);
   const [deleteDialog, setDeleteDialog] = useState({
     open: false,
     scope: '',
     targetId: null,
+    targetIds: [],
     title: '',
     description: '',
     note: '',
@@ -150,6 +154,18 @@ function AdminDashboard() {
   const mediaAlbumOptions = useMemo(() => buildMediaAlbumOptions(mediaQuery.media), [mediaQuery.media]);
   const mediaYearOptions = useMemo(() => buildMediaYearOptions(mediaQuery.media), [mediaQuery.media]);
   const mediaTypeOptions = useMemo(() => buildMediaTypeOptions(mediaQuery.media), [mediaQuery.media]);
+  const allAlbumsSelected = albumsQuery.albums.length > 0
+    && albumsQuery.albums.every((album) => selectedAlbumIds.includes(album.id));
+  const allMediaSelected = mediaQuery.media.length > 0
+    && mediaQuery.media.every((item) => selectedMediaIds.includes(item.id));
+
+  useEffect(() => {
+    setSelectedAlbumIds((prev) => prev.filter((id) => albumsQuery.albums.some((album) => album.id === id)));
+  }, [albumsQuery.albums]);
+
+  useEffect(() => {
+    setSelectedMediaIds((prev) => prev.filter((id) => mediaQuery.media.some((item) => item.id === id)));
+  }, [mediaQuery.media]);
 
   function closeDeleteDialog() {
     if (dialogSubmitting) return;
@@ -157,6 +173,7 @@ function AdminDashboard() {
       open: false,
       scope: '',
       targetId: null,
+      targetIds: [],
       title: '',
       description: '',
       note: '',
@@ -169,6 +186,7 @@ function AdminDashboard() {
       open: true,
       scope: 'user',
       targetId: user.id,
+      targetIds: [],
       title: '删除这个成员？',
       description: `你将删除用户“${user.username}”。`,
       note: '该用户发布的内容统计会从后台成员列表中移除。',
@@ -181,6 +199,7 @@ function AdminDashboard() {
       open: true,
       scope: 'album',
       targetId: album.id,
+      targetIds: [],
       title: '删除这个相册？',
       description: `你将删除相册“${album.title}”。`,
       note: '相册记录会被移除，已上传的媒体文件会保留。',
@@ -193,6 +212,7 @@ function AdminDashboard() {
       open: true,
       scope: 'media',
       targetId: media.id,
+      targetIds: [],
       title: '删除这条媒体？',
       description: `你将删除 ${media.username} 上传的这条媒体。`,
       note: '删除后无法恢复，相关展示内容会立即从后台列表中移除。',
@@ -200,8 +220,56 @@ function AdminDashboard() {
     });
   }
 
+  function confirmDeleteAlbumsBatch() {
+    if (selectedAlbumIds.length === 0) return;
+    setDeleteDialog({
+      open: true,
+      scope: 'album_batch',
+      targetId: null,
+      targetIds: selectedAlbumIds,
+      title: '批量删除这些相册？',
+      description: `你将删除 ${selectedAlbumIds.length} 个已选相册。`,
+      note: '相册记录会被移除，已上传的媒体文件会保留。',
+      error: '',
+    });
+  }
+
+  function confirmDeleteMediaBatch() {
+    if (selectedMediaIds.length === 0) return;
+    setDeleteDialog({
+      open: true,
+      scope: 'media_batch',
+      targetId: null,
+      targetIds: selectedMediaIds,
+      title: '批量删除这些媒体？',
+      description: `你将删除 ${selectedMediaIds.length} 条已选媒体。`,
+      note: '删除后无法恢复，相关展示内容会立即从后台列表中移除。',
+      error: '',
+    });
+  }
+
+  function toggleAlbumSelection(albumId, checked) {
+    setSelectedAlbumIds((prev) => (
+      checked ? Array.from(new Set([...prev, albumId])) : prev.filter((id) => id !== albumId)
+    ));
+  }
+
+  function toggleMediaSelection(mediaId, checked) {
+    setSelectedMediaIds((prev) => (
+      checked ? Array.from(new Set([...prev, mediaId])) : prev.filter((id) => id !== mediaId)
+    ));
+  }
+
+  function toggleAllAlbums(checked) {
+    setSelectedAlbumIds(checked ? albumsQuery.albums.map((album) => album.id) : []);
+  }
+
+  function toggleAllMedia(checked) {
+    setSelectedMediaIds(checked ? mediaQuery.media.map((item) => item.id) : []);
+  }
+
   async function submitDeleteDialog() {
-    if (!deleteDialog.targetId) return;
+    if (!deleteDialog.targetId && (!deleteDialog.targetIds || deleteDialog.targetIds.length === 0)) return;
 
     setDialogSubmitting(true);
     let result = { ok: false, error: '删除失败' };
@@ -212,11 +280,21 @@ function AdminDashboard() {
       result = await albumsMutations.removeAlbum(deleteDialog.targetId);
     } else if (deleteDialog.scope === 'media') {
       result = await mediaMutations.removeMedia(deleteDialog.targetId);
+    } else if (deleteDialog.scope === 'album_batch') {
+      result = await albumsMutations.removeAlbums(deleteDialog.targetIds);
+    } else if (deleteDialog.scope === 'media_batch') {
+      result = await mediaMutations.removeMediaBatch(deleteDialog.targetIds);
     }
 
     setDialogSubmitting(false);
 
     if (result.ok) {
+      if (deleteDialog.scope === 'album_batch') {
+        setSelectedAlbumIds([]);
+      }
+      if (deleteDialog.scope === 'media_batch') {
+        setSelectedMediaIds([]);
+      }
       closeDeleteDialog();
       return;
     }
@@ -322,8 +400,22 @@ function AdminDashboard() {
                 />
               </FilterToolbar>
 
+              <AdminBatchToolbar
+                label="相册"
+                selectedCount={selectedAlbumIds.length}
+                totalCount={albumsQuery.albums.length}
+                allSelected={allAlbumsSelected}
+                disabled={dialogSubmitting}
+                onToggleAll={toggleAllAlbums}
+                onClear={() => setSelectedAlbumIds([])}
+                onDelete={confirmDeleteAlbumsBatch}
+              />
+
               <AdminAlbumTable
                 albums={albumsQuery.albums}
+                selectedIds={selectedAlbumIds}
+                onToggleAlbum={toggleAlbumSelection}
+                onToggleAllAlbums={toggleAllAlbums}
                 onDeleteAlbum={confirmDeleteAlbum}
                 onUploadCover={albumsMutations.uploadCover}
               />
@@ -369,7 +461,23 @@ function AdminDashboard() {
                 />
               </FilterToolbar>
 
-              <AdminMediaGrid media={mediaQuery.media} onDeleteMedia={confirmDeleteMedia} />
+              <AdminBatchToolbar
+                label="媒体"
+                selectedCount={selectedMediaIds.length}
+                totalCount={mediaQuery.media.length}
+                allSelected={allMediaSelected}
+                disabled={dialogSubmitting}
+                onToggleAll={toggleAllMedia}
+                onClear={() => setSelectedMediaIds([])}
+                onDelete={confirmDeleteMediaBatch}
+              />
+
+              <AdminMediaGrid
+                media={mediaQuery.media}
+                selectedIds={selectedMediaIds}
+                onToggleMedia={toggleMediaSelection}
+                onDeleteMedia={confirmDeleteMedia}
+              />
             </>
           )}
         </section>

@@ -430,6 +430,18 @@ Supported query params:
 
 Delete any album.
 
+### `DELETE /admin/albums/batch`
+
+Batch delete albums.
+
+Request body:
+
+```json
+{
+  "ids": [3, 4, 5]
+}
+```
+
 ### `PUT /admin/albums/:id/cover`
 
 Update any album cover.
@@ -454,6 +466,18 @@ Supported query params:
 ### `DELETE /admin/media/:id`
 
 Delete any media item.
+
+### `DELETE /admin/media/batch`
+
+Batch delete media items.
+
+Request body:
+
+```json
+{
+  "ids": [10, 11, 12]
+}
+```
 
 ## Search and filter implementation note
 

@@ -67,6 +67,8 @@ This file tracks implemented product behavior, not future ideas.
 - User management
 - Album management
 - Media management
+- Batch delete for admin albums
+- Batch delete for admin media
 - Chinese labels for admin navigation, filters, and management actions
 - Admin delete actions use a shared in-app confirmation dialog
 - Admin-only route protection

@@ -13,9 +13,11 @@ router.put('/admin/users/:id', adminController.updateUser);
 router.delete('/admin/users/:id', adminController.deleteUser);
 
 router.get('/admin/media', adminController.listMedia);
+router.delete('/admin/media/batch', adminController.deleteMediaBatch);
 router.delete('/admin/media/:id', adminController.deleteMedia);
 
 router.get('/admin/albums', adminController.listAlbums);
+router.delete('/admin/albums/batch', adminController.deleteAlbumBatch);
 router.delete('/admin/albums/:id', adminController.deleteAlbum);
 router.put(
   '/admin/albums/:id/cover',

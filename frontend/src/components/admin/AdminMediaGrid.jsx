@@ -2,7 +2,9 @@ import BASE_URL from '../../config';
 import UserIdentity from '../UserIdentity';
 import { getMediaTypeLabel } from '../../utils/uiLabels';
 
-function AdminMediaGrid({ media, onDeleteMedia }) {
+function AdminMediaGrid({ media, selectedIds = [], onToggleMedia, onDeleteMedia }) {
+  const selectedSet = new Set(selectedIds);
+
   if (media.length === 0) {
     return <p className="status-text">没有符合条件的媒体。</p>;
   }
@@ -10,7 +12,18 @@ function AdminMediaGrid({ media, onDeleteMedia }) {
   return (
     <div className="admin-media-grid">
       {media.map((item) => (
-        <article key={item.id} className="admin-media-card">
+        <article
+          key={item.id}
+          className={`admin-media-card ${selectedSet.has(item.id) ? 'selected' : ''}`}
+        >
+          <label className="admin-card-check">
+            <input
+              type="checkbox"
+              checked={selectedSet.has(item.id)}
+              onChange={(event) => onToggleMedia?.(item.id, event.target.checked)}
+            />
+            <span>选择</span>
+          </label>
           <div className="admin-media-preview">
             {item.type === 'video' ? (
               <video src={BASE_URL + item.url} controls />

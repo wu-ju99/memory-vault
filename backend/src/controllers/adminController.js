@@ -54,6 +54,15 @@ async function deleteMedia(req, res, next) {
   }
 }
 
+async function deleteMediaBatch(req, res, next) {
+  try {
+    const result = await adminMediaService.deleteMediaBatch(req.body.ids, req.user);
+    res.json({ message: `已删除 ${result.count} 条媒体`, count: result.count, ids: result.ids });
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function listAlbums(req, res, next) {
   try {
     const albums = await adminAlbumQueryService.listAlbums(req.query);
@@ -68,6 +77,15 @@ async function deleteAlbum(req, res, next) {
     const albumId = parseId(req.params.id, '相册 ID');
     await adminAlbumService.deleteAlbum(albumId);
     res.json({ message: '相册已删除' });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function deleteAlbumBatch(req, res, next) {
+  try {
+    const result = await adminAlbumService.deleteAlbums(req.body.ids);
+    res.json({ message: `已删除 ${result.count} 个相册`, count: result.count, ids: result.ids });
   } catch (error) {
     next(error);
   }
@@ -91,7 +109,9 @@ module.exports = {
   deleteUser,
   listMedia,
   deleteMedia,
+  deleteMediaBatch,
   listAlbums,
   deleteAlbum,
+  deleteAlbumBatch,
   setAlbumCover,
 };

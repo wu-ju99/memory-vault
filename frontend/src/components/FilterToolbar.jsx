@@ -9,10 +9,12 @@ function FilterToolbar({
     <section className="filter-toolbar" aria-label={title}>
       <div className="filter-toolbar-head">
         <div className="filter-toolbar-meta">
-          <p className="filter-toolbar-title">{title}</p>
-          {typeof resultCount === 'number' && (
-            <span className="filter-toolbar-count">共 {resultCount} 项</span>
-          )}
+          <div className="filter-toolbar-text">
+            <p className="filter-toolbar-title">{title}</p>
+            {typeof resultCount === 'number' && (
+              <span className="filter-toolbar-count">共 {resultCount} 项</span>
+            )}
+          </div>
         </div>
         {showReset && (
           <button className="filter-reset-btn" onClick={onReset} type="button">

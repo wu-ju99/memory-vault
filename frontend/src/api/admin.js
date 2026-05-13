@@ -29,6 +29,11 @@ export async function deleteAdminMedia(mediaId) {
   await api.delete(`/admin/media/${mediaId}`);
 }
 
+export async function deleteAdminMediaBatch(ids) {
+  const res = await api.delete('/admin/media/batch', { data: { ids } });
+  return res.data;
+}
+
 export async function fetchAdminAlbums(filters = {}) {
   const res = await api.get('/admin/albums', { params: cleanParams(filters) });
   return res.data.albums;
@@ -36,6 +41,11 @@ export async function fetchAdminAlbums(filters = {}) {
 
 export async function deleteAdminAlbum(albumId) {
   await api.delete(`/admin/albums/${albumId}`);
+}
+
+export async function deleteAdminAlbumBatch(ids) {
+  const res = await api.delete('/admin/albums/batch', { data: { ids } });
+  return res.data;
 }
 
 export async function uploadAdminAlbumCover(albumId, file) {

@@ -25,12 +25,30 @@ function CoverUploadButton({ album, onUploadCover }) {
   );
 }
 
-function AdminAlbumTable({ albums, onDeleteAlbum, onUploadCover }) {
+function AdminAlbumTable({
+  albums,
+  selectedIds = [],
+  onToggleAlbum,
+  onToggleAllAlbums,
+  onDeleteAlbum,
+  onUploadCover,
+}) {
+  const selectedSet = new Set(selectedIds);
+  const allSelected = albums.length > 0 && albums.every((album) => selectedSet.has(album.id));
+
   return (
     <div className="admin-table-wrap">
       <table className="admin-table">
         <thead>
           <tr>
+            <th>
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={(event) => onToggleAllAlbums?.(event.target.checked)}
+                aria-label="全选相册"
+              />
+            </th>
             <th>相册</th>
             <th>年份</th>
             <th>创建者</th>
@@ -42,7 +60,7 @@ function AdminAlbumTable({ albums, onDeleteAlbum, onUploadCover }) {
         <tbody>
           {albums.length === 0 && (
             <tr>
-              <td colSpan="6" className="admin-empty-cell">没有符合条件的相册。</td>
+              <td colSpan="7" className="admin-empty-cell">没有符合条件的相册。</td>
             </tr>
           )}
           {albums.map((album) => {
@@ -51,6 +69,14 @@ function AdminAlbumTable({ albums, onDeleteAlbum, onUploadCover }) {
               : '';
             return (
               <tr key={album.id}>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={selectedSet.has(album.id)}
+                    onChange={(event) => onToggleAlbum?.(album.id, event.target.checked)}
+                    aria-label={`选择相册 ${album.title}`}
+                  />
+                </td>
                 <td><strong>{album.title}</strong></td>
                 <td>{album.album_year || '-'}</td>
                 <td>

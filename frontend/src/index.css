@@ -684,6 +684,65 @@ body {
   padding: 22px;
 }
 
+.admin-batch-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1px solid rgba(83, 56, 38, 0.14);
+  border-radius: 10px;
+  background: rgba(255, 250, 243, 0.7);
+}
+
+.admin-batch-meta,
+.admin-batch-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-batch-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #5f4e42;
+  font-size: 13px;
+}
+
+.admin-batch-count {
+  color: #8a7663;
+  font-size: 12px;
+}
+
+.admin-batch-actions button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(54, 107, 101, 0.28);
+  border-radius: 999px;
+  background: transparent;
+  color: #366b65;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.admin-batch-actions button:hover {
+  background: rgba(54, 107, 101, 0.1);
+}
+
+.admin-batch-actions button.danger {
+  border-color: rgba(168, 70, 55, 0.34);
+  color: #a84637;
+}
+
+.admin-batch-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .admin-panel-header {
   display: flex;
   align-items: baseline;
@@ -809,6 +868,19 @@ body {
   border-radius: 8px;
   background: #fffaf3;
   box-shadow: 0 12px 24px rgba(69, 47, 31, 0.12);
+}
+
+.admin-media-card.selected {
+  outline: 2px solid rgba(54, 107, 101, 0.42);
+  box-shadow: 0 14px 28px rgba(54, 107, 101, 0.16);
+}
+
+.admin-card-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #756152;
+  font-size: 12px;
 }
 
 .admin-media-preview {
@@ -1021,7 +1093,7 @@ body {
 
 .filter-toolbar-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
 }
@@ -1029,9 +1101,13 @@ body {
 .filter-toolbar-meta {
   min-width: 0;
   display: flex;
-  align-items: baseline;
-  gap: 10px;
-  flex-wrap: nowrap;
+  flex: 1 1 auto;
+}
+
+.filter-toolbar-text {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
 }
 
 .filter-toolbar-title {
@@ -1040,13 +1116,12 @@ body {
   font-weight: 800;
   letter-spacing: 1px;
   text-transform: uppercase;
-  white-space: nowrap;
 }
 
 .filter-toolbar-count {
+  display: block;
   color: #8a7663;
   font-size: 12px;
-  white-space: nowrap;
 }
 
 .filter-toolbar-body {
@@ -1075,6 +1150,7 @@ body {
 .search-btn,
 .search-clear,
 .filter-reset-btn {
+  flex: 0 0 auto;
   min-height: 42px;
   padding: 0 14px;
   border: 1px solid rgba(54, 107, 101, 0.24);
@@ -1084,6 +1160,7 @@ body {
   cursor: pointer;
   font: inherit;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .search-btn:hover,
