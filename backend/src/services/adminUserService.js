@@ -23,28 +23,6 @@ async function getUserById(userId) {
   return rows[0] || null;
 }
 
-async function listUsers() {
-  const [rows] = await pool.query(
-    `SELECT
-       u.id,
-       u.username,
-       u.nickname,
-       u.avatar,
-       u.role,
-       u.created_at,
-       COUNT(DISTINCT a.id) AS album_count,
-       COUNT(DISTINCT m.id) AS media_count,
-       COUNT(DISTINCT c.id) AS comment_count
-     FROM users u
-     LEFT JOIN albums a ON a.user_id = u.id
-     LEFT JOIN media m ON m.user_id = u.id
-     LEFT JOIN comments c ON c.user_id = u.id
-     GROUP BY u.id
-     ORDER BY u.created_at DESC`
-  );
-  return rows;
-}
-
 async function updateUser(userId, fields) {
   const user = await getUserById(userId);
   if (!user) {
@@ -122,7 +100,6 @@ async function deleteUser(userId, adminUserId) {
 }
 
 module.exports = {
-  listUsers,
   updateUser,
   deleteUser,
 };

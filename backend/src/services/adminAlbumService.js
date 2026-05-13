@@ -1,10 +1,6 @@
 const albumService = require('./albumService');
 const albumCoverService = require('./albumCoverService');
 
-async function listAlbums() {
-  return albumService.getList();
-}
-
 async function deleteAlbum(albumId) {
   await albumService.deleteById(albumId);
 }
@@ -18,7 +14,6 @@ async function setCoverFromAlbumMedia(albumId, coverUrl) {
 }
 
 module.exports = {
-  listAlbums,
   deleteAlbum,
   setCoverFromUpload,
   setCoverFromAlbumMedia,

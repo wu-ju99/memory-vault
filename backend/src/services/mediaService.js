@@ -24,20 +24,6 @@ async function createMedia(userId, filename, type, size, description, albumId, e
   };
 }
 
-async function getList(userId, albumId) {
-  let sql = 'SELECT m.id, m.user_id, m.album_id, m.url, m.type, m.size, m.description, m.event_time, m.created_at, a.title AS album_title, u.username, u.nickname, u.avatar, u.role FROM media m LEFT JOIN albums a ON m.album_id = a.id JOIN users u ON m.user_id = u.id';
-  const params = [];
-
-  if (albumId) {
-    sql += ' WHERE m.album_id = ?';
-    params.push(albumId);
-  }
-
-  sql += ' ORDER BY m.created_at DESC';
-  const [rows] = await pool.query(sql, params);
-  return rows;
-}
-
 async function getById(id) {
   const [rows] = await pool.query(
     'SELECT id, user_id, album_id, url, type, size, description, event_time, created_at FROM media WHERE id = ?',
@@ -58,4 +44,4 @@ async function deleteById(id) {
   await pool.query('DELETE FROM media WHERE id = ?', [id]);
 }
 
-module.exports = { createMedia, getList, getById, updateDescription, deleteById };
+module.exports = { createMedia, getById, updateDescription, deleteById };

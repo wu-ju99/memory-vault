@@ -1,11 +1,14 @@
 const adminUserService = require('../services/adminUserService');
 const adminMediaService = require('../services/adminMediaService');
 const adminAlbumService = require('../services/adminAlbumService');
+const adminUserQueryService = require('../services/adminUserQueryService');
+const adminMediaQueryService = require('../services/adminMediaQueryService');
+const adminAlbumQueryService = require('../services/adminAlbumQueryService');
 const parseId = require('../utils/parseId');
 
 async function listUsers(req, res, next) {
   try {
-    const users = await adminUserService.listUsers();
+    const users = await adminUserQueryService.listUsers(req.query);
     res.json({ users });
   } catch (error) {
     next(error);
@@ -34,7 +37,7 @@ async function deleteUser(req, res, next) {
 
 async function listMedia(req, res, next) {
   try {
-    const media = await adminMediaService.listMedia(req.query);
+    const media = await adminMediaQueryService.listMedia(req.query);
     res.json({ media });
   } catch (error) {
     next(error);
@@ -53,7 +56,7 @@ async function deleteMedia(req, res, next) {
 
 async function listAlbums(req, res, next) {
   try {
-    const albums = await adminAlbumService.listAlbums();
+    const albums = await adminAlbumQueryService.listAlbums(req.query);
     res.json({ albums });
   } catch (error) {
     next(error);

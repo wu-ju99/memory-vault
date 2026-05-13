@@ -1,142 +1,116 @@
-# 功能清单
+# Features
 
-## 1. 用户系统
+This file tracks implemented product behavior, not future ideas.
 
-| 功能 | 说明 | 状态 |
-|------|------|------|
-| 注册 | 用户名 + 密码 → bcrypt 加密存储 | 完成 |
-| 确认密码 | 注册时输入两次密码，前端 + 后端双重校验一致性 | 完成 |
-| 登录 | 用户名 + 密码 → JWT token（7 天有效） | 完成 |
-| JWT 鉴权 | 中间件验证，注入 req.user { id, username, role } | 完成 |
-| 路由保护 | 前端 ProtectedRoute + 后端 auth 中间件 | 完成 |
-| 登出 | 清除 localStorage token → 跳转登录页 | 完成 |
-| 修改个人信息 | 修改用户名和密码（PUT /api/auth/me），仅可修改自己 | 完成 |
-| 用户资料完善 | 修改昵称、上传头像、修改密码（旧密码验证），PUT /api/user/update-profile | 完成 |
-| 头像身份展示 | 相册、媒体、评论、用户分区、媒体弹窗和管理员面板统一显示头像 + 昵称/用户名 | 完成 |
+## Authentication
 
-## 2. 相册系统
+- User registration with password confirmation
+- User login with JWT response
+- Protected routes on the frontend
+- Automatic token attachment on API requests
+- Automatic local logout on `401` responses
 
-| 功能 | 说明 | 状态 |
-|------|------|------|
-| 创建相册 | 输入标题和相册年份 → POST /api/albums | 完成 |
-| 相册列表 | 首页卡片展示，按相册年份倒序、创建时间倒序 | 完成 |
-| 相册年份 | 用户可选择 1900 到明年的相册年份，独立于创建时间 | 完成 |
-| 首页年份+用户分区 | 首页按相册年份主分区，年份内再按相册创建者分区 | 完成 |
-| 相册详情 | /album/:id 独立页面，展示该相册内所有媒体 | 完成 |
-| 关联上传 | 上传时可选择或新建相册 | 完成 |
-| 按相册筛选 | GET /api/media?album_id=X | 完成 |
+## Profile
 
-## 3. 媒体上传
+- View current profile
+- Update nickname
+- Upload avatar
+- Change password with old-password verification
+- Admin badge and avatar-ready user identity rendering
 
-| 功能 | 说明 | 状态 |
-|------|------|------|
-| 图片上传 | jpg/png/webp，最大 10MB | 完成 |
-| 视频上传 | mp4/mov/webm，最大 500MB | 完成 |
-| 批量上传 | 一次最多 10 个文件，multi-select | 完成 |
-| 类型识别 | 根据 MIME type 自动区分 image/video | 完成 |
-| 文件命名 | UUID + 原始扩展名，防止冲突 | 完成 |
+## Shared album browsing
 
-## 4. 媒体展示
+- Logged-in users can browse shared albums from all users
+- Album cards show owner identity
+- Albums are grouped by year on the home page
+- Within a year, albums can be segmented by owner
+- Dedicated album detail page per album
+- Album detail no longer depends on fetching the full album list first
 
-| 功能 | 说明 | 状态 |
-|------|------|------|
-| 图片/视频分区 | 相册详情页分 "📷 图片" 和 "🎬 视频" 两个区域 | 完成 |
-| 年份+上传者分区 | 相册详情页按年份主分区，年份内再按上传者分区，单个用户内继续按照片/视频分区 | 完成 |
-| 图片展示 | `<img>` 标签，点击新标签页打开原图 | 完成 |
-| 视频播放 | `<video controls>` 原生播放控制 | 完成 |
-| 网格布局 | CSS Grid 自适应列数 | 完成 |
-| 时间轴视图 | 按日期分组，网格+时间轴双视图切换 | 完成 |
-| 后端直连 | 图片 URL 使用 BASE_URL 绝对路径，不经过 Vite 代理 | 完成 |
-| 上传时间显示 | 每条媒体显示 YYYY-MM-DD 格式时间 | 完成 |
+## Album management
 
-## 5. 媒体管理
+- Create album
+- Rename owned album
+- Delete owned album
+- Upload album cover
+- Reuse an existing album media item as cover
 
-| 功能 | 说明 | 状态 |
-|------|------|------|
-| 描述编辑 | 点击描述 → 内联编辑 → 保存（调用 PUT API） | 完成 |
-| 删除媒体 | 右上角 × 按钮（hover 显示）→ 确认删除 → 删除文件+记录 | 完成 |
-| 权限控制 | 仅上传者或管理员可编辑/删除 | 完成 |
+## Media management
 
-## 6. 评论系统
+- Upload image and video files
+- Batch upload support
+- Media description editing
+- Media deletion by uploader or admin
+- Event time support, with created time fallback when event time is absent
+- Full-screen modal preview with previous/next navigation
 
-| 功能 | 说明 | 状态 |
-|------|------|------|
-| 查看评论 | 每张媒体卡片底部 💬 按钮展开 | 完成 |
-| 发表评论 | 输入框 + 发送按钮，Enter 快捷发送 | 完成 |
-| 删除评论 | 仅自己的评论显示 × 删除按钮 | 完成 |
-| 评论回复 | 支持二级评论（回复评论），树形展示，级联删除 | 完成 |
-| 评论列表 | 显示用户名、内容、时间 | 完成 |
-| 窄栏排版 | 评论正文独占内容行，避免弹窗侧栏中被压成逐字竖排 | 完成 |
+## Comments
 
-## 7. 事件时间
+- Create comments
+- Reply to comments
+- Nested tree rendering
+- Delete own comments
+- Admin can delete any comment
 
-| 功能 | 说明 | 状态 |
-|------|------|------|
-| 事件时间 | 上传时可设置该内容的"发生时间"（可选） | 完成 |
-| 显示优先级 | 有 event_time → 显示 📷 拍摄时间；否则 → 显示 📅 上传时间 | 完成 |
-| 旧数据兼容 | 无 event_time 的旧数据正常显示 created_at | 完成 |
+## Admin
 
-## 8. 共享模式
+- Dedicated `/admin` page
+- User management
+- Album management
+- Media management
+- Admin-only route protection
+- Last-admin and self-delete protection on admin user deletion flow
 
-| 功能 | 说明 | 状态 |
-|------|------|------|
-| 全局可见 | 所有用户登录后可查看全部相册与媒体 | 完成 |
-| 上传者显示 | 媒体和相册卡片显示昵称，未设置昵称时显示 `username` | 完成 |
-| 用户头像展示 | 共享内容和分区标题显示用户头像，未设置头像时使用显示名首字母兜底 | 完成 |
-| 权限保持 | 仅上传者可删除/编辑自己的内容 | 完成 |
-| 条件 UI | 删除按钮仅对上传者本人显示 | 完成 |
+## Search and filter
 
-## 9. 前端基础架构
+Independent search and filter is implemented for:
 
-| 功能 | 说明 | 状态 |
-|------|------|------|
-| Axios 拦截器 | 自动附加 Bearer token，401 自动登出 | 完成 |
-| Token 持久化 | localStorage 存取，刷新页面保持登录 | 完成 |
-| 路由守卫 | ProtectedRoute 组件，无 token 跳转 /login | 完成 |
+- Home album list
+- Album detail media list
+- Admin users
+- Admin albums
+- Admin media
 
-## 10. 管理员系统
+Supported filter categories:
 
-| 功能 | 说明 | 状态 |
-|------|------|------|
-| 角色标识 | users 表 role 字段（'user' / 'admin'），数据库手动设置 | 完成 |
-| 管理员标签 | 相册卡片、媒体卡片、评论区在管理员昵称旁显示红色「管理员」标签 | 完成 |
-| 删除媒体 | 管理员可删除任意用户的媒体 | 完成 |
-| 删除评论 | 管理员可删除任意用户的评论 | 完成 |
-| 管理面板 | `/admin` 独立页面，包含成员、相册、媒体管理 | 完成 |
-| 成员管理 | 管理员可查看成员统计、修改用户名/昵称/角色、删除成员 | 完成 |
-| 相册管理 | 管理员可查看全站相册、删除相册、修改封面 | 完成 |
-| 媒体管理 | 管理员可查看全站媒体并删除任意媒体 | 完成 |
-| 权限兼容 | 普通用户权限不变，仅可操作自己的内容 | 完成 |
-| BASE_URL 配置 | 全局配置文件，部署时改一行 | 完成 |
-| 极简 UI | 黑白灰风格，无 UI 框架依赖 | 完成 |
+- keyword
+- year
+- owner or uploader
+- role
+- media type
+- album
 
-## 12. 剪贴簿 UI（codex/album-book-ui 分支）
+Behavior notes:
 
-| 功能 | 说明 | 状态 |
-|------|------|------|
-| 书本翻页布局 | 首页和详情页使用左右分页的书本视觉 | 完成 |
-| 拍立得相册卡片 | 随机倾斜角度，hover 回正 + 浮起动画 | 完成 |
-| 首页年份用户分组 | 首页按年份分组展示相册，年份内按创建者分组，单个用户内按创建时间倒序 | 完成 |
-| 详情年份用户分组 | 相册详情按年份分组展示媒体，年份内按上传者分组，单个用户内按拍摄/上传时间倒序 | 完成 |
-| 年份导航与用户子导航 | 首页保留年份导航，年份导航下方提供当前年份用户子导航 | 完成 |
-| 媒体详情弹窗 | 点击图片/视频打开全屏抽卡式 modal | 完成 |
-| 弹窗左右切换 | 点击箭头或方向键切换上/下一张 | 完成 |
-| 键盘快捷键 | Escape 关闭弹窗，ArrowLeft/Right 切换 | 完成 |
-| Sticky 顶栏 | 毛玻璃效果粘性导航栏 | 完成 |
+- filter state is mirrored into URL query params
+- refresh keeps the active filters
+- page links can preserve sharable filter state
+- reset only clears the current feature's filter keys
 
+## Frontend maintainability split
 
-| 组件 | 路径 | 说明 | 状态 |
-|------|------|------|------|
-| AlbumCard | components/AlbumCard.jsx | 相册列表卡片，纯展示组件 | 完成 |
-| AvatarUploader | components/AvatarUploader.jsx | 头像上传+预览，自包含状态 | 完成 |
-| NicknameEditor | components/NicknameEditor.jsx | 昵称编辑+保存，自包含状态 | 完成 |
-| MediaCard | components/MediaCard.jsx | 单条媒体卡片（图片/视频/描述/删除），children 注入评论区 | 完成 |
-| CommentList | components/CommentList.jsx | 自包含评论（列表/回复/输入），内部管理 API 调用 | 完成 |
-| AlbumYearNav | components/AlbumYearNav.jsx | 首页年份导航，点击定位年份分区 | 完成 |
-| AlbumYearSection | components/AlbumYearSection.jsx | 首页年份分区，内部按用户分区 | 完成 |
-| AlbumUserNav | components/AlbumUserNav.jsx | 年份导航下的用户子导航 | 完成 |
-| AlbumUserSection | components/AlbumUserSection.jsx | 年内用户相册分区，复用 AlbumCard | 完成 |
-| MediaYearSection | components/MediaYearSection.jsx | 相册详情年份分区，内部按上传者分区 | 完成 |
-| MediaUserSection | components/MediaUserSection.jsx | 年内用户媒体分区，内部保留照片/视频分组 | 完成 |
-| SearchBar | components/SearchBar.jsx | 通用搜索栏，deounce 300ms，Enter/搜索/清除 | 完成 |
-| ProtectedRoute | components/ProtectedRoute.jsx | 路由守卫，未登录跳转 /login | 完成 |
+The codebase now keeps these concerns separate:
+
+- `*Query` hooks for reads
+- `*Mutations` hooks for writes
+- `useUrlFilterState` for filter serialization
+- page components for composition only
+- reusable filter UI components for consistent controls
+
+This was done specifically to avoid overlapping feature ownership and future spaghetti code.
+
+## Backend maintainability split
+
+Search/filter SQL is isolated in dedicated query services:
+
+- `albumQueryService`
+- `mediaQueryService`
+- `adminUserQueryService`
+- `adminAlbumQueryService`
+- `adminMediaQueryService`
+
+CRUD and permission side effects remain in the original management services.
+
+## No schema change for search/filter
+
+The 2026-05-13 search/filter work did not require a database schema change.

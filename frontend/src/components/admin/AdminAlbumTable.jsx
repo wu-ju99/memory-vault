@@ -40,6 +40,11 @@ function AdminAlbumTable({ albums, onDeleteAlbum, onUploadCover }) {
           </tr>
         </thead>
         <tbody>
+          {albums.length === 0 && (
+            <tr>
+              <td colSpan="6" className="admin-empty-cell">没有符合条件的相册。</td>
+            </tr>
+          )}
           {albums.map((album) => {
             const coverSrc = album.cover_url
               ? `${BASE_URL}${album.cover_url}${album.cover_version ? `?v=${album.cover_version}` : ''}`

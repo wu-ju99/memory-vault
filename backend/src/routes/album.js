@@ -7,6 +7,7 @@ const albumController = require('../controllers/albumController');
 
 router.post('/albums', auth, albumController.create);
 router.get('/albums', auth, albumController.list);
+router.get('/albums/:id', auth, albumController.show);
 router.put('/albums/:id', auth, albumController.rename);
 router.delete('/albums/:id', auth, albumController.remove);
 router.put(

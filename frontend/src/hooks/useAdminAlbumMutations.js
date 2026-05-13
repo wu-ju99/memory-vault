@@ -1,0 +1,55 @@
+import { useState } from 'react';
+import {
+  deleteAdminAlbum,
+  uploadAdminAlbumCover,
+} from '../api/admin';
+import getErrorMessage from '../utils/apiError';
+
+export default function useAdminAlbumMutations(onAlbumsChanged) {
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+
+  async function refreshAlbums() {
+    await onAlbumsChanged?.();
+  }
+
+  async function removeAlbum(albumId) {
+    setMessage('');
+    setError('');
+    try {
+      await deleteAdminAlbum(albumId);
+      await refreshAlbums();
+      setMessage('相册已删除');
+      return true;
+    } catch (mutationError) {
+      setError(getErrorMessage(mutationError, '删除相册失败'));
+      return false;
+    }
+  }
+
+  async function uploadCover(albumId, file) {
+    if (!file.type.startsWith('image/')) {
+      setError('封面只能上传图片');
+      return;
+    }
+
+    setMessage('');
+    setError('');
+    try {
+      await uploadAdminAlbumCover(albumId, file);
+      await refreshAlbums();
+      setMessage('封面已更新');
+      return true;
+    } catch (mutationError) {
+      setError(getErrorMessage(mutationError, '封面更新失败'));
+      return false;
+    }
+  }
+
+  return {
+    message,
+    error,
+    removeAlbum,
+    uploadCover,
+  };
+}

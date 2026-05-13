@@ -2,6 +2,10 @@ import BASE_URL from '../../config';
 import UserIdentity from '../UserIdentity';
 
 function AdminMediaGrid({ media, onDeleteMedia }) {
+  if (media.length === 0) {
+    return <p className="status-text">没有符合条件的媒体。</p>;
+  }
+
   return (
     <div className="admin-media-grid">
       {media.map((item) => (

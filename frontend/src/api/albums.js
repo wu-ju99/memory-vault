@@ -1,8 +1,19 @@
 import api from './axios';
 
-export async function fetchAlbums() {
-  const res = await api.get('/albums');
+function cleanParams(filters = {}) {
+  return Object.fromEntries(
+    Object.entries(filters).filter(([, value]) => value !== undefined && value !== null && value !== '')
+  );
+}
+
+export async function fetchAlbums(filters = {}) {
+  const res = await api.get('/albums', { params: cleanParams(filters) });
   return res.data.albums;
+}
+
+export async function fetchAlbum(albumId) {
+  const res = await api.get(`/albums/${albumId}`);
+  return res.data.album;
 }
 
 export async function createAlbum(title, albumYear) {

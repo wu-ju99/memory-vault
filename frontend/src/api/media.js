@@ -1,7 +1,13 @@
 import api from './axios';
 
-export async function fetchMedia(albumId) {
-  const res = await api.get(`/media?album_id=${albumId}`);
+function cleanParams(filters = {}) {
+  return Object.fromEntries(
+    Object.entries(filters).filter(([, value]) => value !== undefined && value !== null && value !== '')
+  );
+}
+
+export async function fetchMedia(filters = {}) {
+  const res = await api.get('/media', { params: cleanParams(filters) });
   return res.data.media;
 }
 

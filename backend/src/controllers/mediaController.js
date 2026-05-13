@@ -4,9 +4,9 @@
  * GET  /api/media（需 JWT）
  */
 
-const mediaService = require('../services/mediaService');
 const mediaUploadService = require('../services/mediaUploadService');
 const mediaManagementService = require('../services/mediaManagementService');
+const mediaQueryService = require('../services/mediaQueryService');
 const parseId = require('../utils/parseId');
 
 /**
@@ -27,8 +27,7 @@ async function upload(req, res, next) {
  */
 async function list(req, res, next) {
   try {
-    const albumId = req.query.album_id || null;
-    const rows = await mediaService.getList(req.user.id, albumId);
+    const rows = await mediaQueryService.listMedia(req.query);
     res.json({ media: rows });
   } catch (error) {
     next(error);

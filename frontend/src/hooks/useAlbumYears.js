@@ -1,20 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
+import { getAlbumYearValue, sortYearValues } from '../utils/yearGroups';
 
 const ALL_YEARS = 'all';
-const UNKNOWN_YEAR = '未知年份';
-
-function getAlbumYear(album) {
-  if (album.album_year) return album.album_year.toString();
-  if (!album.created_at) return UNKNOWN_YEAR;
-  const year = new Date(album.created_at).getFullYear();
-  return Number.isNaN(year) ? UNKNOWN_YEAR : year.toString();
-}
-
-function sortYears(a, b) {
-  if (a === UNKNOWN_YEAR) return 1;
-  if (b === UNKNOWN_YEAR) return -1;
-  return Number(b) - Number(a);
-}
 
 function getYearSectionId(year) {
   return `album-year-${year}`;
@@ -27,7 +14,7 @@ export default function useAlbumYears(albums, rootElementId = 'album-year-root')
     const groups = new Map();
 
     albums.forEach((album) => {
-      const year = getAlbumYear(album);
+      const year = getAlbumYearValue(album);
       if (!groups.has(year)) groups.set(year, []);
       groups.get(year).push(album);
     });
@@ -35,7 +22,7 @@ export default function useAlbumYears(albums, rootElementId = 'album-year-root')
     let startIndex = 0;
 
     return Array.from(groups.entries())
-      .sort(([yearA], [yearB]) => sortYears(yearA, yearB))
+      .sort(([yearA], [yearB]) => sortYearValues(yearA, yearB))
       .map(([year, items]) => {
         const group = { year, items, startIndex };
         startIndex += items.length;

@@ -1,7 +1,13 @@
 import api from './axios';
 
-export async function fetchAdminUsers() {
-  const res = await api.get('/admin/users');
+function cleanParams(filters = {}) {
+  return Object.fromEntries(
+    Object.entries(filters).filter(([, value]) => value !== undefined && value !== null && value !== '')
+  );
+}
+
+export async function fetchAdminUsers(filters = {}) {
+  const res = await api.get('/admin/users', { params: cleanParams(filters) });
   return res.data.users;
 }
 
@@ -15,7 +21,7 @@ export async function deleteAdminUser(userId) {
 }
 
 export async function fetchAdminMedia(filters = {}) {
-  const res = await api.get('/admin/media', { params: filters });
+  const res = await api.get('/admin/media', { params: cleanParams(filters) });
   return res.data.media;
 }
 
@@ -23,8 +29,8 @@ export async function deleteAdminMedia(mediaId) {
   await api.delete(`/admin/media/${mediaId}`);
 }
 
-export async function fetchAdminAlbums() {
-  const res = await api.get('/admin/albums');
+export async function fetchAdminAlbums(filters = {}) {
+  const res = await api.get('/admin/albums', { params: cleanParams(filters) });
   return res.data.albums;
 }
 

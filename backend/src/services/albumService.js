@@ -8,13 +8,6 @@ async function create(userId, title, albumYear) {
   return getDisplayById(result.insertId);
 }
 
-async function getList(userId) {
-  const [rows] = await pool.query(
-    'SELECT a.id, a.user_id, a.title, a.album_year, a.cover_url, a.created_at, u.username, u.nickname, u.avatar, u.role FROM albums a JOIN users u ON a.user_id = u.id ORDER BY COALESCE(a.album_year, YEAR(a.created_at)) DESC, a.created_at DESC'
-  );
-  return rows;
-}
-
 async function getById(id, userId) {
   const params = [id];
   let sql = 'SELECT id, user_id, title, album_year, cover_url, created_at FROM albums WHERE id = ?';
@@ -49,7 +42,6 @@ async function deleteById(albumId) {
 
 module.exports = {
   create,
-  getList,
   getById,
   getDisplayById,
   updateTitle,

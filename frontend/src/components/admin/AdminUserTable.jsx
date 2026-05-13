@@ -20,8 +20,10 @@ function AdminUserTable({ users, currentUserId, onSaveUser, onDeleteUser }) {
   }
 
   async function saveEdit(userId) {
-    await onSaveUser(userId, draft);
-    cancelEdit();
+    try {
+      await onSaveUser(userId, draft);
+      cancelEdit();
+    } catch {}
   }
 
   return (
@@ -39,6 +41,11 @@ function AdminUserTable({ users, currentUserId, onSaveUser, onDeleteUser }) {
           </tr>
         </thead>
         <tbody>
+          {users.length === 0 && (
+            <tr>
+              <td colSpan="7" className="admin-empty-cell">没有符合条件的成员。</td>
+            </tr>
+          )}
           {users.map((user) => {
             const isEditing = editingId === user.id;
             const isCurrentUser = currentUserId === user.id;

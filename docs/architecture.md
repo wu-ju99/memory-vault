@@ -1,139 +1,234 @@
-# 项目架构
+# Architecture
 
-## 总体架构
+## System overview
 
-```
-┌──────────────────────────────────────────────────────────┐
-│ 浏览器 (localhost:5173)                                  │
-│  React SPA (Vite dev server)                             │
-│  ┌─────────┐  ┌──────────┐  ┌─────────────────────────┐ │
-│  │ /login  │  │ /register│  │ / (相册) → /album/:id    │ │
-│  └─────────┘  └──────────┘  └─────────────────────────┘ │
-│         │                        │                      │
-│         │    Vite Proxy          │                      │
-│         │    /api → :3000        │  绝对 URL             │
-│         │    /uploads → :3000    │  BASE_URL + path      │
-└─────────┼────────────────────────┼──────────────────────┘
-          │                        │
-          ▼                        ▼
-┌─────────────────────────────────────────────────────────┐
-│ Express Server (localhost:3000)                          │
-│                                                         │
-│  Middleware Stack:                                       │
-│    express.json() → requestLogger → /uploads (static)   │
-│         → /api (routes) → error handler                 │
-│                                                         │
-│  Layers:                                                 │
-│    routes → controllers → services → MySQL (mysql2)     │
-│                                                         │
-│  Auth: JWT middleware (req.user)                         │
-│  Upload: multer (diskStorage, /uploads)                  │
-│                                                         │
-└─────────────────────────┬───────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────┐
-│ MySQL 8.0                                               │
-│  memory_vault database                                  │
-│  ┌────────┐ ┌────────┐ ┌───────┐ ┌──────────┐         │
-│  │ users  │ │ albums  │ │ media │ │ comments │         │
-│  └────────┘ └────────┘ └───────┘ └──────────┘         │
-└─────────────────────────────────────────────────────────┘
-```
+Memory Vault is a two-tier web app:
 
-## 请求流程
+- Frontend: React SPA served by Vite at `http://localhost:5173`
+- Backend: Express API at `http://localhost:3000`
+- Database: MySQL `memory_vault`
+- Static uploads: served from `backend/uploads` at `/uploads/*`
 
-### 认证请求
+In development, Vite proxies:
 
-```
-POST /api/auth/login { username, password }
-  → authController.login()
-    → authService.login()
-      → users 表查询
-      → bcrypt.compare()
-      → jwt.sign({ id, username, role }, secret, { expiresIn: '7d' })
-      → { token, user }
-```
+- `/api` -> `http://localhost:3000`
+- `/uploads` -> `http://localhost:3000`
 
-### 媒体上传请求
+## Frontend structure
 
-```
-POST /api/media/upload (multipart/form-data)
-  → auth middleware (验证 JWT，注入 req.user)
-  → multer array('files', 10)
-    → 文件写入 backend/uploads/UUID.ext
-    → 写入 req.files[]
-  → mediaController.upload()
-    → detectType(mimetype) → image / video
-    → 分类型大小校验
-    → mediaService.createMedia()
-      → INSERT INTO media
-      → { id, url, type, size, description, album_id }
-    → 201 + { files, count }
-```
+Key frontend directories:
 
-### 静态资源访问
+- `src/pages`
+  Route-level pages
+- `src/components`
+  Reusable presentation and interaction units
+- `src/hooks`
+  Data loading, mutations, local state, and UI behavior
+- `src/api`
+  HTTP wrappers around backend endpoints
+- `src/utils`
+  Shared client-side utilities
 
-```
-浏览器请求 http://localhost:3000/uploads/UUID.png
-  → Express: app.use('/uploads', express.static('backend/uploads'))
-  → 直接返回文件，Content-Type: image/png
-```
+### Routes
 
-## 前端架构
+Defined in `frontend/src/App.jsx`:
 
-```
-main.jsx
-  └─ BrowserRouter
-       └─ App.jsx (Routes)
-            ├─ /login       → Login.jsx       (公开)
-            ├─ /register    → Register.jsx    (公开)
-            ├─ /album/:id   → ProtectedRoute → AlbumDetail.jsx
-            ├─ /            → ProtectedRoute → Home.jsx
-            └─ *            → Navigate to /
+- `/login`
+- `/register`
+- `/profile`
+- `/admin`
+- `/album/:id`
+- `/`
 
-共享模块:
-  api/axios.js        — 统一 Axios 实例 (baseURL=/api, Bearer token 拦截, 401 自动登出)
-  api/albums.js       — 相册/封面 API 封装
-  api/media.js        — 媒体 API 封装
-  hooks/useAlbums.js      — 首页相册列表、创建、改名、删除、封面上传状态
-  hooks/useAlbumYears.js  — 首页按 album_year 分组、年份导航定位状态
-  hooks/useAlbumUsers.js  — 首页年份内按相册创建者分组
-  hooks/useYearUserNav.js — 首页年份导航下的用户子导航数据
-  hooks/useAlbumMedia.js  — 相册详情页数据、年份分组、上传、删除、设封面状态
-  hooks/useMediaUsers.js  — 相册详情年份内按媒体上传者分组状态
-  hooks/useMediaEditor.js — 媒体描述编辑状态
-  hooks/useMediaModal.js  — 媒体预览弹窗状态
-  api/admin.js            — 管理员 API 封装
-  hooks/useAdminUsers.js  — 管理员成员列表、编辑、删除状态
-  hooks/useAdminAlbums.js — 管理员相册列表、删除、封面状态
-  hooks/useAdminMedia.js  — 管理员媒体列表、删除状态
-  utils/auth.js       — localStorage 读写 (getToken/saveAuth/clearAuth/isAuthenticated)
-  config.js           — BASE_URL = 'http://localhost:3000'
-  components/ProtectedRoute.jsx — 路由守卫
-```
+### Frontend responsibility split
 
-## 后端职责边界
+The current codebase intentionally separates read and write concerns.
 
-- `controllers/*`：HTTP 参数入口、响应格式、错误转交。
-- `routes/*`：路由挂载、中间件组合，不写业务规则。
-- `services/albumService.js`：相册表基础数据操作。
-- `services/albumManagementService.js`：相册创建、改名、删除和创建者权限规则。
-- `services/albumCoverService.js`：上传封面、选择相册内照片设封面、媒体删除后的封面引用清理。
-- `services/mediaService.js`：媒体表基础数据操作。
-- `services/mediaUploadService.js`：媒体上传文件分类、大小校验和入库编排。
-- `services/mediaManagementService.js`：媒体编辑、删除权限和删除副作用编排。
-- `services/fileStorageService.js`：上传文件路径、URL 和文件删除。
-- `middlewares/adminOnly.js`：管理员接口权限边界。
-- `routes/admin.js` / `controllers/adminController.js`：独立管理员接口入口。
-- `services/adminUserService.js` / `adminAlbumService.js` / `adminMediaService.js`：管理员业务服务，避免混入普通用户流程。
+Read hooks:
 
-## 数据关系
+- `useAlbumListQuery`
+- `useAlbumMediaQuery`
+- `useAdminUsersQuery`
+- `useAdminAlbumsQuery`
+- `useAdminMediaQuery`
 
-```
-users (1) ──< albums (many)     ON DELETE CASCADE
-users (1) ──< media (many)      ON DELETE CASCADE
-users (1) ──< comments (many)   ON DELETE CASCADE
-albums (1) ──< media (many)     ON DELETE SET NULL
-media (1) ──< comments (many)   ON DELETE CASCADE
-```
+Write hooks:
+
+- `useAlbumMutations`
+- `useAlbumMediaMutations`
+- `useAdminUserMutations`
+- `useAdminAlbumMutations`
+- `useAdminMediaMutations`
+
+URL-backed filter state:
+
+- `useUrlFilterState`
+
+Compatibility wrappers kept for older imports:
+
+- `useAlbums`
+- `useAlbumMedia`
+- `useAdminUsers`
+- `useAdminAlbums`
+- `useAdminMedia`
+
+This keeps new search/filter logic independent from create, update, and delete flows.
+
+### Presentation layer
+
+List and page UIs compose small components instead of embedding everything in page files.
+
+Examples:
+
+- `FilterToolbar`, `FilterSelect`, `SearchBar`
+- `AlbumCard`, `AlbumYearSection`, `AlbumUserSection`
+- `MediaCard`, `MediaUploader`, `MediaModal`, `MediaYearSection`
+- `AdminUserTable`, `AdminAlbumTable`, `AdminMediaGrid`
+
+## Backend structure
+
+Key backend directories:
+
+- `src/routes`
+  Route declarations and middleware composition
+- `src/controllers`
+  HTTP request/response handling
+- `src/services`
+  Business logic and data access orchestration
+- `src/middlewares`
+  Auth, upload, logging, and error handling
+- `src/utils`
+  Cross-service helpers
+- `src/config`
+  Database and JWT configuration
+
+### Request flow
+
+Normal request path:
+
+1. Express route matches under `/api`
+2. Route-level middleware runs
+3. Controller validates and parses HTTP input
+4. Service layer executes business logic
+5. MySQL is queried through `mysql2/promise`
+6. Controller returns JSON
+
+### Middleware stack
+
+Configured in `backend/src/app.js`:
+
+- `express.json()`
+- request logger
+- static `/uploads`
+- `/api` routes
+- upload error handler
+- application error handler
+
+### Auth boundary
+
+- `middlewares/auth.js` injects `req.user` from JWT
+- `middlewares/adminOnly.js` enforces admin-only access
+
+## Backend service split
+
+### Album domain
+
+- `albumService.js`
+  Base album data access helpers
+- `albumManagementService.js`
+  Create, rename, delete, and ownership rules
+- `albumCoverService.js`
+  Cover upload and cover selection behavior
+- `albumQueryService.js`
+  Album read/search/filter logic
+
+### Media domain
+
+- `mediaService.js`
+  Base media data access helpers
+- `mediaUploadService.js`
+  File classification, validation, and media creation
+- `mediaManagementService.js`
+  Description update, delete, and side effects
+- `mediaQueryService.js`
+  Media read/search/filter logic
+
+### Admin domain
+
+- `adminUserService.js`
+  Admin write actions for users
+- `adminAlbumService.js`
+  Admin write actions for albums
+- `adminMediaService.js`
+  Admin write actions for media
+- `adminUserQueryService.js`
+  User list search/filter logic
+- `adminAlbumQueryService.js`
+  Album list search/filter logic
+- `adminMediaQueryService.js`
+  Media list search/filter logic
+
+### Shared helpers
+
+- `fileStorageService.js`
+  Upload path and file delete helpers
+- `queryFilters.js`
+  Shared query normalization and validation
+- `parseId.js`
+  Common id parsing
+- `httpError.js`
+  Reusable HTTP-style errors
+
+## Search and filter design
+
+The search/filter implementation added on 2026-05-13 follows two rules:
+
+1. Read concerns stay separate from write concerns.
+2. Filter state stays local to the current page and serializes into the URL.
+
+This means:
+
+- no CRUD service was overloaded with filter-specific SQL
+- no page-level write hook owns list-fetching logic
+- no filter state is hidden in unrelated component internals
+
+Supported search/filter surfaces:
+
+- home album list
+- album detail media list
+- admin users
+- admin albums
+- admin media
+
+See `search-filter.md` for concrete filters.
+
+## Data model summary
+
+Main tables:
+
+- `users`
+- `albums`
+- `media`
+- `comments`
+
+Relationship summary:
+
+- one user -> many albums
+- one user -> many media items
+- one user -> many comments
+- one album -> many media items
+- one media item -> many comments
+
+Deletion behavior is handled partly by relational constraints and partly by service-layer cleanup.
+
+## Runtime assumptions
+
+Current database config is hardcoded in `backend/src/config/db.js`:
+
+- host `localhost`
+- port `3306`
+- user `root`
+- empty password
+- database `memory_vault`
+
+If local runtime differs, update that config before starting the backend.

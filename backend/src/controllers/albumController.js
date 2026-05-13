@@ -1,6 +1,6 @@
-const albumService = require('../services/albumService');
 const albumManagementService = require('../services/albumManagementService');
 const albumCoverService = require('../services/albumCoverService');
+const albumQueryService = require('../services/albumQueryService');
 const parseId = require('../utils/parseId');
 
 async function create(req, res, next) {
@@ -14,8 +14,21 @@ async function create(req, res, next) {
 
 async function list(req, res, next) {
   try {
-    const rows = await albumService.getList(req.user.id);
+    const rows = await albumQueryService.listAlbums(req.query);
     res.json({ albums: rows });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function show(req, res, next) {
+  try {
+    const albumId = parseId(req.params.id, '相册 ID');
+    const album = await albumQueryService.getAlbumById(albumId);
+    if (!album) {
+      return res.status(404).json({ message: '相册不存在' });
+    }
+    res.json({ album });
   } catch (error) {
     next(error);
   }
@@ -54,4 +67,4 @@ async function remove(req, res, next) {
   }
 }
 
-module.exports = { create, list, setCover, rename, remove };
+module.exports = { create, list, show, setCover, rename, remove };
