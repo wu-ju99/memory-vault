@@ -17,10 +17,11 @@ export default function useAdminMediaMutations(onMediaChanged) {
       await deleteAdminMedia(mediaId);
       await refreshMedia();
       setMessage('媒体已删除');
-      return true;
+      return { ok: true };
     } catch (mutationError) {
-      setError(getErrorMessage(mutationError, '删除媒体失败'));
-      return false;
+      const nextError = getErrorMessage(mutationError, '删除媒体失败');
+      setError(nextError);
+      return { ok: false, error: nextError };
     }
   }
 

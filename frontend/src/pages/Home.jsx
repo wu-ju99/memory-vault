@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { clearAuth, getUser } from '../utils/auth';
 import CreateAlbumForm from '../components/CreateAlbumForm';
@@ -7,6 +8,8 @@ import AlbumUserNav from '../components/AlbumUserNav';
 import SearchBar from '../components/SearchBar';
 import FilterSelect from '../components/FilterSelect';
 import FilterToolbar from '../components/FilterToolbar';
+import ConfirmDialog from '../components/dialogs/ConfirmDialog';
+import InputDialog from '../components/dialogs/InputDialog';
 import useAlbumYears from '../hooks/useAlbumYears';
 import useYearUserNav from '../hooks/useYearUserNav';
 import useAlbumListQuery from '../hooks/useAlbumListQuery';
@@ -49,6 +52,9 @@ function buildYearOptions(albums) {
 function Home() {
   const navigate = useNavigate();
   const user = getUser();
+  const [renameDialog, setRenameDialog] = useState({ open: false, album: null, error: '' });
+  const [deleteDialog, setDeleteDialog] = useState({ open: false, album: null, error: '' });
+  const [dialogSubmitting, setDialogSubmitting] = useState(false);
   const filterState = useUrlFilterState(
     { q: '', year: '', owner: '' },
     { prefix: 'albums_' }
@@ -68,15 +74,52 @@ function Home() {
     await albumMutations.uploadCover(album, file);
   }
 
-  async function handleRenameAlbum(album) {
-    const title = window.prompt('请输入新的相册名称', album.title);
-    if (title === null) return;
-    await albumMutations.renameAlbum(album, title);
+  function closeRenameDialog() {
+    if (dialogSubmitting) return;
+    setRenameDialog({ open: false, album: null, error: '' });
   }
 
-  async function handleDeleteAlbum(album) {
-    if (!window.confirm(`确定删除相册“${album.title}”吗？已上传的媒体文件会保留。`)) return;
-    await albumMutations.removeAlbum(album);
+  function closeDeleteDialog() {
+    if (dialogSubmitting) return;
+    setDeleteDialog({ open: false, album: null, error: '' });
+  }
+
+  function handleRenameAlbum(album) {
+    setRenameDialog({ open: true, album, error: '' });
+  }
+
+  async function submitRenameAlbum(title) {
+    if (!renameDialog.album) return;
+
+    setDialogSubmitting(true);
+    const result = await albumMutations.renameAlbum(renameDialog.album, title);
+    setDialogSubmitting(false);
+
+    if (result.ok) {
+      closeRenameDialog();
+      return;
+    }
+
+    setRenameDialog((prev) => ({ ...prev, error: result.error || '修改相册名称失败' }));
+  }
+
+  function handleDeleteAlbum(album) {
+    setDeleteDialog({ open: true, album, error: '' });
+  }
+
+  async function confirmDeleteAlbum() {
+    if (!deleteDialog.album) return;
+
+    setDialogSubmitting(true);
+    const result = await albumMutations.removeAlbum(deleteDialog.album);
+    setDialogSubmitting(false);
+
+    if (result.ok) {
+      closeDeleteDialog();
+      return;
+    }
+
+    setDeleteDialog((prev) => ({ ...prev, error: result.error || '删除相册失败' }));
   }
 
   function handleLogout() {
@@ -186,6 +229,34 @@ function Home() {
           </div>
         </section>
       </main>
+
+      <InputDialog
+        open={renameDialog.open}
+        eyebrow="Album Rename"
+        title="修改相册名称"
+        description={renameDialog.album ? `为“${renameDialog.album.title}”设置一个更清晰的新名称。` : ''}
+        value={renameDialog.album?.title || ''}
+        placeholder="输入新的相册名称"
+        error={renameDialog.error}
+        confirmLabel="保存名称"
+        submitting={dialogSubmitting}
+        onSubmit={submitRenameAlbum}
+        onClose={closeRenameDialog}
+      />
+
+      <ConfirmDialog
+        open={deleteDialog.open}
+        eyebrow="Remove Album"
+        title="删除这个相册？"
+        description={deleteDialog.album ? `你将删除相册“${deleteDialog.album.title}”。` : ''}
+        note="相册会被移除，已上传的媒体文件会保留在系统中。"
+        error={deleteDialog.error}
+        confirmLabel="确认删除"
+        danger
+        confirming={dialogSubmitting}
+        onConfirm={confirmDeleteAlbum}
+        onClose={closeDeleteDialog}
+      />
     </div>
   );
 }

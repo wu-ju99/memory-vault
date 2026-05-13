@@ -60,10 +60,11 @@ export default function useAlbumMutations(onAlbumsChanged) {
   async function renameAlbum(album, title) {
     const trimmed = title.trim();
     if (!trimmed) {
-      setError('相册名称不能为空');
-      return;
+      const nextError = '相册名称不能为空';
+      setError(nextError);
+      return { ok: false, error: nextError };
     }
-    if (trimmed === album.title) return;
+    if (trimmed === album.title) return { ok: true };
 
     setManagingAlbumId(album.id);
     clearStatus();
@@ -71,8 +72,11 @@ export default function useAlbumMutations(onAlbumsChanged) {
       await renameAlbumRequest(album.id, trimmed);
       await refreshAlbums();
       setMessage('相册名称已更新');
+      return { ok: true };
     } catch (mutationError) {
-      setError(getErrorMessage(mutationError, '修改相册名称失败'));
+      const nextError = getErrorMessage(mutationError, '修改相册名称失败');
+      setError(nextError);
+      return { ok: false, error: nextError };
     } finally {
       setManagingAlbumId(null);
     }
@@ -85,8 +89,11 @@ export default function useAlbumMutations(onAlbumsChanged) {
       await deleteAlbumRequest(album.id);
       await refreshAlbums();
       setMessage('相册已删除');
+      return { ok: true };
     } catch (mutationError) {
-      setError(getErrorMessage(mutationError, '删除相册失败'));
+      const nextError = getErrorMessage(mutationError, '删除相册失败');
+      setError(nextError);
+      return { ok: false, error: nextError };
     } finally {
       setManagingAlbumId(null);
     }

@@ -2,6 +2,14 @@
 
 ## 2026-05-13
 
+### Dialog UI
+
+- Replaced browser-native confirm and prompt dialogs with standalone in-app modal dialogs
+- Added isolated dialog components in `frontend/src/components/dialogs/`
+- Added isolated dialog styling in `frontend/src/styles/dialog.css`
+- Covered album rename, album delete, memory delete, admin user delete, admin album delete, and admin media delete flows
+- Kept dialog presentation separate from page business logic to avoid overlapping responsibilities
+
 ### UI copy and navigation
 
 - Localized search, filter, admin, and browsing actions to Chinese across home, album detail, and admin pages

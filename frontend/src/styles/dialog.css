@@ -1,0 +1,221 @@
+.app-dialog-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.app-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background:
+    radial-gradient(circle at 50% 24%, rgba(255, 245, 223, 0.16), transparent 30%),
+    rgba(34, 26, 21, 0.62);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+}
+
+.app-dialog-card {
+  position: relative;
+  z-index: 1;
+  width: min(520px, 100%);
+  padding: 28px;
+  border: 1px solid rgba(83, 56, 38, 0.18);
+  border-radius: 22px;
+  background:
+    linear-gradient(155deg, rgba(255, 251, 244, 0.98), rgba(247, 238, 224, 0.98)),
+    #fffaf2;
+  box-shadow:
+    0 24px 60px rgba(32, 22, 16, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.76);
+  animation: appDialogEnter 0.22s ease-out;
+}
+
+.app-dialog-card.danger {
+  background:
+    linear-gradient(155deg, rgba(255, 248, 244, 0.98), rgba(251, 238, 233, 0.98)),
+    #fff8f4;
+}
+
+@keyframes appDialogEnter {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.app-dialog-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(79, 58, 43, 0.08);
+  color: #6e4c37;
+  cursor: pointer;
+  font: inherit;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.app-dialog-close:hover {
+  background: rgba(79, 58, 43, 0.16);
+}
+
+.app-dialog-head {
+  padding-right: 40px;
+}
+
+.app-dialog-eyebrow {
+  margin-bottom: 6px;
+  color: #8c5f49;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.app-dialog-head h2 {
+  color: #31251f;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(26px, 4vw, 34px);
+  line-height: 1.08;
+}
+
+.app-dialog-body {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.app-dialog-copy {
+  color: #5f4e42;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.app-dialog-note {
+  padding: 12px 14px;
+  border: 1px dashed rgba(168, 70, 55, 0.28);
+  border-radius: 14px;
+  background: rgba(168, 70, 55, 0.05);
+  color: #8a5f52;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.app-dialog-field {
+  display: grid;
+  gap: 8px;
+  color: #6e4c37;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.app-dialog-input {
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid rgba(92, 66, 47, 0.22);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.84);
+  color: #3f2f24;
+  font: inherit;
+}
+
+.app-dialog-input:focus {
+  outline: none;
+  border-color: rgba(54, 107, 101, 0.62);
+  box-shadow: 0 0 0 4px rgba(54, 107, 101, 0.12);
+}
+
+.app-dialog-error {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(168, 70, 55, 0.09);
+  color: #a84637;
+  font-size: 13px;
+}
+
+.app-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.app-dialog-btn {
+  min-width: 104px;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.app-dialog-btn.subtle {
+  border: 1px solid rgba(117, 97, 82, 0.24);
+  background: transparent;
+  color: #756152;
+}
+
+.app-dialog-btn.subtle:hover {
+  background: rgba(117, 97, 82, 0.08);
+}
+
+.app-dialog-btn.primary {
+  border: 1px solid rgba(54, 107, 101, 0.22);
+  background: #366b65;
+  color: #fff;
+}
+
+.app-dialog-btn.primary:hover {
+  background: #254f4a;
+}
+
+.app-dialog-btn.danger {
+  border: 1px solid rgba(168, 70, 55, 0.28);
+  background: #a84637;
+  color: #fff;
+}
+
+.app-dialog-btn.danger:hover {
+  background: #89382d;
+}
+
+.app-dialog-btn:disabled,
+.app-dialog-close:disabled {
+  cursor: wait;
+  opacity: 0.58;
+}
+
+@media (max-width: 620px) {
+  .app-dialog-layer {
+    padding: 12px;
+  }
+
+  .app-dialog-card {
+    padding: 22px 18px 18px;
+    border-radius: 18px;
+  }
+
+  .app-dialog-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .app-dialog-btn {
+    width: 100%;
+  }
+}

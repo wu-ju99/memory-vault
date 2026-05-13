@@ -35,6 +35,7 @@
 - 左页 `AlbumYearNav` 提供年份导航，`AlbumUserNav` 作为当前年份用户子导航
 - 卡片网格展示（`Link` 到 `/album/:id`）
 - 新建相册输入框 + 创建按钮
+- 相册改名和删除使用独立站内弹窗，不再使用浏览器原生白框
 - 显示当前用户名 + 退出按钮
 - 空状态："还没有相册，创建一个吧"
 
@@ -61,9 +62,15 @@
 - 视频：`<video controls>` 原生播放
 - 描述：点击进入内联编辑，保存/取消
 - 时间：`formatDate()` 格式化 YYYY-MM-DD
-- 删除：右上角 × 按钮（hover 显示），确认删除
+- 删除：右上角 × 按钮（hover 显示），使用独立站内确认弹窗
 - 评论：💬 按钮展开/收起，发表/删除
 - 评论排版：`CommentList.jsx` 负责评论交互状态，`index.css` 负责窄栏换行和视觉布局，避免把评论逻辑混入页面组件
+
+### AdminDashboard.jsx (`/admin`)
+
+- 成员、相册、媒体三个后台分区共用独立筛选工具栏
+- 删除成员、删除相册、删除媒体统一使用共享确认弹窗
+- 删除弹窗由页面负责打开和提交，公共弹窗组件只负责展示与交互壳层
 
 ## 共享模块
 
@@ -76,8 +83,9 @@
 | 用户分组 | `hooks/useAlbumUsers.js` / `hooks/useMediaUsers.js` / `hooks/useYearUserNav.js` | 年份内用户分区和首页用户子导航，保持分组逻辑独立 |
 | 用户显示名 | `utils/userDisplay.js` | 昵称优先，未设置昵称时回退用户名 |
 | 用户头像 | `components/UserAvatar.jsx` / `components/UserIdentity.jsx` | 统一头像、显示名、管理员标识和缺省头像展示，供相册、媒体、评论、分区和管理员面板复用 |
+| 站内弹窗 | `components/dialogs/*` | 统一危险操作确认和文本输入弹窗，替换原生 confirm/prompt |
 | 全局配置 | `config.js` | BASE_URL = 'http://localhost:3000' |
-| 全局样式 | `index.css` | 极简黑白灰风格，无 UI 框架 |
+| 全局样式 | `index.css` / `styles/dialog.css` | 站点基础样式与独立弹窗样式 |
 
 ## 数据流
 

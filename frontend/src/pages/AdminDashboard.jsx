@@ -4,6 +4,7 @@ import { getUser } from '../utils/auth';
 import SearchBar from '../components/SearchBar';
 import FilterSelect from '../components/FilterSelect';
 import FilterToolbar from '../components/FilterToolbar';
+import ConfirmDialog from '../components/dialogs/ConfirmDialog';
 import useAdminUsersQuery from '../hooks/useAdminUsersQuery';
 import useAdminUserMutations from '../hooks/useAdminUserMutations';
 import useAdminMediaQuery from '../hooks/useAdminMediaQuery';
@@ -115,6 +116,16 @@ function buildMediaTypeOptions(media) {
 
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('users');
+  const [deleteDialog, setDeleteDialog] = useState({
+    open: false,
+    scope: '',
+    targetId: null,
+    title: '',
+    description: '',
+    note: '',
+    error: '',
+  });
+  const [dialogSubmitting, setDialogSubmitting] = useState(false);
   const currentUser = getUser();
 
   const userFilters = useUrlFilterState({ q: '', role: '' }, { prefix: 'admin_users_' });
@@ -140,19 +151,77 @@ function AdminDashboard() {
   const mediaYearOptions = useMemo(() => buildMediaYearOptions(mediaQuery.media), [mediaQuery.media]);
   const mediaTypeOptions = useMemo(() => buildMediaTypeOptions(mediaQuery.media), [mediaQuery.media]);
 
-  async function confirmDeleteUser(user) {
-    if (!window.confirm(`确定删除用户“${user.username}”吗？`)) return;
-    await usersMutations.removeUser(user.id);
+  function closeDeleteDialog() {
+    if (dialogSubmitting) return;
+    setDeleteDialog({
+      open: false,
+      scope: '',
+      targetId: null,
+      title: '',
+      description: '',
+      note: '',
+      error: '',
+    });
   }
 
-  async function confirmDeleteAlbum(album) {
-    if (!window.confirm(`确定删除相册“${album.title}”吗？已上传的媒体文件会保留。`)) return;
-    await albumsMutations.removeAlbum(album.id);
+  function confirmDeleteUser(user) {
+    setDeleteDialog({
+      open: true,
+      scope: 'user',
+      targetId: user.id,
+      title: '删除这个成员？',
+      description: `你将删除用户“${user.username}”。`,
+      note: '该用户发布的内容统计会从后台成员列表中移除。',
+      error: '',
+    });
   }
 
-  async function confirmDeleteMedia(media) {
-    if (!window.confirm(`确定删除 ${media.username} 上传的这条媒体吗？`)) return;
-    await mediaMutations.removeMedia(media.id);
+  function confirmDeleteAlbum(album) {
+    setDeleteDialog({
+      open: true,
+      scope: 'album',
+      targetId: album.id,
+      title: '删除这个相册？',
+      description: `你将删除相册“${album.title}”。`,
+      note: '相册记录会被移除，已上传的媒体文件会保留。',
+      error: '',
+    });
+  }
+
+  function confirmDeleteMedia(media) {
+    setDeleteDialog({
+      open: true,
+      scope: 'media',
+      targetId: media.id,
+      title: '删除这条媒体？',
+      description: `你将删除 ${media.username} 上传的这条媒体。`,
+      note: '删除后无法恢复，相关展示内容会立即从后台列表中移除。',
+      error: '',
+    });
+  }
+
+  async function submitDeleteDialog() {
+    if (!deleteDialog.targetId) return;
+
+    setDialogSubmitting(true);
+    let result = { ok: false, error: '删除失败' };
+
+    if (deleteDialog.scope === 'user') {
+      result = await usersMutations.removeUser(deleteDialog.targetId);
+    } else if (deleteDialog.scope === 'album') {
+      result = await albumsMutations.removeAlbum(deleteDialog.targetId);
+    } else if (deleteDialog.scope === 'media') {
+      result = await mediaMutations.removeMedia(deleteDialog.targetId);
+    }
+
+    setDialogSubmitting(false);
+
+    if (result.ok) {
+      closeDeleteDialog();
+      return;
+    }
+
+    setDeleteDialog((prev) => ({ ...prev, error: result.error || '删除失败' }));
   }
 
   const activeState = activeTab === 'users'
@@ -305,6 +374,20 @@ function AdminDashboard() {
           )}
         </section>
       </main>
+
+      <ConfirmDialog
+        open={deleteDialog.open}
+        eyebrow="Admin Action"
+        title={deleteDialog.title}
+        description={deleteDialog.description}
+        note={deleteDialog.note}
+        error={deleteDialog.error}
+        confirmLabel="确认删除"
+        danger
+        confirming={dialogSubmitting}
+        onConfirm={submitDeleteDialog}
+        onClose={closeDeleteDialog}
+      />
     </div>
   );
 }

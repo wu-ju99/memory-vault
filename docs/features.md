@@ -37,6 +37,7 @@ This file tracks implemented product behavior, not future ideas.
 - Delete owned album
 - Upload album cover
 - Reuse an existing album media item as cover
+- Rename and delete flows use standalone in-app dialogs instead of browser-native prompts
 
 ## Media management
 
@@ -46,6 +47,7 @@ This file tracks implemented product behavior, not future ideas.
 - Media deletion by uploader or admin
 - Event time support, with created time fallback when event time is absent
 - Full-screen modal preview with previous/next navigation
+- Media deletion uses a dedicated in-app confirmation dialog
 
 ## Comments
 
@@ -62,6 +64,7 @@ This file tracks implemented product behavior, not future ideas.
 - Album management
 - Media management
 - Chinese labels for admin navigation, filters, and management actions
+- Admin delete actions use a shared in-app confirmation dialog
 - Admin-only route protection
 - Last-admin and self-delete protection on admin user deletion flow
 
@@ -100,6 +103,7 @@ The codebase now keeps these concerns separate:
 - `useUrlFilterState` for filter serialization
 - page components for composition only
 - reusable filter UI components for consistent controls
+- reusable dialog UI components for confirm/input overlays
 
 This was done specifically to avoid overlapping feature ownership and future spaghetti code.
 

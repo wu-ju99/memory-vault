@@ -34,10 +34,11 @@ export default function useAdminUserMutations(onUsersChanged) {
       await deleteAdminUser(userId);
       await refreshUsers();
       setMessage('成员已删除');
-      return true;
+      return { ok: true };
     } catch (mutationError) {
-      setError(getErrorMessage(mutationError, '删除成员失败'));
-      return false;
+      const nextError = getErrorMessage(mutationError, '删除成员失败');
+      setError(nextError);
+      return { ok: false, error: nextError };
     }
   }
 

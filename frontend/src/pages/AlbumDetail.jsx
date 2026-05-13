@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getUser } from '../utils/auth';
 import MediaCard from '../components/MediaCard';
@@ -8,6 +9,7 @@ import MediaYearSection from '../components/MediaYearSection';
 import SearchBar from '../components/SearchBar';
 import FilterSelect from '../components/FilterSelect';
 import FilterToolbar from '../components/FilterToolbar';
+import ConfirmDialog from '../components/dialogs/ConfirmDialog';
 import useAlbumMediaQuery from '../hooks/useAlbumMediaQuery';
 import useAlbumMediaMutations from '../hooks/useAlbumMediaMutations';
 import useMediaEditor from '../hooks/useMediaEditor';
@@ -62,6 +64,8 @@ function buildOwnerOptions(mediaList) {
 function AlbumDetail() {
   const { id } = useParams();
   const currentUser = getUser();
+  const [deleteDialog, setDeleteDialog] = useState({ open: false, item: null, error: '' });
+  const [dialogSubmitting, setDialogSubmitting] = useState(false);
   const filterState = useUrlFilterState(
     { q: '', type: '', year: '', owner: '' },
     { prefix: `album_${id}_` }
@@ -77,12 +81,31 @@ function AlbumDetail() {
   const yearOptions = buildMediaYearOptions(mediaQuery.mediaList);
   const ownerOptions = buildOwnerOptions(mediaQuery.mediaList);
 
-  async function handleDelete(item) {
-    if (!window.confirm('确定删除这条回忆吗？')) return;
+  function closeDeleteDialog() {
+    if (dialogSubmitting) return;
+    setDeleteDialog({ open: false, item: null, error: '' });
+  }
+
+  function handleDelete(item) {
+    setDeleteDialog({ open: true, item, error: '' });
+  }
+
+  async function confirmDeleteItem() {
+    if (!deleteDialog.item) return;
+
+    setDialogSubmitting(true);
     try {
-      await mediaMutations.removeMedia(item);
-      mediaModal.clearIfActive(item.id);
-    } catch {}
+      await mediaMutations.removeMedia(deleteDialog.item);
+      mediaModal.clearIfActive(deleteDialog.item.id);
+      setDeleteDialog({ open: false, item: null, error: '' });
+    } catch (error) {
+      setDeleteDialog((prev) => ({
+        ...prev,
+        error: error.response?.data?.message || '删除这条回忆失败',
+      }));
+    } finally {
+      setDialogSubmitting(false);
+    }
   }
 
   async function handleSetCover(item) {
@@ -235,6 +258,20 @@ function AlbumDetail() {
           onClose={mediaModal.closeMedia}
           onPrevious={mediaModal.previousMedia}
           onNext={mediaModal.nextMedia}
+        />
+
+        <ConfirmDialog
+          open={deleteDialog.open}
+          eyebrow="Delete Memory"
+          title="删除这条回忆？"
+          description="删除后将无法恢复，相关评论也会一并移除。"
+          note="如果这条内容正在作为相册封面，建议先重新设置封面。"
+          error={deleteDialog.error}
+          confirmLabel="确认删除"
+          danger
+          confirming={dialogSubmitting}
+          onConfirm={confirmDeleteItem}
+          onClose={closeDeleteDialog}
         />
       </main>
     </div>

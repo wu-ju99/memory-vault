@@ -20,10 +20,11 @@ export default function useAdminAlbumMutations(onAlbumsChanged) {
       await deleteAdminAlbum(albumId);
       await refreshAlbums();
       setMessage('相册已删除');
-      return true;
+      return { ok: true };
     } catch (mutationError) {
-      setError(getErrorMessage(mutationError, '删除相册失败'));
-      return false;
+      const nextError = getErrorMessage(mutationError, '删除相册失败');
+      setError(nextError);
+      return { ok: false, error: nextError };
     }
   }
 
