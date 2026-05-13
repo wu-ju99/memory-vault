@@ -60,6 +60,7 @@
 - 每个上传者分区内继续按图片 / 视频分组，并按 `event_time` / `created_at` 倒序
 - `renderMediaCard()` 提取函数，复用媒体卡片、评论、删除、弹窗逻辑
 - 单个媒体下载能力独立接入 `MediaCard` 和 `MediaModal`，不与上传/删除 hook 混用
+- 相册详情页支持多选当前列表内容并批量下载，选择态与下载进度独立管理
 
 **卡片功能：**
 - 图片：`<a>` 新标签页打开原图
@@ -91,6 +92,7 @@
 | 用户头像 | `components/UserAvatar.jsx` / `components/UserIdentity.jsx` | 统一头像、显示名、管理员标识和缺省头像展示，供相册、媒体、评论、分区和管理员面板复用 |
 | 站内弹窗 | `components/dialogs/*` | 统一危险操作确认和文本输入弹窗，替换原生 confirm/prompt |
 | 媒体下载 | `hooks/useMediaDownload.js` | 单个媒体下载状态与浏览器文件保存流程，保持与上传/删除解耦 |
+| 批量下载条 | `components/MediaBatchToolbar.jsx` | 相册详情多选、全选、清空选择和批量下载入口 |
 | 全局配置 | `config.js` | BASE_URL = 'http://localhost:3000' |
 | 全局样式 | `index.css` / `styles/dialog.css` | 站点基础样式与独立弹窗样式 |
 

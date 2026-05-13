@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getUser } from '../utils/auth';
 import MediaCard from '../components/MediaCard';
@@ -6,6 +6,7 @@ import CommentList from '../components/CommentList';
 import MediaUploader from '../components/MediaUploader';
 import MediaModal from '../components/MediaModal';
 import MediaYearSection from '../components/MediaYearSection';
+import MediaBatchToolbar from '../components/MediaBatchToolbar';
 import SearchBar from '../components/SearchBar';
 import FilterSelect from '../components/FilterSelect';
 import FilterToolbar from '../components/FilterToolbar';
@@ -65,6 +66,7 @@ function buildOwnerOptions(mediaList) {
 function AlbumDetail() {
   const { id } = useParams();
   const currentUser = getUser();
+  const [selectedMediaIds, setSelectedMediaIds] = useState([]);
   const [deleteDialog, setDeleteDialog] = useState({ open: false, item: null, error: '' });
   const [dialogSubmitting, setDialogSubmitting] = useState(false);
   const filterState = useUrlFilterState(
@@ -82,6 +84,12 @@ function AlbumDetail() {
   const typeOptions = buildMediaTypeOptions(mediaQuery.mediaList);
   const yearOptions = buildMediaYearOptions(mediaQuery.mediaList);
   const ownerOptions = buildOwnerOptions(mediaQuery.mediaList);
+  const allSelected = mediaQuery.mediaList.length > 0
+    && mediaQuery.mediaList.every((item) => selectedMediaIds.includes(item.id));
+
+  useEffect(() => {
+    setSelectedMediaIds((prev) => prev.filter((idValue) => mediaQuery.mediaList.some((item) => item.id === idValue)));
+  }, [mediaQuery.mediaList]);
 
   function closeDeleteDialog() {
     if (dialogSubmitting) return;
@@ -120,6 +128,21 @@ function AlbumDetail() {
     await mediaDownload.downloadMedia(item);
   }
 
+  function toggleMediaSelection(item, checked) {
+    setSelectedMediaIds((prev) => (
+      checked ? Array.from(new Set([...prev, item.id])) : prev.filter((idValue) => idValue !== item.id)
+    ));
+  }
+
+  function toggleAllMedia(checked) {
+    setSelectedMediaIds(checked ? mediaQuery.mediaList.map((item) => item.id) : []);
+  }
+
+  async function handleBatchDownload() {
+    const selectedItems = mediaQuery.mediaList.filter((item) => selectedMediaIds.includes(item.id));
+    await mediaDownload.downloadMediaBatch(selectedItems);
+  }
+
   function renderMediaCard(item, index) {
     const canDelete = item.user_id === currentUser?.id || currentUser?.role === 'admin';
     return (
@@ -138,6 +161,9 @@ function AlbumDetail() {
         onOpen={mediaModal.openMedia}
         onDownload={handleDownload}
         downloading={mediaDownload.downloadingId === item.id}
+        selectable
+        selected={selectedMediaIds.includes(item.id)}
+        onSelectChange={toggleMediaSelection}
       >
         <CommentList mediaId={item.id} currentUserId={currentUser?.id} currentUserRole={currentUser?.role} />
       </MediaCard>
@@ -232,6 +258,18 @@ function AlbumDetail() {
             <div className="book-page book-page-right memories-page">
               {mediaDownload.error && <p className="status-text error">{mediaDownload.error}</p>}
               {mediaQuery.error && <p className="status-text error">{mediaQuery.error}</p>}
+
+              <MediaBatchToolbar
+                selectedCount={selectedMediaIds.length}
+                totalCount={mediaQuery.mediaList.length}
+                allSelected={allSelected}
+                disabled={mediaDownload.batchDownloading}
+                batchDownloading={mediaDownload.batchDownloading}
+                batchProgress={mediaDownload.batchProgress}
+                onToggleAll={toggleAllMedia}
+                onClear={() => setSelectedMediaIds([])}
+                onDownload={handleBatchDownload}
+              />
 
               {mediaQuery.mediaList.length === 0 && (
                 <p className="status-text empty-memory">

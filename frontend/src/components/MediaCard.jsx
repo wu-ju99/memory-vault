@@ -15,6 +15,9 @@ function MediaCard({
   onOpen,
   onDownload,
   downloading,
+  selectable = false,
+  selected = false,
+  onSelectChange,
   children,
 }) {
   const fullUrl = BASE_URL + item.url;
@@ -31,6 +34,17 @@ function MediaCard({
       className={`grid-item scrapbook-photo ${item.type === 'video' ? 'grid-item-video' : ''}`}
       style={{ '--photo-tilt': `${tilt}deg` }}
     >
+      {selectable && (
+        <label className="media-select-check">
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={(event) => onSelectChange?.(item, event.target.checked)}
+          />
+          <span>选择</span>
+        </label>
+      )}
+
       {item.type === 'video' ? (
         <button className="media-preview-btn" onClick={() => onOpen?.(item)} type="button">
           <video src={fullUrl} muted className="grid-video" />
@@ -78,7 +92,7 @@ function MediaCard({
       {children}
 
       {onDownload && (
-        <button className="media-download-btn" onClick={() => onDownload(item)} type="button">
+        <button className="media-download-btn" onClick={() => onDownload(item)} type="button" disabled={downloading}>
           {downloading ? '下载中...' : '下载'}
         </button>
       )}

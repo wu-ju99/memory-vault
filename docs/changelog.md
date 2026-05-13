@@ -2,6 +2,12 @@
 
 ## 2026-05-13
 
+### Media batch download
+
+- Added isolated multi-select and batch download controls to album detail media browsing
+- Reused the protected single-media download route instead of coupling batch download to upload or delete flows
+- Added local selection state and progress feedback for multi-file download in album detail
+
 ### Admin batch delete
 
 - Added isolated batch-select and batch-delete flows for admin albums

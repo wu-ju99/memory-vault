@@ -1705,6 +1705,59 @@ html {
   font-size: 13px;
 }
 
+.media-batch-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  border: 1px solid rgba(113, 82, 55, 0.14);
+  border-radius: 10px;
+  background: rgba(255, 250, 243, 0.58);
+}
+
+.media-batch-meta,
+.media-batch-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.media-batch-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #5f4e42;
+  font-size: 13px;
+}
+
+.media-batch-count {
+  color: #8a7663;
+  font-size: 12px;
+}
+
+.media-batch-actions button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(54, 107, 101, 0.28);
+  border-radius: 999px;
+  background: transparent;
+  color: #366b65;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.media-batch-actions button:hover {
+  background: rgba(54, 107, 101, 0.1);
+}
+
+.media-batch-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .media-type-section {
   display: grid;
   gap: 14px;
@@ -1801,6 +1854,7 @@ html {
 }
 
 .scrapbook-photo {
+  position: relative;
   transform: rotate(var(--photo-tilt));
   overflow: visible;
   border: none;
@@ -1859,6 +1913,23 @@ html {
 .scrapbook-photo .grid-desc {
   color: #5f4e42;
   font-size: 12px;
+}
+
+.media-select-check {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: rgba(255, 250, 243, 0.9);
+  box-shadow: 0 6px 12px rgba(69, 47, 31, 0.14);
+  color: #5f4e42;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .media-download-btn {
