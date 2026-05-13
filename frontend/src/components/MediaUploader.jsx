@@ -42,7 +42,7 @@ function MediaUploader({
         ref={fileInputRef}
         type="file"
         multiple
-        accept="image/jpeg,image/png,image/webp,video/mp4,video/mov,video/webm"
+        accept=".jpg,.jpeg,.png,.webp,.mp4,.mov,.webm,image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm"
         onChange={handleUpload}
         id="file-upload-detail"
         className="file-input"

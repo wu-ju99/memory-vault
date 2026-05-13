@@ -231,15 +231,27 @@ Fields:
 Notes:
 
 - files are stored under `backend/uploads`
-- media type is derived from file metadata
-- single-file max size is enforced by upload middleware
+- supported formats: `jpg`, `jpeg`, `png`, `webp`, `mp4`, `mov`, `webm`
+- media type is derived from browser metadata first, with file extension fallback
+- single-file max size: image `10MB`, video `500MB`
+- if every selected file fails validation, the request returns a `400` error instead of a zero-count success payload
 
 Response shape:
 
 ```json
 {
-  "files": [],
-  "count": 0
+  "files": [
+    {
+      "id": 12,
+      "url": "/uploads/example.mp4",
+      "type": "video",
+      "size": 174717460,
+      "description": "Screen capture",
+      "album_id": 3,
+      "event_time": null
+    }
+  ],
+  "count": 1
 }
 ```
 

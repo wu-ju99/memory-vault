@@ -43,11 +43,14 @@ This file tracks implemented product behavior, not future ideas.
 
 - Upload image and video files
 - Batch upload support
+- Supported upload formats: `jpg`, `jpeg`, `png`, `webp`, `mp4`, `mov`, `webm`
+- Upload limits: image `10MB`, video `500MB`
 - Media description editing
 - Media deletion by uploader or admin
 - Event time support, with created time fallback when event time is absent
 - Full-screen modal preview with previous/next navigation
 - Media deletion uses a dedicated in-app confirmation dialog
+- Upload validation now reports clear errors when selected files fail format or size checks
 
 ## Comments
 

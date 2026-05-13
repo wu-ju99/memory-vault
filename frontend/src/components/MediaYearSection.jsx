@@ -8,7 +8,7 @@ function MediaYearSection({ year, items, renderMediaCard }) {
     <section id={`year-${year}`} className="memory-year-section">
       <div className="year-heading">
         <h2>{year}</h2>
-        <span>{items.length} 张</span>
+        <span>{items.length} 条内容</span>
       </div>
 
       <div className="media-year-user-sections">

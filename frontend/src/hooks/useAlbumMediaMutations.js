@@ -28,6 +28,10 @@ export default function useAlbumMediaMutations(albumId, handlers = {}) {
     setUploading(true);
     try {
       const result = await uploadMediaFiles(albumId, files, options);
+      if (!result?.count) {
+        setUploadError('没有可上传的文件，请检查文件格式或大小后重试');
+        return null;
+      }
       await refreshMedia();
       setUploadMessage(`上传完成，共 ${result.count} 个文件`);
       return result;

@@ -2,6 +2,14 @@
 
 ## 2026-05-13
 
+### Media upload fix
+
+- Fixed a video upload regression where valid `.mp4`, `.mov`, and `.webm` files could be skipped and reported as zero uploaded files
+- Hardened media type detection so upload handling now falls back to file extension when browser metadata is incomplete
+- Fixed backend upload limit exports so image and video size validation uses the intended limits again
+- Added clearer frontend and backend error handling when all selected files fail format or size validation
+- Kept album detail media display partitioned by uploader, then split into photo and video sections
+
 ### Dialog UI
 
 - Replaced browser-native confirm and prompt dialogs with standalone in-app modal dialogs

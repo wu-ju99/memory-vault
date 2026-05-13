@@ -15,10 +15,6 @@ const UPLOADS_DIR = path.resolve(__dirname, '../../uploads');
 const IMAGE_MAX = 10 * 1024 * 1024;   // 10MB
 const VIDEO_MAX = 500 * 1024 * 1024;  // 500MB
 
-// 导出供控制器做二次校验
-module.exports.IMAGE_MAX = IMAGE_MAX;
-module.exports.VIDEO_MAX = VIDEO_MAX;
-
 // 允许的扩展名
 const IMAGE_EXTS = ['.jpg', '.jpeg', '.png', '.webp'];
 const VIDEO_EXTS = ['.mp4', '.mov', '.webm'];
@@ -50,5 +46,9 @@ const upload = multer({
   fileFilter,
   limits: { fileSize: Math.max(IMAGE_MAX, VIDEO_MAX) }, // 取较大值，分类型校验在 controller
 });
+
+// 供上传服务读取分类型大小限制
+upload.IMAGE_MAX = IMAGE_MAX;
+upload.VIDEO_MAX = VIDEO_MAX;
 
 module.exports = upload;
