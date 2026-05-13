@@ -15,6 +15,9 @@ export default function useYearUserNav(yearGroups, activeYear, allYearsValue) {
         if (!users.has(userKey)) {
           users.set(userKey, {
             userKey,
+            username: item.username,
+            nickname: item.nickname,
+            avatar: item.avatar,
             displayName: getUserDisplayName(item),
             role: item.role,
             count: 0,

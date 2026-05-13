@@ -22,6 +22,7 @@ export default function useMediaUsers(mediaList) {
           userId: item.user_id,
           username: item.username,
           nickname: item.nickname,
+          avatar: item.avatar,
           role: item.role,
           displayName: getUserDisplayName(item),
           items: [],

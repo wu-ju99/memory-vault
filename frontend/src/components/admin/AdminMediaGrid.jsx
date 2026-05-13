@@ -1,4 +1,5 @@
 import BASE_URL from '../../config';
+import UserIdentity from '../UserIdentity';
 
 function AdminMediaGrid({ media, onDeleteMedia }) {
   return (
@@ -13,7 +14,11 @@ function AdminMediaGrid({ media, onDeleteMedia }) {
             )}
           </div>
           <div className="admin-media-meta">
-            <strong>{item.username}</strong>
+            <UserIdentity
+              user={item}
+              avatarSize="sm"
+              className="admin-content-owner"
+            />
             <span>{item.album_title || '未归档相册'}</span>
             <span>{item.type} · {item.created_at?.slice(0, 10)}</span>
           </div>

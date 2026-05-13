@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import UserIdentity from '../UserIdentity';
 
 function AdminUserTable({ users, currentUserId, onSaveUser, onDeleteUser }) {
   const [editingId, setEditingId] = useState(null);
@@ -57,10 +58,11 @@ function AdminUserTable({ users, currentUserId, onSaveUser, onDeleteUser }) {
                       />
                     </div>
                   ) : (
-                    <div>
-                      <strong>{user.username}</strong>
-                      {user.nickname && <span>{user.nickname}</span>}
-                    </div>
+                    <UserIdentity
+                      user={user}
+                      avatarSize="md"
+                      className="admin-member-identity"
+                    />
                   )}
                 </td>
                 <td>

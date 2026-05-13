@@ -1,4 +1,5 @@
 import AlbumCard from './AlbumCard';
+import UserIdentity from './UserIdentity';
 
 function AlbumUserSection({
   group,
@@ -15,10 +16,7 @@ function AlbumUserSection({
       <div className="album-user-heading">
         <div>
           <p>Uploaded by</p>
-          <h2>
-            {group.displayName}
-            {group.role === 'admin' && <span className="admin-badge">管理员</span>}
-          </h2>
+          <h2><UserIdentity user={group} avatarSize="lg" /></h2>
         </div>
         <span>{group.items.length} 本相册</span>
       </div>

@@ -1,3 +1,5 @@
+import UserIdentity from './UserIdentity';
+
 function MediaUserSection({ group, renderMediaCard }) {
   const photos = group.items.filter((item) => item.type === 'image');
   const videos = group.items.filter((item) => item.type === 'video');
@@ -7,10 +9,7 @@ function MediaUserSection({ group, renderMediaCard }) {
       <div className="media-user-heading">
         <div>
           <p>Uploaded by</p>
-          <h2>
-            {group.displayName}
-            {group.role === 'admin' && <span className="admin-badge">管理员</span>}
-          </h2>
+          <h2><UserIdentity user={group} avatarSize="lg" /></h2>
         </div>
         <span>{photos.length} 张照片 / {videos.length} 个视频</span>
       </div>

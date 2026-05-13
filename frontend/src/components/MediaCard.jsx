@@ -1,5 +1,5 @@
 import BASE_URL from '../config';
-import { getUserDisplayName } from '../utils/userDisplay';
+import UserIdentity from './UserIdentity';
 
 function MediaCard({
   item,
@@ -70,10 +70,7 @@ function MediaCard({
         {item.event_time ? `拍摄 ${formatDate(item.event_time)}` : `上传 ${formatDate(item.created_at)}`}
       </p>
       {item.username && (
-        <p className="media-user">
-          {getUserDisplayName(item)}
-          {item.role === 'admin' && <span className="admin-badge">管理员</span>}
-        </p>
+        <UserIdentity user={item} avatarSize="sm" className="media-user" />
       )}
 
       {children}

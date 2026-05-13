@@ -23,6 +23,7 @@ export default function useAlbumUsers(albums) {
           userId: album.user_id,
           username: album.username,
           nickname: album.nickname,
+          avatar: album.avatar,
           role: album.role,
           displayName: getUserDisplayName(album),
           items: [],

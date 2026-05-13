@@ -785,11 +785,15 @@ body {
   text-transform: uppercase;
 }
 
-.admin-table td span {
+.admin-table td > span:not(.user-identity) {
   display: block;
   margin-top: 4px;
   color: #8a7663;
   font-size: 12px;
+}
+
+.admin-member-identity {
+  max-width: 220px;
 }
 
 .admin-edit-stack {
@@ -1194,12 +1198,15 @@ body {
   white-space: nowrap;
 }
 
-.album-user-nav em {
-  display: inline-block;
-  margin-left: 5px;
-  font-size: 10px;
-  font-style: normal;
-  opacity: 0.78;
+.album-user-nav .user-identity {
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.album-user-nav .user-identity-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .album-user-nav strong {
@@ -1211,6 +1218,73 @@ body {
   background: rgba(255, 255, 255, 0.54);
   color: inherit;
   font-size: 12px;
+}
+
+.user-identity {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  color: inherit;
+  vertical-align: middle;
+}
+
+.user-identity-text {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.user-identity-name {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.user-identity-meta {
+  color: #8a7663;
+  font-size: 11px;
+}
+
+.user-avatar {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #366b65;
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(69, 47, 31, 0.18);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.user-avatar-sm {
+  width: 22px;
+  height: 22px;
+  font-size: 10px;
+}
+
+.user-avatar-md {
+  width: 30px;
+  height: 30px;
+  font-size: 13px;
+}
+
+.user-avatar-lg {
+  width: 44px;
+  height: 44px;
+  font-size: 18px;
 }
 
 .album-year-sections,
@@ -1834,13 +1908,18 @@ html {
   margin: 18px 0;
 }
 
-.modal-meta span {
+.modal-meta > span,
+.modal-meta > .modal-user-identity {
   padding: 6px 10px;
   border-radius: 999px;
   background: rgba(54, 107, 101, 0.12);
   color: #366b65;
   font-size: 12px;
   font-weight: 700;
+}
+
+.modal-user-identity {
+  max-width: 100%;
 }
 
 .modal-comments {
@@ -1988,13 +2067,18 @@ html {
 .media-user {
   font-size: 11px;
   color: #bbb;
-  padding: 0 10px 2px;
+  padding: 0 10px 4px;
 }
 
 .album-owner {
   font-size: 11px;
   color: #bbb;
   margin-top: 2px;
+}
+
+.album-owner,
+.media-user {
+  max-width: 100%;
 }
 
 /* --- 用户标签链接 --- */
@@ -2132,6 +2216,12 @@ html {
 .comment-main .comment-user {
   max-width: 100%;
   overflow-wrap: anywhere;
+}
+
+.comment-user .user-avatar-sm {
+  width: 18px;
+  height: 18px;
+  font-size: 9px;
 }
 
 .comment-reply-btn {

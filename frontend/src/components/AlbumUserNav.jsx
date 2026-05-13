@@ -1,3 +1,5 @@
+import UserIdentity from './UserIdentity';
+
 function AlbumUserNav({
   users,
   onSelectUser,
@@ -13,10 +15,7 @@ function AlbumUserNav({
           onClick={() => onSelectUser(user)}
           type="button"
         >
-          <span>
-            {user.displayName}
-            {user.role === 'admin' && <em>管理员</em>}
-          </span>
+          <UserIdentity user={user} avatarSize="sm" />
           <strong>{user.count}</strong>
         </button>
       ))}

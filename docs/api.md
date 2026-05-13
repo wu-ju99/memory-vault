@@ -372,6 +372,20 @@ Authorization: Bearer <token>
 
 ---
 
+## 用户身份字段补充
+
+下列列表接口会返回用于前端头像身份展示的用户字段：`username`、`nickname`、`avatar`、`role`。前端统一通过 `UserIdentity` 组件消费这些字段，避免每个页面重复拼装头像逻辑。
+
+| 接口 | 身份字段用途 |
+|------|------|
+| `GET /api/albums` | 相册卡片、首页年份内用户分区、管理员相册创建者 |
+| `GET /api/media` | 媒体卡片、相册详情上传者分区、媒体弹窗 |
+| `GET /api/comments/:mediaId` | 评论作者和回复占位名称 |
+| `GET /api/admin/users` | 管理员成员列表 |
+| `GET /api/admin/media` | 管理员媒体上传者 |
+
+---
+
 ## 认证错误统一响应
 
 所有受保护接口在 token 无效时返回：

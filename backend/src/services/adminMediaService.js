@@ -13,6 +13,8 @@ async function listMedia(filters = {}) {
       m.event_time,
       m.created_at,
       u.username,
+      u.nickname,
+      u.avatar,
       u.role,
       a.title AS album_title,
       a.album_year

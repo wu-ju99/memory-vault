@@ -5,6 +5,8 @@
 
 import { useState } from 'react';
 import api from '../api/axios';
+import { getUserDisplayName } from '../utils/userDisplay';
+import UserIdentity from './UserIdentity';
 
 function CommentList({ mediaId, currentUserId, currentUserRole }) {
   const [comments, setComments] = useState([]);
@@ -73,10 +75,7 @@ function CommentList({ mediaId, currentUserId, currentUserRole }) {
     return (
       <div key={comment.id} className={`comment-item ${depth > 0 ? 'comment-nested' : ''}`}>
         <div className="comment-main">
-          <span className="comment-user">
-            {comment.username}
-            {comment.role === 'admin' && <span className="admin-badge">管理员</span>}
-          </span>
+          <UserIdentity user={comment} avatarSize="sm" className="comment-user" />
           <span className="comment-content">{comment.content}</span>
           <span className="comment-date">{formatDate(comment.created_at)}</span>
           <button
@@ -94,7 +93,7 @@ function CommentList({ mediaId, currentUserId, currentUserRole }) {
           <div className="comment-input-row comment-reply-row">
             <input
               className="comment-input"
-              placeholder={`回复 ${comment.username}...`}
+              placeholder={`回复 ${getUserDisplayName(comment)}...`}
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && submit(comment.id)}

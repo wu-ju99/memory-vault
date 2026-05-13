@@ -75,6 +75,7 @@
 | 年份分组 | `hooks/useAlbumYears.js` / `hooks/useAlbumMedia.js` | 首页相册年份分区、详情媒体年份分区 |
 | 用户分组 | `hooks/useAlbumUsers.js` / `hooks/useMediaUsers.js` / `hooks/useYearUserNav.js` | 年份内用户分区和首页用户子导航，保持分组逻辑独立 |
 | 用户显示名 | `utils/userDisplay.js` | 昵称优先，未设置昵称时回退用户名 |
+| 用户头像 | `components/UserAvatar.jsx` / `components/UserIdentity.jsx` | 统一头像、显示名、管理员标识和缺省头像展示，供相册、媒体、评论、分区和管理员面板复用 |
 | 全局配置 | `config.js` | BASE_URL = 'http://localhost:3000' |
 | 全局样式 | `index.css` | 极简黑白灰风格，无 UI 框架 |
 

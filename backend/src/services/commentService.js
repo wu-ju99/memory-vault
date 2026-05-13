@@ -14,7 +14,7 @@ async function create(userId, mediaId, content, parentId) {
 
 async function getByMedia(mediaId) {
   const [rows] = await pool.query(
-    `SELECT c.id, c.media_id, c.parent_id, c.content, c.created_at, c.user_id, u.username, u.role
+    `SELECT c.id, c.media_id, c.parent_id, c.content, c.created_at, c.user_id, u.username, u.nickname, u.avatar, u.role
      FROM comments c
      JOIN users u ON c.user_id = u.id
      WHERE c.media_id = ?

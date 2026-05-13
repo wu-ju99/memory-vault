@@ -2,6 +2,22 @@
 
 ## 2026-05-12
 
+### 新增：头像身份展示模块
+- 新增独立 `UserAvatar` 与 `UserIdentity` 组件，统一处理头像 URL、缺省首字母、昵称/用户名优先级和管理员标识。
+- 相册卡片、媒体卡片、年份内用户分区标题、首页用户子导航、媒体弹窗、评论列表、管理员成员/相册/媒体管理都接入统一身份组件。
+- 后端相册、媒体、评论、管理员媒体列表补齐 `nickname` / `avatar` 用户字段，前端分组 hook 同步透传头像字段。
+- 收窄管理员表格和媒体弹窗的宽泛 `span` 样式，避免头像组件内部结构被旧样式打散。
+
+| 改动 | 文件 | 说明 |
+|------|------|------|
+| 后端 | `albumService.js` / `mediaService.js` / `commentService.js` / `adminMediaService.js` | 列表接口返回用户头像和昵称字段 |
+| 前端 | `UserAvatar.jsx` / `UserIdentity.jsx` / `utils/userDisplay.js` | 独立用户身份显示模块 |
+| 前端 | `AlbumCard.jsx` / `MediaCard.jsx` / `MediaModal.jsx` / `CommentList.jsx` | 共享内容和评论中显示头像身份 |
+| 前端 | `AlbumUserNav.jsx` / `AlbumUserSection.jsx` / `MediaUserSection.jsx` / `use*Users.js` | 年份内用户分区和用户子导航透传头像 |
+| 前端 | `components/admin/*` | 管理员面板成员、相册创建者、媒体上传者显示头像身份 |
+
+---
+
 ### 新增：年份分区内按用户分组
 - 首页恢复年份作为主导航和主分区；每个年份分区内部再按相册创建者分组。
 - 年份导航下方新增当前年份的用户子导航；选择“全部”年份时，用户子导航会定位到该用户最新出现的年份分区。

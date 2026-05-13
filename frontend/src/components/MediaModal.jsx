@@ -1,5 +1,6 @@
 import BASE_URL from '../config';
 import CommentList from './CommentList';
+import UserIdentity from './UserIdentity';
 
 function formatDate(iso) {
   return iso ? iso.slice(0, 10) : '';
@@ -65,7 +66,13 @@ function MediaModal({
 
           <div className="modal-meta">
             <span>{media.event_time ? `拍摄 ${formatDate(media.event_time)}` : `上传 ${formatDate(media.created_at)}`}</span>
-            {media.username && <span>{media.username}</span>}
+            {media.username && (
+              <UserIdentity
+                user={media}
+                avatarSize="sm"
+                className="modal-user-identity"
+              />
+            )}
           </div>
 
           <div className="modal-comments">

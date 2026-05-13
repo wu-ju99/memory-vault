@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import BASE_URL from '../../config';
+import UserIdentity from '../UserIdentity';
 
 function CoverUploadButton({ album, onUploadCover }) {
   const inputRef = useRef(null);
@@ -47,7 +48,13 @@ function AdminAlbumTable({ albums, onDeleteAlbum, onUploadCover }) {
               <tr key={album.id}>
                 <td><strong>{album.title}</strong></td>
                 <td>{album.album_year || '-'}</td>
-                <td>{album.username}</td>
+                <td>
+                  <UserIdentity
+                    user={album}
+                    avatarSize="sm"
+                    className="admin-content-owner"
+                  />
+                </td>
                 <td>
                   {coverSrc ? (
                     <img src={coverSrc} alt="" className="admin-cover-thumb" />
