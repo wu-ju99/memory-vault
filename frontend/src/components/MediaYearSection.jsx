@@ -1,8 +1,6 @@
-import MediaUserSection from './MediaUserSection';
-import useMediaUsers from '../hooks/useMediaUsers';
-
 function MediaYearSection({ year, items, renderMediaCard }) {
-  const userGroups = useMediaUsers(items);
+  const photos = items.filter((item) => item.type === 'image');
+  const videos = items.filter((item) => item.type === 'video');
 
   return (
     <section id={`year-${year}`} className="memory-year-section">
@@ -11,15 +9,35 @@ function MediaYearSection({ year, items, renderMediaCard }) {
         <span>{items.length} 条内容</span>
       </div>
 
-      <div className="media-year-user-sections">
-        {userGroups.map((group) => (
-          <MediaUserSection
-            key={group.userKey}
-            group={group}
-            renderMediaCard={renderMediaCard}
-          />
-        ))}
-      </div>
+      {photos.length > 0 && (
+        <section className="media-type-section">
+          <div className="media-type-heading">
+            <div className="media-type-title">
+              <span className="media-type-icon media-type-icon-photo" aria-hidden="true" />
+              <strong>照片</strong>
+            </div>
+            <span>{photos.length}</span>
+          </div>
+          <div className="grid scrapbook-grid">
+            {photos.map((item, index) => renderMediaCard(item, index))}
+          </div>
+        </section>
+      )}
+
+      {videos.length > 0 && (
+        <section className="media-type-section">
+          <div className="media-type-heading">
+            <div className="media-type-title">
+              <span className="media-type-icon media-type-icon-video" aria-hidden="true" />
+              <strong>视频</strong>
+            </div>
+            <span>{videos.length}</span>
+          </div>
+          <div className="grid scrapbook-grid">
+            {videos.map((item, index) => renderMediaCard(item, photos.length + index))}
+          </div>
+        </section>
+      )}
     </section>
   );
 }
