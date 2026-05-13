@@ -5,6 +5,7 @@
  */
 
 const mediaUploadService = require('../services/mediaUploadService');
+const mediaDownloadService = require('../services/mediaDownloadService');
 const mediaManagementService = require('../services/mediaManagementService');
 const mediaQueryService = require('../services/mediaQueryService');
 const parseId = require('../utils/parseId');
@@ -29,6 +30,16 @@ async function list(req, res, next) {
   try {
     const rows = await mediaQueryService.listMedia(req.query);
     res.json({ media: rows });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function download(req, res, next) {
+  try {
+    const mediaId = parseId(req.params.id, '媒体 ID');
+    const payload = await mediaDownloadService.buildDownloadPayload(mediaId);
+    res.download(payload.path, payload.filename);
   } catch (error) {
     next(error);
   }
@@ -62,4 +73,4 @@ async function remove(req, res, next) {
   }
 }
 
-module.exports = { upload, list, update, remove };
+module.exports = { upload, list, download, update, remove };

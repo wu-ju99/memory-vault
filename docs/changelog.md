@@ -2,6 +2,13 @@
 
 ## 2026-05-13
 
+### Media download
+
+- Added a standalone single-media download flow for album detail pages
+- Added protected backend download endpoint `GET /api/media/:id/download`
+- Added isolated frontend download handling without mixing it into upload or delete mutations
+- Added download actions to album detail media cards and preview modal
+
 ### Media upload fix
 
 - Fixed a video upload regression where valid `.mp4`, `.mov`, and `.webm` files could be skipped and reported as zero uploaded files

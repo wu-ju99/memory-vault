@@ -13,6 +13,8 @@ function MediaCard({
   onCancelEdit,
   onDelete,
   onOpen,
+  onDownload,
+  downloading,
   children,
 }) {
   const fullUrl = BASE_URL + item.url;
@@ -74,6 +76,12 @@ function MediaCard({
       )}
 
       {children}
+
+      {onDownload && (
+        <button className="media-download-btn" onClick={() => onDownload(item)} type="button">
+          {downloading ? '下载中...' : '下载'}
+        </button>
+      )}
 
       {onDelete && (
         <button className="del-btn" onClick={() => onDelete(item)}>x</button>

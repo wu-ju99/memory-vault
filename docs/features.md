@@ -45,6 +45,7 @@ This file tracks implemented product behavior, not future ideas.
 - Batch upload support
 - Supported upload formats: `jpg`, `jpeg`, `png`, `webp`, `mp4`, `mov`, `webm`
 - Upload limits: image `10MB`, video `500MB`
+- Logged-in users can download a single shared photo or video from album detail
 - Media description editing
 - Media deletion by uploader or admin
 - Event time support, with created time fallback when event time is absent

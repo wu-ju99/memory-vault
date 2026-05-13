@@ -18,6 +18,8 @@ function MediaModal({
   onSaveEdit,
   onCancelEdit,
   onDelete,
+  onDownload,
+  downloading,
   onSetCover,
   onClose,
   onPrevious,
@@ -79,6 +81,10 @@ function MediaModal({
           <div className="modal-comments">
             <CommentList mediaId={media.id} currentUserId={currentUser?.id} currentUserRole={currentUser?.role} />
           </div>
+
+          <button className="modal-download" onClick={() => onDownload?.(media)} type="button">
+            {downloading ? '下载中...' : '下载原文件'}
+          </button>
 
           {media.type === 'image' && (
             <button className="modal-set-cover" onClick={() => onSetCover(media)} type="button">

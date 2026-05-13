@@ -12,6 +12,7 @@ import FilterToolbar from '../components/FilterToolbar';
 import ConfirmDialog from '../components/dialogs/ConfirmDialog';
 import useAlbumMediaQuery from '../hooks/useAlbumMediaQuery';
 import useAlbumMediaMutations from '../hooks/useAlbumMediaMutations';
+import useMediaDownload from '../hooks/useMediaDownload';
 import useMediaEditor from '../hooks/useMediaEditor';
 import useMediaModal from '../hooks/useMediaModal';
 import useUrlFilterState from '../hooks/useUrlFilterState';
@@ -75,6 +76,7 @@ function AlbumDetail() {
     onAlbumChanged: mediaQuery.reloadAlbum,
     onMediaChanged: mediaQuery.reloadMedia,
   });
+  const mediaDownload = useMediaDownload();
   const mediaEditor = useMediaEditor(mediaMutations.saveDescription);
   const mediaModal = useMediaModal(mediaQuery.mediaList);
   const typeOptions = buildMediaTypeOptions(mediaQuery.mediaList);
@@ -114,6 +116,10 @@ function AlbumDetail() {
     } catch {}
   }
 
+  async function handleDownload(item) {
+    await mediaDownload.downloadMedia(item);
+  }
+
   function renderMediaCard(item, index) {
     const canDelete = item.user_id === currentUser?.id || currentUser?.role === 'admin';
     return (
@@ -130,6 +136,8 @@ function AlbumDetail() {
         onCancelEdit={mediaEditor.cancelEdit}
         onDelete={canDelete ? handleDelete : null}
         onOpen={mediaModal.openMedia}
+        onDownload={handleDownload}
+        downloading={mediaDownload.downloadingId === item.id}
       >
         <CommentList mediaId={item.id} currentUserId={currentUser?.id} currentUserRole={currentUser?.role} />
       </MediaCard>
@@ -180,7 +188,6 @@ function AlbumDetail() {
             <div className="book-page book-page-left upload-page">
               <div className="book-page-header">
                 <span>添加回忆</span>
-                <strong>+</strong>
               </div>
 
               <MediaUploader
@@ -223,6 +230,7 @@ function AlbumDetail() {
             </div>
 
             <div className="book-page book-page-right memories-page">
+              {mediaDownload.error && <p className="status-text error">{mediaDownload.error}</p>}
               {mediaQuery.error && <p className="status-text error">{mediaQuery.error}</p>}
 
               {mediaQuery.mediaList.length === 0 && (
@@ -254,6 +262,8 @@ function AlbumDetail() {
           onSaveEdit={mediaEditor.saveEdit}
           onCancelEdit={mediaEditor.cancelEdit}
           onDelete={handleDelete}
+          onDownload={handleDownload}
+          downloading={mediaDownload.downloadingId === mediaModal.activeMedia?.id}
           onSetCover={handleSetCover}
           onClose={mediaModal.closeMedia}
           onPrevious={mediaModal.previousMedia}

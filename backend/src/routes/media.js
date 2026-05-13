@@ -24,6 +24,9 @@ router.post(
 // 获取图片列表
 router.get('/media', auth, mediaController.list);
 
+// 下载单个媒体
+router.get('/media/:id/download', auth, mediaController.download);
+
 // 更新媒体描述
 router.put('/media/:id', auth, mediaController.update);
 

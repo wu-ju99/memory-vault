@@ -292,6 +292,16 @@ Response shape:
 }
 ```
 
+### `GET /media/:id/download`
+
+Download a single media file as an attachment.
+
+Notes:
+
+- requires login
+- returns the original stored file bytes
+- response includes a suggested download filename
+
 ### `PUT /media/:id`
 
 Update media description.

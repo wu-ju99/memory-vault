@@ -59,10 +59,12 @@
 - 按年份主分区展示，年份内再按上传者分区
 - 每个上传者分区内继续按图片 / 视频分组，并按 `event_time` / `created_at` 倒序
 - `renderMediaCard()` 提取函数，复用媒体卡片、评论、删除、弹窗逻辑
+- 单个媒体下载能力独立接入 `MediaCard` 和 `MediaModal`，不与上传/删除 hook 混用
 
 **卡片功能：**
 - 图片：`<a>` 新标签页打开原图
 - 视频：`<video controls>` 原生播放
+- 下载：卡片和预览弹窗都可直接下载原文件
 - 描述：点击进入内联编辑，保存/取消
 - 时间：`formatDate()` 格式化 YYYY-MM-DD
 - 删除：右上角 × 按钮（hover 显示），使用独立站内确认弹窗
@@ -87,6 +89,7 @@
 | 用户显示名 | `utils/userDisplay.js` | 昵称优先，未设置昵称时回退用户名 |
 | 用户头像 | `components/UserAvatar.jsx` / `components/UserIdentity.jsx` | 统一头像、显示名、管理员标识和缺省头像展示，供相册、媒体、评论、分区和管理员面板复用 |
 | 站内弹窗 | `components/dialogs/*` | 统一危险操作确认和文本输入弹窗，替换原生 confirm/prompt |
+| 媒体下载 | `hooks/useMediaDownload.js` | 单个媒体下载状态与浏览器文件保存流程，保持与上传/删除解耦 |
 | 全局配置 | `config.js` | BASE_URL = 'http://localhost:3000' |
 | 全局样式 | `index.css` / `styles/dialog.css` | 站点基础样式与独立弹窗样式 |
 

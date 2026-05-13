@@ -958,8 +958,8 @@ body {
 
 .book-page-header {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: flex-start;
   gap: 16px;
   margin-bottom: 28px;
   color: #6e4c37;
@@ -969,6 +969,7 @@ body {
 .book-page-header span {
   font-size: clamp(26px, 4vw, 44px);
   line-height: 1;
+  white-space: nowrap;
 }
 
 .book-page-header strong {
@@ -1736,6 +1737,26 @@ html {
   font-size: 12px;
 }
 
+.media-download-btn {
+  display: block;
+  width: calc(100% - 28px);
+  margin: 12px 14px 14px;
+  padding: 7px 10px;
+  border: 1px solid rgba(54, 107, 101, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 250, 243, 0.72);
+  color: #366b65;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.media-download-btn:hover {
+  background: #366b65;
+  color: #fff;
+}
+
 .scrapbook-photo .grid-date,
 .scrapbook-photo .media-user,
 .comment-toggle {
@@ -1962,6 +1983,19 @@ html {
   font-size: 13px;
 }
 
+.modal-download {
+  margin-top: 12px;
+  border: 1px solid rgba(54, 107, 101, 0.4);
+  border-radius: 999px;
+  background: transparent;
+  color: #366b65;
+  cursor: pointer;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 13px;
+}
+
+.modal-download:hover,
 .modal-set-cover:hover {
   background: #366b65;
   color: #fff;
