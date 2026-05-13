@@ -4,9 +4,25 @@
  */
 
 import { useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/axios';
 import { saveAuth } from '../utils/auth';
+import AuthShell from '../components/auth/AuthShell';
+
+const loginHighlights = [
+  {
+    title: '时间归档',
+    description: '按相册、年份和成员整理内容，不再四处散落。',
+  },
+  {
+    title: '协作清晰',
+    description: '和家人朋友一起维护回忆，也保留清楚归属。',
+  },
+  {
+    title: '长期保存',
+    description: '照片、视频和说明统一沉淀，方便随时补充和回看。',
+  },
+];
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -49,45 +65,64 @@ function Login() {
   }
 
   return (
-    <div className="page">
-      <form className="card" onSubmit={handleSubmit}>
-        <h1>Memory Vault</h1>
-        <p className="subtitle">登录你的私人空间</p>
+    <AuthShell
+      mode="login"
+      heroEyebrow="Memory Vault"
+      heroTitle="把回忆收进私人记忆库"
+      heroDescription="登录后继续查看你的相册、视频和故事，把重要内容留在一个清晰、可长期保存的空间里。"
+      formEyebrow="Welcome Back"
+      formTitle="登录你的私人空间"
+      formDescription="输入账号信息，继续进入你的回忆档案。"
+      alternatePrompt="还没有账号？"
+      alternateTo="/register"
+      alternateLabel="立即注册"
+      highlights={loginHighlights}
+    >
+      <form className="auth-form" onSubmit={handleSubmit}>
+        {successMessage && (
+          <p className="auth-status is-success" aria-live="polite">
+            {successMessage}
+          </p>
+        )}
+        {error && (
+          <p className="auth-status is-error" role="alert">
+            {error}
+          </p>
+        )}
 
-        {successMessage && <p className="status-text success">{successMessage}</p>}
-        {error && <p className="status-text error">{error}</p>}
+        <div className="auth-field">
+          <label htmlFor="username">用户名</label>
+          <input
+            id="username"
+            className="auth-input"
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="请输入用户名"
+            autoComplete="username"
+            required
+          />
+        </div>
 
-        <label htmlFor="username">用户名</label>
-        <input
-          id="username"
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="请输入用户名"
-          autoComplete="username"
-          required
-        />
+        <div className="auth-field">
+          <label htmlFor="password">密码</label>
+          <input
+            id="password"
+            className="auth-input"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="请输入密码"
+            autoComplete="current-password"
+            required
+          />
+        </div>
 
-        <label htmlFor="password">密码</label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="请输入密码"
-          autoComplete="current-password"
-          required
-        />
-
-        <button type="submit" disabled={loading}>
+        <button className="auth-submit" type="submit" disabled={loading}>
           {loading ? '登录中...' : '登录'}
         </button>
-
-        <p className="hint">
-          没有账号？<Link to="/register">去注册</Link>
-        </p>
       </form>
-    </div>
+    </AuthShell>
   );
 }
 

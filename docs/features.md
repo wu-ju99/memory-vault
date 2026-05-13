@@ -6,6 +6,7 @@ This file tracks implemented product behavior, not future ideas.
 
 - User registration with password confirmation
 - User login with JWT response
+- Dedicated standalone login/register UI with a shared auth shell
 - Protected routes on the frontend
 - Automatic token attachment on API requests
 - Automatic local logout on `401` responses

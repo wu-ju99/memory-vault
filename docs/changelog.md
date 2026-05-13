@@ -2,6 +2,13 @@
 
 ## 2026-05-13
 
+### Authentication UI
+
+- Added a dedicated shared auth shell for login and register pages
+- Moved auth-page styling into a standalone `frontend/src/styles/auth.css`
+- Refreshed login/register visuals with cleaner layout, shorter copy, and mobile-friendly spacing
+- Removed old mixed auth card styling from the global stylesheet
+
 ### Search and filter
 
 - Added independent search and filter support for home albums

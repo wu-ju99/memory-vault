@@ -80,10 +80,20 @@ List and page UIs compose small components instead of embedding everything in pa
 
 Examples:
 
+- `auth/AuthShell`
 - `FilterToolbar`, `FilterSelect`, `SearchBar`
 - `AlbumCard`, `AlbumYearSection`, `AlbumUserSection`
 - `MediaCard`, `MediaUploader`, `MediaModal`, `MediaYearSection`
 - `AdminUserTable`, `AdminAlbumTable`, `AdminMediaGrid`
+
+Authentication pages now use a dedicated presentation layer:
+
+- `frontend/src/components/auth/AuthShell.jsx`
+  Shared structure for login and register pages
+- `frontend/src/styles/auth.css`
+  Auth-only visual system, kept separate from the rest of the app
+
+This keeps authentication UI changes isolated instead of mixing them into general page styles.
 
 ## Backend structure
 
