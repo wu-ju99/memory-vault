@@ -36,6 +36,7 @@ function MediaUploader({
         type="datetime-local"
         value={eventTime}
         onChange={(e) => setEventTime(e.target.value)}
+        aria-label="拍摄时间"
       />
       <input
         ref={fileInputRef}

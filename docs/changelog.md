@@ -2,6 +2,12 @@
 
 ## 2026-05-13
 
+### UI copy and navigation
+
+- Localized search, filter, admin, and browsing actions to Chinese across home, album detail, and admin pages
+- Added shared frontend label helpers in `frontend/src/utils/uiLabels.js` for role, media-type, and unknown-year display
+- Simplified profile-page navigation so it keeps only a top-right return-home action
+
 ### Profile UI
 
 - Added a standalone profile settings visual layer in `frontend/src/styles/profile.css`

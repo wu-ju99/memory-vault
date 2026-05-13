@@ -11,12 +11,12 @@ function FilterToolbar({
         <div>
           <p className="filter-toolbar-title">{title}</p>
           {typeof resultCount === 'number' && (
-            <span className="filter-toolbar-count">{resultCount} results</span>
+            <span className="filter-toolbar-count">共 {resultCount} 项</span>
           )}
         </div>
         {showReset && (
           <button className="filter-reset-btn" onClick={onReset} type="button">
-            Clear filters
+            清空筛选
           </button>
         )}
       </div>

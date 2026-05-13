@@ -28,6 +28,7 @@ This file tracks implemented product behavior, not future ideas.
 - Within a year, albums can be segmented by owner
 - Dedicated album detail page per album
 - Album detail no longer depends on fetching the full album list first
+- Core browsing actions, search, filter, and admin-entry labels are localized to Chinese for end users
 
 ## Album management
 
@@ -60,6 +61,7 @@ This file tracks implemented product behavior, not future ideas.
 - User management
 - Album management
 - Media management
+- Chinese labels for admin navigation, filters, and management actions
 - Admin-only route protection
 - Last-admin and self-delete protection on admin user deletion flow
 

@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
-import { getUser, saveAuth, clearAuth } from '../utils/auth';
+import { getUser, saveAuth } from '../utils/auth';
 import BASE_URL from '../config';
 import AvatarUploader from '../components/AvatarUploader';
 import NicknameEditor from '../components/NicknameEditor';
@@ -54,11 +54,6 @@ function Profile() {
     }
   }
 
-  function handleLogout() {
-    clearAuth();
-    navigate('/login');
-  }
-
   const currentAvatarUrl = user?.avatar ? BASE_URL + user.avatar : null;
 
   return (
@@ -70,9 +65,8 @@ function Profile() {
         </div>
         <div className="profile-topbar-actions">
           <a href="/" className="profile-topbar-link" onClick={(e) => { e.preventDefault(); navigate('/'); }}>
-            首页
+            返回首页
           </a>
-          <button onClick={handleLogout} className="profile-topbar-button">退出登录</button>
         </div>
       </header>
 
@@ -179,10 +173,6 @@ function Profile() {
                 {pwdErr && <p className="profile-status error">{pwdErr}</p>}
               </form>
             </div>
-
-            <a className="profile-footer-link" href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }}>
-              返回首页
-            </a>
           </section>
         </div>
       </main>

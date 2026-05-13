@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import UserIdentity from '../UserIdentity';
+import { getRoleLabel } from '../../utils/uiLabels';
 
 function AdminUserTable({ users, currentUserId, onSaveUser, onDeleteUser }) {
   const [editingId, setEditingId] = useState(null);
@@ -78,11 +79,11 @@ function AdminUserTable({ users, currentUserId, onSaveUser, onDeleteUser }) {
                       value={draft.role}
                       onChange={(e) => setDraft((prev) => ({ ...prev, role: e.target.value }))}
                     >
-                      <option value="user">user</option>
-                      <option value="admin">admin</option>
+                      <option value="user">{getRoleLabel('user')}</option>
+                      <option value="admin">{getRoleLabel('admin')}</option>
                     </select>
                   ) : (
-                    <span className={`admin-role ${user.role}`}>{user.role}</span>
+                    <span className={`admin-role ${user.role}`}>{getRoleLabel(user.role)}</span>
                   )}
                 </td>
                 <td>{user.album_count}</td>

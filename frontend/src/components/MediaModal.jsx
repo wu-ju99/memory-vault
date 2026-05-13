@@ -1,6 +1,7 @@
 import BASE_URL from '../config';
 import CommentList from './CommentList';
 import UserIdentity from './UserIdentity';
+import { getMediaTypeLabel } from '../utils/uiLabels';
 
 function formatDate(iso) {
   return iso ? iso.slice(0, 10) : '';
@@ -41,7 +42,7 @@ function MediaModal({
         </div>
 
         <div className="modal-memory-details">
-          <p className="eyebrow">{media.type === 'video' ? 'Video Memory' : 'Photo Memory'}</p>
+          <p className="eyebrow">{getMediaTypeLabel(media.type)}</p>
           {editingId === media.id ? (
             <div className="edit-area modal-edit-area">
               <textarea

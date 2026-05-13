@@ -8,7 +8,7 @@ function MediaUserSection({ group, renderMediaCard }) {
     <section className="media-user-section">
       <div className="media-user-heading">
         <div>
-          <p>Uploaded by</p>
+          <p>上传者</p>
           <h2><UserIdentity user={group} avatarSize="lg" /></h2>
         </div>
         <span>{photos.length} 张照片 / {videos.length} 个视频</span>

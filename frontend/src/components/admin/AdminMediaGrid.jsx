@@ -1,5 +1,6 @@
 import BASE_URL from '../../config';
 import UserIdentity from '../UserIdentity';
+import { getMediaTypeLabel } from '../../utils/uiLabels';
 
 function AdminMediaGrid({ media, onDeleteMedia }) {
   if (media.length === 0) {
@@ -24,11 +25,11 @@ function AdminMediaGrid({ media, onDeleteMedia }) {
               className="admin-content-owner"
             />
             <span>{item.album_title || '未归档相册'}</span>
-            <span>{item.type} · {item.created_at?.slice(0, 10)}</span>
+            <span>{getMediaTypeLabel(item.type)} · {item.created_at?.slice(0, 10)}</span>
           </div>
           {item.description && <p>{item.description}</p>}
           <button className="admin-danger-btn" onClick={() => onDeleteMedia(item)} type="button">
-            删除媒体
+            删除
           </button>
         </article>
       ))}

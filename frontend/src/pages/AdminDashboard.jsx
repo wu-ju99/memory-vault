@@ -16,18 +16,19 @@ import AdminMediaGrid from '../components/admin/AdminMediaGrid';
 import AdminAlbumTable from '../components/admin/AdminAlbumTable';
 import { getAlbumYearValue, getMediaYearValue, UNKNOWN_YEAR } from '../utils/yearGroups';
 import { getUserDisplayName } from '../utils/userDisplay';
+import { getMediaTypeLabel, getRoleLabel, UNKNOWN_YEAR_LABEL } from '../utils/uiLabels';
 
 const TABS = [
-  { id: 'users', label: 'Users' },
-  { id: 'albums', label: 'Albums' },
-  { id: 'media', label: 'Media' },
+  { id: 'users', label: '成员' },
+  { id: 'albums', label: '相册' },
+  { id: 'media', label: '媒体' },
 ];
 
 function buildUserRoleOptions(users) {
   const roles = Array.from(new Set(users.map((user) => user.role)));
   return [
-    { value: '', label: 'All roles' },
-    ...roles.map((role) => ({ value: role, label: role })),
+    { value: '', label: '全部角色' },
+    ...roles.map((role) => ({ value: role, label: getRoleLabel(role) })),
   ];
 }
 
@@ -42,7 +43,7 @@ function buildAlbumOwnerOptions(albums) {
     }
   });
   return [
-    { value: '', label: 'All owners' },
+    { value: '', label: '全部创建者' },
     ...Array.from(owners.values()).sort((a, b) => a.label.localeCompare(b.label, 'zh-Hans-CN')),
   ];
 }
@@ -50,10 +51,10 @@ function buildAlbumOwnerOptions(albums) {
 function buildAlbumYearOptions(albums) {
   const years = Array.from(new Set(albums.map(getAlbumYearValue)));
   return [
-    { value: '', label: 'All years' },
+    { value: '', label: '全部年份' },
     ...years.map((year) => ({
       value: year,
-      label: year === UNKNOWN_YEAR ? 'Unknown year' : year,
+      label: year === UNKNOWN_YEAR ? UNKNOWN_YEAR_LABEL : year,
     })),
   ];
 }
@@ -69,7 +70,7 @@ function buildMediaOwnerOptions(media) {
     }
   });
   return [
-    { value: '', label: 'All uploaders' },
+    { value: '', label: '全部上传者' },
     ...Array.from(owners.values()).sort((a, b) => a.label.localeCompare(b.label, 'zh-Hans-CN')),
   ];
 }
@@ -80,12 +81,12 @@ function buildMediaAlbumOptions(media) {
     if (item.album_id && !albums.has(item.album_id)) {
       albums.set(item.album_id, {
         value: String(item.album_id),
-        label: item.album_title || `Album ${item.album_id}`,
+        label: item.album_title || `相册 ${item.album_id}`,
       });
     }
   });
   return [
-    { value: '', label: 'All albums' },
+    { value: '', label: '全部相册' },
     ...Array.from(albums.values()).sort((a, b) => a.label.localeCompare(b.label, 'zh-Hans-CN')),
   ];
 }
@@ -93,10 +94,10 @@ function buildMediaAlbumOptions(media) {
 function buildMediaYearOptions(media) {
   const years = Array.from(new Set(media.map(getMediaYearValue)));
   return [
-    { value: '', label: 'All years' },
+    { value: '', label: '全部年份' },
     ...years.map((year) => ({
       value: year,
-      label: year === UNKNOWN_YEAR ? 'Unknown year' : year,
+      label: year === UNKNOWN_YEAR ? UNKNOWN_YEAR_LABEL : year,
     })),
   ];
 }
@@ -104,10 +105,10 @@ function buildMediaYearOptions(media) {
 function buildMediaTypeOptions(media) {
   const types = Array.from(new Set(media.map((item) => item.type)));
   return [
-    { value: '', label: 'All types' },
+    { value: '', label: '全部类型' },
     ...types.map((type) => ({
       value: type,
-      label: type === 'image' ? 'Images' : type === 'video' ? 'Videos' : type,
+      label: getMediaTypeLabel(type),
     })),
   ];
 }
@@ -140,17 +141,17 @@ function AdminDashboard() {
   const mediaTypeOptions = useMemo(() => buildMediaTypeOptions(mediaQuery.media), [mediaQuery.media]);
 
   async function confirmDeleteUser(user) {
-    if (!window.confirm(`Delete user "${user.username}"?`)) return;
+    if (!window.confirm(`确定删除用户“${user.username}”吗？`)) return;
     await usersMutations.removeUser(user.id);
   }
 
   async function confirmDeleteAlbum(album) {
-    if (!window.confirm(`Delete album "${album.title}"? Media files will stay in place.`)) return;
+    if (!window.confirm(`确定删除相册“${album.title}”吗？已上传的媒体文件会保留。`)) return;
     await albumsMutations.removeAlbum(album.id);
   }
 
   async function confirmDeleteMedia(media) {
-    if (!window.confirm(`Delete media uploaded by ${media.username}?`)) return;
+    if (!window.confirm(`确定删除 ${media.username} 上传的这条媒体吗？`)) return;
     await mediaMutations.removeMedia(media.id);
   }
 
@@ -163,17 +164,17 @@ function AdminDashboard() {
   return (
     <div className="page admin-page">
       <header className="topbar memory-topbar">
-        <Link to="/" className="text-btn">Back home</Link>
+        <Link to="/" className="text-btn">返回首页</Link>
         <div className="album-title-block">
-          <p className="eyebrow">Admin</p>
-          <h1>Admin Panel</h1>
+          <p className="eyebrow">Admin Console</p>
+          <h1>管理员面板</h1>
         </div>
         <span className="user-tag">{currentUser?.username}</span>
       </header>
 
       <main className="admin-shell">
         <aside className="admin-sidebar">
-          <h2>Manage</h2>
+          <h2>后台管理</h2>
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -189,7 +190,7 @@ function AdminDashboard() {
         <section className="admin-panel">
           <div className="admin-panel-header">
             <h2>{TABS.find((tab) => tab.id === activeTab)?.label}</h2>
-            {activeState.loading && <span>Loading...</span>}
+            {activeState.loading && <span>加载中...</span>}
           </div>
 
           {activeState.message && <p className="status-text success">{activeState.message}</p>}
@@ -198,7 +199,7 @@ function AdminDashboard() {
           {activeTab === 'users' && (
             <>
               <FilterToolbar
-                title="User search and filters"
+                title="成员搜索与筛选"
                 resultCount={usersQuery.users.length}
                 onReset={userFilters.resetFilters}
                 showReset={userFilters.hasActiveFilters}
@@ -206,13 +207,13 @@ function AdminDashboard() {
                 <SearchBar
                   value={userFilters.filters.q}
                   onSearch={(value) => userFilters.setFilter('q', value)}
-                  placeholder="Search username or nickname..."
+                  placeholder="搜索用户名或昵称..."
                 />
                 <FilterSelect
                   value={userFilters.filters.role}
                   onChange={(value) => userFilters.setFilter('role', value)}
                   options={userRoleOptions}
-                  ariaLabel="Filter users by role"
+                  ariaLabel="按角色筛选成员"
                 />
               </FilterToolbar>
 
@@ -228,7 +229,7 @@ function AdminDashboard() {
           {activeTab === 'albums' && (
             <>
               <FilterToolbar
-                title="Album search and filters"
+                title="相册搜索与筛选"
                 resultCount={albumsQuery.albums.length}
                 onReset={albumFilters.resetFilters}
                 showReset={albumFilters.hasActiveFilters}
@@ -236,19 +237,19 @@ function AdminDashboard() {
                 <SearchBar
                   value={albumFilters.filters.q}
                   onSearch={(value) => albumFilters.setFilter('q', value)}
-                  placeholder="Search album title or owner..."
+                  placeholder="搜索相册名称或创建者..."
                 />
                 <FilterSelect
                   value={albumFilters.filters.year}
                   onChange={(value) => albumFilters.setFilter('year', value)}
                   options={albumYearOptions}
-                  ariaLabel="Filter albums by year"
+                  ariaLabel="按年份筛选相册"
                 />
                 <FilterSelect
                   value={albumFilters.filters.owner}
                   onChange={(value) => albumFilters.setFilter('owner', value)}
                   options={albumOwnerOptions}
-                  ariaLabel="Filter albums by owner"
+                  ariaLabel="按创建者筛选相册"
                 />
               </FilterToolbar>
 
@@ -263,7 +264,7 @@ function AdminDashboard() {
           {activeTab === 'media' && (
             <>
               <FilterToolbar
-                title="Media search and filters"
+                title="媒体搜索与筛选"
                 resultCount={mediaQuery.media.length}
                 onReset={mediaFilters.resetFilters}
                 showReset={mediaFilters.hasActiveFilters}
@@ -271,31 +272,31 @@ function AdminDashboard() {
                 <SearchBar
                   value={mediaFilters.filters.q}
                   onSearch={(value) => mediaFilters.setFilter('q', value)}
-                  placeholder="Search description, album or uploader..."
+                  placeholder="搜索描述、相册或上传者..."
                 />
                 <FilterSelect
                   value={mediaFilters.filters.type}
                   onChange={(value) => mediaFilters.setFilter('type', value)}
                   options={mediaTypeOptions}
-                  ariaLabel="Filter media by type"
+                  ariaLabel="按类型筛选媒体"
                 />
                 <FilterSelect
                   value={mediaFilters.filters.year}
                   onChange={(value) => mediaFilters.setFilter('year', value)}
                   options={mediaYearOptions}
-                  ariaLabel="Filter media by year"
+                  ariaLabel="按年份筛选媒体"
                 />
                 <FilterSelect
                   value={mediaFilters.filters.owner}
                   onChange={(value) => mediaFilters.setFilter('owner', value)}
                   options={mediaOwnerOptions}
-                  ariaLabel="Filter media by uploader"
+                  ariaLabel="按上传者筛选媒体"
                 />
                 <FilterSelect
                   value={mediaFilters.filters.album}
                   onChange={(value) => mediaFilters.setFilter('album', value)}
                   options={mediaAlbumOptions}
-                  ariaLabel="Filter media by album"
+                  ariaLabel="按相册筛选媒体"
                 />
               </FilterToolbar>
 

@@ -15,6 +15,7 @@ import useMediaModal from '../hooks/useMediaModal';
 import useUrlFilterState from '../hooks/useUrlFilterState';
 import { getMediaYearValue, UNKNOWN_YEAR } from '../utils/yearGroups';
 import { getUserDisplayName } from '../utils/userDisplay';
+import { getMediaTypeLabel, UNKNOWN_YEAR_LABEL } from '../utils/uiLabels';
 
 function formatDate(iso) {
   return iso ? iso.slice(0, 10) : '';
@@ -23,20 +24,20 @@ function formatDate(iso) {
 function buildMediaTypeOptions(mediaList) {
   const hasImage = mediaList.some((item) => item.type === 'image');
   const hasVideo = mediaList.some((item) => item.type === 'video');
-  const options = [{ value: '', label: 'All types' }];
+  const options = [{ value: '', label: '全部类型' }];
 
-  if (hasImage) options.push({ value: 'image', label: 'Images' });
-  if (hasVideo) options.push({ value: 'video', label: 'Videos' });
+  if (hasImage) options.push({ value: 'image', label: getMediaTypeLabel('image') });
+  if (hasVideo) options.push({ value: 'video', label: getMediaTypeLabel('video') });
   return options;
 }
 
 function buildMediaYearOptions(mediaList) {
   const years = Array.from(new Set(mediaList.map(getMediaYearValue)));
   return [
-    { value: '', label: 'All years' },
+    { value: '', label: '全部年份' },
     ...years.map((year) => ({
       value: year,
-      label: year === UNKNOWN_YEAR ? 'Unknown year' : year,
+      label: year === UNKNOWN_YEAR ? UNKNOWN_YEAR_LABEL : year,
     })),
   ];
 }
@@ -53,7 +54,7 @@ function buildOwnerOptions(mediaList) {
   });
 
   return [
-    { value: '', label: 'All uploaders' },
+    { value: '', label: '全部上传者' },
     ...Array.from(groups.values()).sort((a, b) => a.label.localeCompare(b.label, 'zh-Hans-CN')),
   ];
 }
@@ -77,7 +78,7 @@ function AlbumDetail() {
   const ownerOptions = buildOwnerOptions(mediaQuery.mediaList);
 
   async function handleDelete(item) {
-    if (!window.confirm('Delete this memory?')) return;
+    if (!window.confirm('确定删除这条回忆吗？')) return;
     try {
       await mediaMutations.removeMedia(item);
       mediaModal.clearIfActive(item.id);
@@ -116,7 +117,7 @@ function AlbumDetail() {
     return (
       <div className="page scrapbook-page">
         <main className="content memory-content">
-          <p className="status-text">Loading album...</p>
+          <p className="status-text">相册加载中...</p>
         </main>
       </div>
     );
@@ -126,8 +127,8 @@ function AlbumDetail() {
     return (
       <div className="page scrapbook-page">
         <main className="content memory-content">
-          <p className="status-text">Album not found.</p>
-          <Link to="/" className="text-btn">Back home</Link>
+          <p className="status-text">未找到该相册。</p>
+          <Link to="/" className="text-btn">返回首页</Link>
         </main>
       </div>
     );
@@ -136,16 +137,16 @@ function AlbumDetail() {
   return (
     <div className="page scrapbook-page">
       <header className="topbar memory-topbar">
-        <Link to="/" className="text-btn">Back</Link>
+        <Link to="/" className="text-btn">返回</Link>
         <div className="album-title-block">
-          <p className="eyebrow">Album</p>
+          <p className="eyebrow">Memory Album</p>
           <h1>{mediaQuery.album.title}</h1>
         </div>
         <span className="album-date">{formatDate(mediaQuery.album.created_at)}</span>
       </header>
 
       <main className="content memory-content album-detail-content">
-        <aside className="year-bookmarks" aria-label="Year bookmarks">
+        <aside className="year-bookmarks" aria-label="年份索引">
           {mediaQuery.yearGroups.map(({ year }) => (
             <a key={year} href={`#year-${year}`} className="year-bookmark">{year}</a>
           ))}
@@ -155,7 +156,7 @@ function AlbumDetail() {
           <div className="book-spread detail-spread">
             <div className="book-page book-page-left upload-page">
               <div className="book-page-header">
-                <span>New Memory</span>
+                <span>添加回忆</span>
                 <strong>+</strong>
               </div>
 
@@ -167,7 +168,7 @@ function AlbumDetail() {
               />
 
               <FilterToolbar
-                title="Media search and filters"
+                title="内容搜索与筛选"
                 resultCount={mediaQuery.mediaList.length}
                 onReset={filterState.resetFilters}
                 showReset={filterState.hasActiveFilters}
@@ -175,25 +176,25 @@ function AlbumDetail() {
                 <SearchBar
                   value={filterState.filters.q}
                   onSearch={(value) => filterState.setFilter('q', value)}
-                  placeholder="Search media description..."
+                  placeholder="搜索描述内容..."
                 />
                 <FilterSelect
                   value={filterState.filters.type}
                   onChange={(value) => filterState.setFilter('type', value)}
                   options={typeOptions}
-                  ariaLabel="Filter media by type"
+                  ariaLabel="按类型筛选内容"
                 />
                 <FilterSelect
                   value={filterState.filters.year}
                   onChange={(value) => filterState.setFilter('year', value)}
                   options={yearOptions}
-                  ariaLabel="Filter media by year"
+                  ariaLabel="按年份筛选内容"
                 />
                 <FilterSelect
                   value={filterState.filters.owner}
                   onChange={(value) => filterState.setFilter('owner', value)}
                   options={ownerOptions}
-                  ariaLabel="Filter media by uploader"
+                  ariaLabel="按上传者筛选内容"
                 />
               </FilterToolbar>
             </div>
@@ -203,7 +204,7 @@ function AlbumDetail() {
 
               {mediaQuery.mediaList.length === 0 && (
                 <p className="status-text empty-memory">
-                  {filterState.hasActiveFilters ? 'No media match the current filters.' : 'No media yet.'}
+                  {filterState.hasActiveFilters ? '没有符合当前筛选条件的内容。' : '还没有上传内容。'}
                 </p>
               )}
 

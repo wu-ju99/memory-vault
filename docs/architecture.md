@@ -108,6 +108,13 @@ Profile settings now use a dedicated presentation layer as well:
 
 This keeps profile-page refinement independent from the rest of the product UI.
 
+User-facing copy for list browsing and admin controls now also shares a small label utility:
+
+- `frontend/src/utils/uiLabels.js`
+  Centralized labels for media type, role, and unknown-year display
+
+This reduces repeated inline wording and makes later localization adjustments easier to keep consistent.
+
 ## Backend structure
 
 Key backend directories:

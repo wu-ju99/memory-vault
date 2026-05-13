@@ -15,7 +15,7 @@ function AlbumUserSection({
     <section id={sectionId} className="album-user-section" data-user-key={group.userKey}>
       <div className="album-user-heading">
         <div>
-          <p>Uploaded by</p>
+          <p>创建者</p>
           <h2><UserIdentity user={group} avatarSize="lg" /></h2>
         </div>
         <span>{group.items.length} 本相册</span>

@@ -14,6 +14,7 @@ import useAlbumMutations from '../hooks/useAlbumMutations';
 import useUrlFilterState from '../hooks/useUrlFilterState';
 import { getAlbumYearValue, UNKNOWN_YEAR } from '../utils/yearGroups';
 import { getUserDisplayName } from '../utils/userDisplay';
+import { UNKNOWN_YEAR_LABEL } from '../utils/uiLabels';
 
 function buildOwnerOptions(albums) {
   const groups = new Map();
@@ -28,7 +29,7 @@ function buildOwnerOptions(albums) {
   });
 
   return [
-    { value: '', label: 'All owners' },
+    { value: '', label: '全部创建者' },
     ...Array.from(groups.values()).sort((a, b) => a.label.localeCompare(b.label, 'zh-Hans-CN')),
   ];
 }
@@ -37,10 +38,10 @@ function buildYearOptions(albums) {
   const years = Array.from(new Set(albums.map(getAlbumYearValue)));
 
   return [
-    { value: '', label: 'All years' },
+    { value: '', label: '全部年份' },
     ...years.map((year) => ({
       value: year,
-      label: year === UNKNOWN_YEAR ? 'Unknown year' : year,
+      label: year === UNKNOWN_YEAR ? UNKNOWN_YEAR_LABEL : year,
     })),
   ];
 }
@@ -68,13 +69,13 @@ function Home() {
   }
 
   async function handleRenameAlbum(album) {
-    const title = window.prompt('Enter a new album title', album.title);
+    const title = window.prompt('请输入新的相册名称', album.title);
     if (title === null) return;
     await albumMutations.renameAlbum(album, title);
   }
 
   async function handleDeleteAlbum(album) {
-    if (!window.confirm(`Delete album "${album.title}"? Media files will stay in place.`)) return;
+    if (!window.confirm(`确定删除相册“${album.title}”吗？已上传的媒体文件会保留。`)) return;
     await albumMutations.removeAlbum(album);
   }
 
@@ -99,25 +100,25 @@ function Home() {
           <h1>Memory Vault</h1>
         </div>
         <div className="topbar-right">
-          {user?.role === 'admin' && <Link to="/admin" className="text-btn">Admin</Link>}
+          {user?.role === 'admin' && <Link to="/admin" className="text-btn">管理员面板</Link>}
           {user && <Link to="/profile" className="user-tag">{user.username}</Link>}
-          <button onClick={handleLogout} className="text-btn logout-btn" type="button">Logout</button>
+          <button onClick={handleLogout} className="text-btn logout-btn" type="button">退出登录</button>
         </div>
       </header>
 
       <main className="content memory-content">
-        <section id="album-year-root" className="album-book-shell" aria-label="Album list">
+        <section id="album-year-root" className="album-book-shell" aria-label="相册列表">
           <div className="book-spread">
             <div className="book-page book-page-left">
               <div className="book-page-header">
-                <span>Shared Albums</span>
+                <span>共享相册</span>
                 <strong>{albumQuery.albums.length}</strong>
               </div>
 
               <CreateAlbumForm onCreate={albumMutations.createAlbum} />
 
               <FilterToolbar
-                title="Album search and filters"
+                title="相册搜索与筛选"
                 resultCount={albumQuery.albums.length}
                 onReset={filterState.resetFilters}
                 showReset={filterState.hasActiveFilters}
@@ -125,30 +126,30 @@ function Home() {
                 <SearchBar
                   value={filterState.filters.q}
                   onSearch={(value) => filterState.setFilter('q', value)}
-                  placeholder="Search album title or owner..."
+                  placeholder="搜索相册名称或创建者..."
                 />
                 <FilterSelect
                   value={filterState.filters.year}
                   onChange={(value) => filterState.setFilter('year', value)}
                   options={yearOptions}
-                  ariaLabel="Filter albums by year"
+                  ariaLabel="按年份筛选相册"
                 />
                 <FilterSelect
                   value={filterState.filters.owner}
                   onChange={(value) => filterState.setFilter('owner', value)}
                   options={ownerOptions}
-                  ariaLabel="Filter albums by owner"
+                  ariaLabel="按创建者筛选相册"
                 />
               </FilterToolbar>
 
-              {albumQuery.loading && <p className="status-text">Loading albums...</p>}
+              {albumQuery.loading && <p className="status-text">相册加载中...</p>}
               {albumMutations.message && <p className="status-text success">{albumMutations.message}</p>}
               {(albumMutations.error || albumQuery.error) && (
                 <p className="status-text error">{albumMutations.error || albumQuery.error}</p>
               )}
               {!albumQuery.loading && albumQuery.albums.length === 0 && (
                 <p className="status-text">
-                  {filterState.hasActiveFilters ? 'No albums match the current filters.' : 'No albums yet.'}
+                  {filterState.hasActiveFilters ? '没有符合当前筛选条件的相册。' : '还没有相册。'}
                 </p>
               )}
 

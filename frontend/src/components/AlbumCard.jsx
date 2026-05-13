@@ -48,7 +48,7 @@ function AlbumCard({
           {album.cover_url ? (
             <img src={coverSrc} alt={album.title} className="album-cover-img" />
           ) : (
-            <span className="album-icon" aria-hidden="true">PHOTO</span>
+            <span className="album-icon" aria-hidden="true">相册</span>
           )}
         </div>
         <div className="album-info">
