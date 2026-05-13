@@ -17,6 +17,7 @@ This file tracks implemented product behavior, not future ideas.
 - Update nickname
 - Upload avatar
 - Change password with old-password verification
+- Dedicated standalone profile settings UI for avatar, nickname, and password flows
 - Admin badge and avatar-ready user identity rendering
 
 ## Shared album browsing

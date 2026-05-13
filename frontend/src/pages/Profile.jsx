@@ -9,9 +9,10 @@ import { getUser, saveAuth, clearAuth } from '../utils/auth';
 import BASE_URL from '../config';
 import AvatarUploader from '../components/AvatarUploader';
 import NicknameEditor from '../components/NicknameEditor';
+import '../styles/profile.css';
 
 function Profile() {
-  const user = getUser();
+  const [user, setUser] = useState(() => getUser());
   const navigate = useNavigate();
 
   const [oldPassword, setOldPassword] = useState('');
@@ -24,6 +25,7 @@ function Profile() {
   function refreshUser(updated) {
     const token = localStorage.getItem('token');
     saveAuth(token, updated);
+    setUser(updated);
   }
 
   async function savePassword(e) {
@@ -60,50 +62,128 @@ function Profile() {
   const currentAvatarUrl = user?.avatar ? BASE_URL + user.avatar : null;
 
   return (
-    <div className="page">
-      <header className="topbar">
-        <h1>Memory Vault</h1>
-        <div className="topbar-right">
-          <a href="/" className="text-btn" onClick={(e) => { e.preventDefault(); navigate('/'); }}>
+    <div className="profile-page">
+      <header className="profile-topbar">
+        <div className="profile-topbar-title">
+          <span>Profile Center</span>
+          <strong>Memory Vault</strong>
+        </div>
+        <div className="profile-topbar-actions">
+          <a href="/" className="profile-topbar-link" onClick={(e) => { e.preventDefault(); navigate('/'); }}>
             首页
           </a>
-          <button onClick={handleLogout} className="text-btn logout-btn">退出</button>
+          <button onClick={handleLogout} className="profile-topbar-button">退出登录</button>
         </div>
       </header>
 
-      <main className="content">
-        <div className="profile-card">
+      <main className="profile-shell">
+        <section className="profile-hero">
+          <span className="profile-hero-eyebrow">Account Settings</span>
+          <h1>管理你的个人信息与账户安全</h1>
+        </section>
 
-          <AvatarUploader currentAvatarUrl={currentAvatarUrl} onAvatarSaved={refreshUser} />
+        <div className="profile-grid">
+          <aside className="profile-panel profile-summary">
+            <div className="profile-identity-card">
+              <div className="profile-identity-copy">
+                <strong>{user?.nickname || '未设置昵称'}</strong>
+                <span className="profile-user-handle">@{user?.username}</span>
+                <p>你的头像、昵称和登录密码会在这里统一维护，后续只需要在一个地方完成资料更新。</p>
+              </div>
+            </div>
 
-          <div className="profile-section">
-            <p className="profile-username">@{user?.username}</p>
-            <NicknameEditor initialNickname={user?.nickname} onNicknameSaved={refreshUser} />
-          </div>
+            <div className="profile-info-list">
+              <div className="profile-info-row">
+                <span>账号名称</span>
+                <strong>@{user?.username}</strong>
+              </div>
+              <div className="profile-info-row">
+                <span>当前昵称</span>
+                <strong>{user?.nickname || '未设置'}</strong>
+              </div>
+              <div className="profile-info-row">
+                <span>资料维护</span>
+                <strong>头像 / 昵称 / 密码</strong>
+              </div>
+            </div>
 
-          <div className="profile-section">
-            <h3 className="profile-section-title">修改密码</h3>
-            <form onSubmit={savePassword}>
-              <label htmlFor="oldPassword">旧密码</label>
-              <input id="oldPassword" type="password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} placeholder="输入当前密码" autoComplete="current-password" />
+            <div className="profile-notice">
+              修改密码后，下次登录将使用新密码。头像支持 JPG、PNG、WEBP，文件大小不超过 2MB。
+            </div>
+          </aside>
 
-              <label htmlFor="newPassword">新密码</label>
-              <input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="至少 6 位新密码" autoComplete="new-password" />
+          <section className="profile-panel profile-editor">
+            <div className="profile-card-section">
+              <div className="profile-section-head">
+                <span>Profile</span>
+                <h2>基本信息</h2>
+                <p>先更新你的头像和昵称，让个人主页和互动信息更完整。</p>
+              </div>
 
-              <label htmlFor="confirmPassword">确认新密码</label>
-              <input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="再次输入新密码" autoComplete="new-password" />
+              <AvatarUploader currentAvatarUrl={currentAvatarUrl} onAvatarSaved={refreshUser} />
+              <NicknameEditor initialNickname={user?.nickname} onNicknameSaved={refreshUser} />
+            </div>
 
-              <button type="submit" disabled={savingPwd} className="save-btn-full">
-                {savingPwd ? '修改中...' : '修改密码'}
-              </button>
-              {pwdMsg && <p className="status-text success">{pwdMsg}</p>}
-              {pwdErr && <p className="status-text error">{pwdErr}</p>}
-            </form>
-          </div>
+            <div className="profile-card-section">
+              <div className="profile-section-head">
+                <span>Security</span>
+                <h2>修改密码</h2>
+                <p>建议定期更新密码，避免在多个站点复用同一套口令。</p>
+              </div>
 
-          <p className="hint">
-            <a href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }}>返回首页</a>
-          </p>
+              <form className="profile-password-form" onSubmit={savePassword}>
+                <div className="profile-field">
+                  <label htmlFor="oldPassword">旧密码</label>
+                  <input
+                    id="oldPassword"
+                    className="profile-input"
+                    type="password"
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    placeholder="输入当前密码"
+                    autoComplete="current-password"
+                  />
+                </div>
+
+                <div className="profile-field">
+                  <label htmlFor="newPassword">新密码</label>
+                  <input
+                    id="newPassword"
+                    className="profile-input"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="至少 6 位新密码"
+                    autoComplete="new-password"
+                  />
+                  <p className="profile-password-tip">建议使用字母、数字和不同字符组合，避免使用过于简单的常见密码。</p>
+                </div>
+
+                <div className="profile-field">
+                  <label htmlFor="confirmPassword">确认新密码</label>
+                  <input
+                    id="confirmPassword"
+                    className="profile-input"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="再次输入新密码"
+                    autoComplete="new-password"
+                  />
+                </div>
+
+                <button type="submit" disabled={savingPwd} className="profile-save-btn">
+                  {savingPwd ? '修改中...' : '更新密码'}
+                </button>
+                {pwdMsg && <p className="profile-status success">{pwdMsg}</p>}
+                {pwdErr && <p className="profile-status error">{pwdErr}</p>}
+              </form>
+            </div>
+
+            <a className="profile-footer-link" href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }}>
+              返回首页
+            </a>
+          </section>
         </div>
       </main>
     </div>

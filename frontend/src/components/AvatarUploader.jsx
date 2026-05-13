@@ -49,15 +49,23 @@ function AvatarUploader({ currentAvatarUrl, onAvatarSaved }) {
   }
 
   return (
-    <div className="profile-avatar-section">
-      <div className="profile-avatar" onClick={() => inputRef.current?.click()}>
-        {displayUrl ? (
-          <img src={displayUrl} alt="头像" />
-        ) : (
-          <span className="profile-avatar-placeholder">?</span>
-        )}
-        <div className="profile-avatar-overlay">更换</div>
+    <div className="profile-avatar-uploader">
+      <div className="profile-avatar-stage">
+        <div className="profile-avatar" onClick={() => inputRef.current?.click()}>
+          {displayUrl ? (
+            <img src={displayUrl} alt="头像" />
+          ) : (
+            <span className="profile-avatar-placeholder">MV</span>
+          )}
+          <div className="profile-avatar-overlay">更换头像</div>
+        </div>
+
+        <div className="profile-avatar-meta">
+          <strong>头像设置</strong>
+          <p>点击头像即可选择新图片。支持 JPG、PNG、WEBP，上传前会先显示本地预览。</p>
+        </div>
       </div>
+
       <input
         ref={inputRef}
         type="file"
@@ -66,12 +74,14 @@ function AvatarUploader({ currentAvatarUrl, onAvatarSaved }) {
         style={{ display: 'none' }}
       />
       {file && (
-        <button className="edit-btn save" style={{ marginTop: 8 }} disabled={uploading} onClick={handleUpload}>
-          {uploading ? '上传中...' : '保存头像'}
-        </button>
+        <div className="profile-avatar-actions">
+          <button className="profile-inline-btn" disabled={uploading} onClick={handleUpload}>
+            {uploading ? '上传中...' : '保存头像'}
+          </button>
+        </div>
       )}
-      {message && <p className="status-text success">{message}</p>}
-      {error && <p className="status-text error">{error}</p>}
+      {message && <p className="profile-status success">{message}</p>}
+      {error && <p className="profile-status error">{error}</p>}
     </div>
   );
 }

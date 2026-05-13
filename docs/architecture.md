@@ -95,6 +95,19 @@ Authentication pages now use a dedicated presentation layer:
 
 This keeps authentication UI changes isolated instead of mixing them into general page styles.
 
+Profile settings now use a dedicated presentation layer as well:
+
+- `frontend/src/styles/profile.css`
+  Profile-only layout and visual system
+- `frontend/src/pages/Profile.jsx`
+  Owns account-summary and security layout composition
+- `frontend/src/components/AvatarUploader.jsx`
+  Avatar update UI within the profile surface
+- `frontend/src/components/NicknameEditor.jsx`
+  Nickname update UI within the profile surface
+
+This keeps profile-page refinement independent from the rest of the product UI.
+
 ## Backend structure
 
 Key backend directories:

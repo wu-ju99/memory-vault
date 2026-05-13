@@ -2,6 +2,13 @@
 
 ## 2026-05-13
 
+### Profile UI
+
+- Added a standalone profile settings visual layer in `frontend/src/styles/profile.css`
+- Reworked the profile page into a dedicated account-center layout for avatar, nickname, and password editing
+- Unified avatar, nickname, and password form presentation without changing profile update APIs
+- Removed older mixed profile styling from the global stylesheet
+
 ### Authentication UI
 
 - Added a dedicated shared auth shell for login and register pages

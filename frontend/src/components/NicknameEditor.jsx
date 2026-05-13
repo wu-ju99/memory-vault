@@ -35,22 +35,23 @@ function NicknameEditor({ initialNickname, onNicknameSaved }) {
   }
 
   return (
-    <form className="profile-row" onSubmit={handleSubmit}>
-      <label className="profile-label">昵称</label>
-      <div className="profile-input-row">
+    <form className="profile-nickname-form" onSubmit={handleSubmit}>
+      <label className="profile-nickname-label">昵称</label>
+      <div className="profile-nickname-row">
         <input
+          className="profile-nickname-input"
           type="text"
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
           placeholder="设置昵称"
           autoComplete="nickname"
         />
-        <button type="submit" className="edit-btn save" disabled={saving}>
-          {saving ? '...' : '保存'}
+        <button type="submit" className="profile-inline-btn" disabled={saving}>
+          {saving ? '保存中...' : '保存昵称'}
         </button>
       </div>
-      {message && <p className="status-text success">{message}</p>}
-      {error && <p className="status-text error">{error}</p>}
+      {message && <p className="profile-status success">{message}</p>}
+      {error && <p className="profile-status error">{error}</p>}
     </form>
   );
 }
