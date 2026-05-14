@@ -2,6 +2,15 @@
 
 ## 2026-05-13
 
+### Security hardening
+
+- Fixed comment ID parsing so invalid comment and media identifiers no longer leak raw MySQL errors
+- Added username sanitization and max-length validation in authentication flows
+- Hardened `parseId` to reject non-positive identifiers consistently
+- Added backend rate limiting for auth, upload, and media search endpoints
+- Updated JWT config so production requires an explicit `JWT_SECRET`
+- Changed 5xx responses to return generic server errors instead of raw internal messages
+
 ### Media batch download
 
 - Added isolated multi-select and batch download controls to album detail media browsing

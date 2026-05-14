@@ -9,13 +9,26 @@ const { pool } = require('../config/db');
 const jwtConfig = require('../config/jwt');
 
 const SALT_ROUNDS = 10;
+const MAX_USERNAME_LENGTH = 50;
+
+function normalizeUsername(username) {
+  return String(username || '')
+    .trim()
+    .replace(/<[^>]*>/g, '')
+    .replace(/\s+/g, ' ');
+}
 
 /**
  * 用户注册
  */
 async function register(username, password, confirmPassword) {
-  if (!username || username.trim() === '') {
+  const normalizedUsername = normalizeUsername(username);
+
+  if (!normalizedUsername) {
     throw Object.assign(new Error('用户名不能为空'), { status: 400 });
+  }
+  if (normalizedUsername.length > MAX_USERNAME_LENGTH) {
+    throw Object.assign(new Error('用户名不能超过 50 个字符'), { status: 400 });
   }
   if (!password || password === '') {
     throw Object.assign(new Error('密码不能为空'), { status: 400 });
@@ -29,7 +42,7 @@ async function register(username, password, confirmPassword) {
 
   const [rows] = await pool.query(
     'SELECT id FROM users WHERE username = ?',
-    [username.trim()]
+    [normalizedUsername]
   );
   if (rows.length > 0) {
     throw Object.assign(new Error('用户名已存在'), { status: 409 });
@@ -39,7 +52,7 @@ async function register(username, password, confirmPassword) {
 
   await pool.query(
     'INSERT INTO users (username, password_hash) VALUES (?, ?)',
-    [username.trim(), passwordHash]
+    [normalizedUsername, passwordHash]
   );
 
   return { message: '注册成功' };
@@ -50,10 +63,12 @@ async function register(username, password, confirmPassword) {
  * @returns {object} { token, user: { id, username, role } }
  */
 async function login(username, password) {
+  const normalizedUsername = normalizeUsername(username);
+
   // 查询用户
   const [rows] = await pool.query(
     'SELECT id, username, nickname, avatar, password_hash, role FROM users WHERE username = ?',
-    [username]
+    [normalizedUsername]
   );
 
   if (rows.length === 0) {
@@ -99,14 +114,19 @@ async function login(username, password) {
  * @returns {object} 更新后的用户信息（不含密码）
  */
 async function updateProfile(userId, username, password, confirmPassword) {
-  if (!username || username.trim() === '') {
+  const normalizedUsername = normalizeUsername(username);
+
+  if (!normalizedUsername) {
     throw Object.assign(new Error('用户名不能为空'), { status: 400 });
+  }
+  if (normalizedUsername.length > MAX_USERNAME_LENGTH) {
+    throw Object.assign(new Error('用户名不能超过 50 个字符'), { status: 400 });
   }
 
   // 检查新用户名是否被其他用户占用
   const [existing] = await pool.query(
     'SELECT id FROM users WHERE username = ? AND id != ?',
-    [username.trim(), userId]
+    [normalizedUsername, userId]
   );
   if (existing.length > 0) {
     throw Object.assign(new Error('用户名已被占用'), { status: 409 });
@@ -122,12 +142,12 @@ async function updateProfile(userId, username, password, confirmPassword) {
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
     await pool.query(
       'UPDATE users SET username = ?, password_hash = ? WHERE id = ?',
-      [username.trim(), passwordHash, userId]
+      [normalizedUsername, passwordHash, userId]
     );
   } else {
     await pool.query(
       'UPDATE users SET username = ? WHERE id = ?',
-      [username.trim(), userId]
+      [normalizedUsername, userId]
     );
   }
 

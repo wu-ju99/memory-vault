@@ -10,6 +10,7 @@ This file tracks implemented product behavior, not future ideas.
 - Protected routes on the frontend
 - Automatic token attachment on API requests
 - Automatic local logout on `401` responses
+- Username input is sanitized and limited to 50 characters
 
 ## Profile
 
@@ -61,6 +62,8 @@ This file tracks implemented product behavior, not future ideas.
 - Nested tree rendering
 - Delete own comments
 - Admin can delete any comment
+- Comment IDs and media IDs are validated before database access
+- Comment content is limited to 2000 characters
 
 ## Admin
 
@@ -125,6 +128,13 @@ Search/filter SQL is isolated in dedicated query services:
 - `adminMediaQueryService`
 
 CRUD and permission side effects remain in the original management services.
+
+## Security guardrails
+
+- Auth endpoints are rate-limited
+- Media upload is rate-limited
+- Media list search is rate-limited
+- Production JWT signing now requires `JWT_SECRET`
 
 ## No schema change for search/filter
 

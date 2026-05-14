@@ -34,6 +34,8 @@ Request body:
 Notes:
 
 - `username` is required
+- `username` max length is `50`
+- HTML tags in `username` are stripped before storage
 - password minimum length is `6`
 - `confirm_password` must match `password`
 
@@ -82,6 +84,7 @@ Request body:
 Notes:
 
 - `username` is required
+- `username` max length is `50`
 - if `password` is sent, `confirm_password` must also match
 
 ## User
@@ -346,6 +349,8 @@ Notes:
 
 - `parent_id` is optional
 - empty content is rejected
+- `content` max length is `2000`
+- invalid `media_id` or `parent_id` returns a `400` validation error
 
 ### `GET /comments/:mediaId`
 

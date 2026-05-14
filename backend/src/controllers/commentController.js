@@ -2,7 +2,9 @@
  * 评论控制器（支持回复/树形结构）
  */
 
+const { pool } = require('../config/db');
 const commentService = require('../services/commentService');
+const parseId = require('../utils/parseId');
 
 // 将平铺数据转为树结构
 function buildTree(comments) {
@@ -29,11 +31,17 @@ function buildTree(comments) {
 async function create(req, res, next) {
   try {
     const { media_id, content, parent_id } = req.body;
-    if (!media_id) return res.status(400).json({ message: 'media_id 不能为空' });
+    if (media_id === undefined || media_id === null || media_id === '') {
+      return res.status(400).json({ message: 'media_id 不能为空' });
+    }
     if (!content || !content.trim()) return res.status(400).json({ message: '评论内容不能为空' });
+    if (content.trim().length > 2000) {
+      return res.status(400).json({ message: '评论内容不能超过 2000 个字符' });
+    }
 
-    const parentId = parent_id ? parseInt(parent_id, 10) || null : null;
-    const result = await commentService.create(req.user.id, media_id, content.trim(), parentId);
+    const mediaId = parseId(media_id, '媒体 ID');
+    const parentId = parent_id ? parseId(parent_id, '父评论 ID') : null;
+    const result = await commentService.create(req.user.id, mediaId, content.trim(), parentId);
     res.status(201).json(result);
   } catch (error) {
     next(error);
@@ -43,7 +51,7 @@ async function create(req, res, next) {
 // GET /api/comments/:mediaId（返回树结构）
 async function list(req, res, next) {
   try {
-    const mediaId = parseInt(req.params.mediaId, 10);
+    const mediaId = parseId(req.params.mediaId, '媒体 ID');
     const rows = await commentService.getByMedia(mediaId);
     res.json({ comments: buildTree(rows) });
   } catch (error) {
@@ -54,8 +62,7 @@ async function list(req, res, next) {
 // DELETE /api/comments/:id（级联删除回复）
 async function remove(req, res, next) {
   try {
-    const commentId = parseInt(req.params.id, 10);
-    const { pool } = require('../config/db');
+    const commentId = parseId(req.params.id, '评论 ID');
     const [rows] = await pool.query(
       'SELECT user_id FROM comments WHERE id = ?', [commentId]
     );

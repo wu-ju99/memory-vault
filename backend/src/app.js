@@ -51,7 +51,10 @@ app.use((err, req, res, next) => {
   if (status >= 500) {
     console.error('[Error]', err);
   }
-  res.status(status).json({ message: err.message || '服务器内部错误' });
+  if (status >= 500) {
+    return res.status(500).json({ message: '服务器内部错误' });
+  }
+  return res.status(status).json({ message: err.message || '请求失败' });
 });
 
 module.exports = app;

@@ -37,6 +37,7 @@ Memory Vault is a private photo and video sharing application with:
 - Backend: Express 4
 - Database: MySQL 8
 - Upload handling: Multer
+- Basic API protection: `express-rate-limit`
 
 Default local addresses:
 
@@ -75,6 +76,11 @@ The backend currently reads MySQL config from `backend/src/config/db.js`:
 - database: `memory_vault`
 
 Make sure local MySQL matches that configuration, or update the file before starting the backend.
+
+## Security configuration notes
+
+- Set `JWT_SECRET` in production. The backend now throws on startup if production uses the default development secret.
+- Optional: set `JWT_EXPIRES_IN` to override the default `7d` token lifetime.
 
 ## Search and filter notes
 
